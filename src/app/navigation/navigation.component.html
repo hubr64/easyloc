@@ -4,7 +4,7 @@
       [mode]="(isHandset$ | async) ? 'over' : 'side'"
       [opened]="(isHandset$ | async) === false">
     <mat-nav-list>
-      <img src="/assets/logo_sans_titre_small.png" alt="EasyLoc">
+      <img src="assets/logo_sans_titre_small.png" alt="EasyLoc">
       <a mat-list-item routerLink="/dashboard" title="Tableau de bord" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>dashboard</mat-icon></a>
       <a mat-list-item routerLink="/browse" title="Parcourir" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>view_stream</mat-icon></a>
       <mat-divider></mat-divider>
@@ -37,7 +37,7 @@
       <app-my></app-my>
     </mat-toolbar>
     <div *ngIf="isLoading || !isLoggedIn || !isCompliant" class="loading-message" matRipple [matRippleUnbounded]="true" [matRippleRadius]="250">
-        <img src="/assets/logo_sans_titre.png" alt="EasyLoc">
+        <img src="assets/logo_sans_titre.png" alt="EasyLoc">
         <div>Easy<b>LOC</b></div>
         <mat-progress-bar *ngIf="isLoading" color="primary" mode="indeterminate"></mat-progress-bar>
         <div *ngIf="isLoading">Chargement en cours...</div>

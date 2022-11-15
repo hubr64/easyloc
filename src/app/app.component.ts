@@ -15,7 +15,7 @@ export class AppComponent {
     private domSanitizer: DomSanitizer){
     this.matIconRegistry.addSvgIcon(
       'bailleur',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('../assets/bailleur.svg')
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/bailleur.svg')
     );
   }
 }
