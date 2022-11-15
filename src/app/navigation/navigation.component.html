@@ -1,0 +1,56 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport
+      [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+      [mode]="(isHandset$ | async) ? 'over' : 'side'"
+      [opened]="(isHandset$ | async) === false">
+    <mat-nav-list>
+      <img src="/assets/logo_sans_titre_small.png" alt="EasyLoc">
+      <a mat-list-item routerLink="/dashboard" title="Tableau de bord" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>dashboard</mat-icon></a>
+      <a mat-list-item routerLink="/browse" title="Parcourir" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>view_stream</mat-icon></a>
+      <mat-divider></mat-divider>
+      <a mat-list-item routerLink="/biens" title="Biens" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>apartment</mat-icon></a>
+      <a mat-list-item routerLink="/locataires" title="Locataires" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>people</mat-icon></a>
+      <a mat-list-item routerLink="/bails" title="Baux" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>assignment</mat-icon></a>
+      <a mat-list-item routerLink="/bailleurs" title="Bailleurs" routerLinkActive="mat-nav-accent"><mat-icon matListIcon svgIcon="bailleur"></mat-icon></a>
+      <a mat-list-item routerLink="/mouvements" title="Mouvements" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>euro_symbol</mat-icon></a>
+      <a mat-list-item routerLink="/pieces" title="Documents" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>book</mat-icon></a>
+      <mat-divider></mat-divider>
+      <a mat-list-item routerLink="/impots" title="Impots" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>account_balance</mat-icon></a>
+      <a mat-list-item routerLink="/statistiques" title="Statistiques" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>query_stats</mat-icon></a>
+      <a mat-list-item (click)="mail()" title="Envoyer un email"><mat-icon matListIcon>mail</mat-icon></a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+      <button
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle()"
+        *ngIf="isHandset$ | async">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span class="name">Easy<b>Loc</b></span>
+      <span class="flex"></span>
+      <button mat-icon-button *ngIf="!documentService.autoSave" (click)="saveDocument()" title="Sauvegarder" [disabled]="!documentService.docIsModified"><mat-icon [matBadge]="documentService.docIsModified?'!':''" matBadgeColor="warn">save</mat-icon></button>
+      <button mat-icon-button (click)="toggleTheme()" title="Changer de thème"><mat-icon *ngIf="darkModeCheck">dark_mode</mat-icon><mat-icon *ngIf="!darkModeCheck">light_mode</mat-icon></button>
+      <app-my></app-my>
+    </mat-toolbar>
+    <div *ngIf="isLoading || !isLoggedIn || !isCompliant" class="loading-message" matRipple [matRippleUnbounded]="true" [matRippleRadius]="250">
+        <img src="/assets/logo_sans_titre.png" alt="EasyLoc">
+        <div>Easy<b>LOC</b></div>
+        <mat-progress-bar *ngIf="isLoading" color="primary" mode="indeterminate"></mat-progress-bar>
+        <div *ngIf="isLoading">Chargement en cours...</div>
+        <div *ngIf="!isLoading">pour vous simplifier la location...</div>
+      </div>
+    <div *ngIf="(!isLoading && isLoggedIn && isCompliant)">
+      <router-outlet></router-outlet>
+    </div>
+    <div *ngIf="(!isLoading && !isLoggedIn)" class="connect-msg">
+      <mat-icon>warning</mat-icon>Vous devez d'abord vous connecter ! <mat-icon color="warn">reply</mat-icon>
+    </div>
+    <div *ngIf="(!isLoading && isLoggedIn && !isCompliant)"class="connect-msg">
+      <mat-icon>warning</mat-icon>Vous êtes connectés mais la configuration n'est pas correcte ! <mat-icon color="warn">reply</mat-icon>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

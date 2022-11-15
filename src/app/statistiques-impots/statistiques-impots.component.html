@@ -1,0 +1,252 @@
+<mat-toolbar color="primary" class="primary-darker sticky-toolbar" *ngIf="!defaultBien">
+    <button mat-icon-button (click)="goBack()"><mat-icon>chevron_left</mat-icon></button>
+    <mat-icon>account_balance</mat-icon>
+    <span>Déclaration Impôts</span>
+    <span class="flex"></span>
+</mat-toolbar>
+
+<div class="configuration-form">
+    <mat-form-field appearance="standard">
+        <mat-label>Exercice fiscal</mat-label>
+        <mat-select #annee required [(ngModel)]="selectedAnnee" [disabled]="computeEnded">
+            <mat-option *ngFor="let number of annees" [value]="number">
+                Exercice fiscal {{number}} (revenus de {{number-1}})
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="standard" *ngIf="!defaultBien">
+        <mat-label>Bien déclaré</mat-label>
+        <mat-select #bien required [(ngModel)]="selectedBien" [disabled]="computeEnded">
+            <mat-option [value]="'total'">Tous</mat-option>
+            <mat-option *ngFor="let bien of documentService.document.biens" [value]="bien.nom">
+                {{bien.nom}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <button mat-flat-button color="accent" type="button" (click)="computeImpots()" *ngIf="!computeEnded"><mat-icon>calculate</mat-icon>Calculer</button>
+    <button mat-flat-button color="accent" type="button" (click)="reset()" *ngIf="computeEnded"><mat-icon>edit</mat-icon>Retour</button>
+</div>
+<div class="configuration-form">
+</div>
+
+<div class="result" *ngIf="computeEnded">
+    <table cellpadding="4" cellspacing="0">
+        <tr class="main-category">
+            <td>Bien</td>
+            <ng-container *ngIf="selectedBien=='total'">
+                <td *ngFor="let bien of documentService.document.biens">{{bien.nom}}</td>
+                <td>Total</td>
+            </ng-container>
+            <ng-container *ngIf="selectedBien!='total'">
+                <td>{{selectedBien}}</td>
+            </ng-container>
+            <td>Pointage</td>
+        </tr>
+        <tr class="main-category in">
+            <td>Revenus</td>
+            <ng-container *ngIf="selectedBien=='total'">
+                <td *ngFor="let bien of documentService.document.biens">
+                    {{(bienTotal[bien.nom][this.selectedAnnee-1]?bienTotal[bien.nom][this.selectedAnnee-1].totalIn:0)| currency:'EUR':'symbol':'1.0-0'}}
+                </td>
+                <td>{{(bienTotal['total'][this.selectedAnnee-1]?bienTotal['total'][this.selectedAnnee-1].totalIn:0) | currency:'EUR':'symbol':'1.0-0'}}</td>
+            </ng-container>
+            <ng-container *ngIf="selectedBien!='total'">
+                <td>
+                    {{(bienTotal[selectedBien][this.selectedAnnee-1]?bienTotal[selectedBien][this.selectedAnnee-1].totalIn:0) | currency:'EUR':'symbol':'1.0-0'}}
+                </td>
+            </ng-container>
+            <td>211</td>
+        </tr>
+        <ng-container *ngFor="let txt of txtIn">
+            <tr class="sub-category in">
+                <td>{{txt}}</td>
+                <ng-container *ngIf="selectedBien=='total'">
+                    <td *ngFor="let bien of documentService.document.biens">
+                        {{(mouvementClassifiedIn[bien.nom][this.selectedAnnee-1]?mouvementClassifiedIn[bien.nom][this.selectedAnnee-1].mouvements[txt].total:0)| currency:'EUR':'symbol':'1.0-0'}}
+                    </td>
+                    <td>{{getTotalForTxt(this.selectedAnnee-1, 'in', txt) | currency:'EUR':'symbol':'1.0-0' }}</td>
+                </ng-container>
+                <ng-container *ngIf="selectedBien!='total'">
+                    <td>
+                        {{mouvementClassifiedIn[selectedBien][this.selectedAnnee-1].mouvements[txt].total| currency:'EUR':'symbol':'1.0-0'}}
+                    </td>
+                </ng-container>
+                <td>&nbsp;</td>
+            </tr>
+            <ng-container *ngIf="selectedBien!='total'">
+                <tr class="details-category" *ngFor="let mouvement of mouvementClassifiedIn[selectedBien][this.selectedAnnee-1].mouvements[txt].liste">
+                    <td class="details-category">{{mouvement.libelle}}</td>
+                    <td class="details-category">{{mouvement.montant | currency:'EUR':'symbol':'1.0-0'}}</td>
+                    <td class="details-category">&nbsp;</td>
+                </tr>
+            </ng-container>
+        </ng-container>
+        <tr class="main-category out">
+            <td>Micro-foncier ({{forfaitDeduction*100}}%)</td>
+            <ng-container *ngIf="selectedBien=='total'">
+                <td *ngFor="let bien of documentService.document.biens">
+                    <mat-icon color="primary" *ngIf="bienTotal[bien.nom][this.selectedAnnee-1]?bienTotal[bien.nom][this.selectedAnnee-1].bestForfait:false">done</mat-icon>
+                    {{(bienTotal[bien.nom][this.selectedAnnee-1]?bienTotal[bien.nom][this.selectedAnnee-1].totalIn * forfaitDeduction:0) | currency:'EUR':'symbol':'1.0-0'}}
+                </td>
+                <td>
+                    <mat-icon color="primary" *ngIf="bienTotal['total'][this.selectedAnnee-1]?bienTotal['total'][this.selectedAnnee-1].bestForfait:false">done</mat-icon>
+                    {{(bienTotal['total'][this.selectedAnnee-1]?bienTotal['total'][this.selectedAnnee-1].totalIn * forfaitDeduction:0) | currency:'EUR':'symbol':'1.0-0'}}
+                </td>
+            </ng-container>
+            <ng-container *ngIf="selectedBien!='total'">
+                <td>
+                    <mat-icon color="primary" *ngIf="bienTotal[selectedBien][this.selectedAnnee-1]?bienTotal[selectedBien][this.selectedAnnee-1].bestForfait:false">done</mat-icon>
+                    {{(bienTotal[selectedBien][this.selectedAnnee-1]?bienTotal[selectedBien][this.selectedAnnee-1].totalIn * forfaitDeduction:0) | currency:'EUR':'symbol':'1.0-0'}}
+                </td>
+            </ng-container>
+            <td>&nbsp;</td>
+        </tr>
+        <tr class="main-category out">
+            <td>Déductions Réelles</td>
+            <ng-container *ngIf="selectedBien=='total'">
+                <td *ngFor="let bien of documentService.document.biens">
+                    <mat-icon color="primary" *ngIf="bienTotal[bien.nom][this.selectedAnnee-1]?!bienTotal[bien.nom][this.selectedAnnee-1].bestForfait:false">done</mat-icon>
+                    {{(bienTotal[bien.nom][this.selectedAnnee-1]?-bienTotal[bien.nom][this.selectedAnnee-1].totalOut:0) | currency:'EUR':'symbol':'1.0-0'}}
+                </td>
+                <td>
+                    <mat-icon color="primary" *ngIf="bienTotal['total'][this.selectedAnnee-1]?!bienTotal['total'][this.selectedAnnee-1].bestForfait:false">done</mat-icon>
+                    {{(bienTotal['total'][this.selectedAnnee-1]?-bienTotal['total'][this.selectedAnnee-1].totalOut:0) | currency:'EUR':'symbol':'1.0-0'}}
+                </td>
+            </ng-container>
+            <ng-container *ngIf="selectedBien!='total'">
+                <td>
+                    <mat-icon color="primary" *ngIf="bienTotal[selectedBien][this.selectedAnnee-1]?!bienTotal[selectedBien][this.selectedAnnee-1].bestForfait:false">done</mat-icon>
+                    {{(bienTotal[selectedBien][this.selectedAnnee-1]?-bienTotal[selectedBien][this.selectedAnnee-1].totalOut:0) | currency:'EUR':'symbol':'1.0-0'}}
+                </td>
+            </ng-container>
+            <td>&nbsp;</td>
+        </tr>
+        <ng-container *ngFor="let txt of txtOut">
+            <tr class="sub-category out">
+                <td>{{txt}}</td>
+                <ng-container *ngIf="selectedBien=='total'">
+                    <td *ngFor="let bien of documentService.document.biens">
+                        {{(mouvementClassifiedOut[bien.nom][this.selectedAnnee-1]?-mouvementClassifiedOut[bien.nom][this.selectedAnnee-1].mouvements[txt].total:0) | currency:'EUR':'symbol':'1.0-0'}}
+                    </td>
+                    <td>{{-getTotalForTxt(this.selectedAnnee-1, 'out', txt) | currency:'EUR':'symbol':'1.0-0' }}</td>
+                </ng-container>
+                <ng-container *ngIf="selectedBien!='total'">
+                    <td>
+                        {{-mouvementClassifiedOut[selectedBien][this.selectedAnnee-1].mouvements[txt].total | currency:'EUR':'symbol':'1.0-0'}}
+                    </td>
+                </ng-container>
+                <td>{{getPointage(txt)}}</td>
+            </tr>
+            <ng-container *ngIf="selectedBien!='total'">
+                <tr *ngFor="let mouvement of mouvementClassifiedOut[selectedBien][this.selectedAnnee-1].mouvements[txt].liste">
+                    <td class="details-category">{{mouvement.libelle}}</td>
+                    <td class="details-category">{{-mouvement.montant | currency:'EUR':'symbol':'1.0-0'}}</td>
+                    <td class="details-category">&nbsp;</td>
+                </tr>
+            </ng-container>
+        </ng-container>
+
+        <tr class="main-category regul">
+            <td>Régularisation de charges {{this.selectedAnnee-2}}</td>
+            <ng-container *ngIf="selectedBien=='total'">
+                <td *ngFor="let bien of documentService.document.biens">
+                    {{getRegularisationCharges(bien.nom) | currency:'EUR':'symbol':'1.0-0'}}
+                </td>
+                <td>
+                    {{getRegularisationCharges('total') | currency:'EUR':'symbol':'1.0-0'}}
+                </td>
+            </ng-container>
+            <ng-container *ngIf="selectedBien!='total'">
+                <td>
+                    {{getRegularisationCharges(selectedBien) | currency:'EUR':'symbol':'1.0-0'}}
+                </td>
+            </ng-container>
+            <td>230</td>
+        </tr>
+        <tr class="sub-category regul">
+            <td>Charges récupérables sur le locataire</td>
+            <ng-container *ngIf="selectedBien=='total'">
+                <td *ngFor="let bien of documentService.document.biens">
+                    {{ (this.mouvementClassifiedIn[bien.nom][this.selectedAnnee-2]?this.mouvementClassifiedIn[bien.nom][this.selectedAnnee-2].charges:0) | currency:'EUR':'symbol':'1.0-0' }}
+                </td>
+                <td>{{getChargesRecuperablesTotal(this.selectedAnnee-2) | currency:'EUR':'symbol':'1.0-0' }}</td>
+            </ng-container>
+            <ng-container *ngIf="selectedBien!='total'">
+                <td>
+                    {{ (this.mouvementClassifiedIn[selectedBien][this.selectedAnnee-2]?this.mouvementClassifiedIn[selectedBien][this.selectedAnnee-2].charges:0) | currency:'EUR':'symbol':'1.0-0' }}
+                </td>
+            </ng-container>
+            <td>&nbsp;</td>
+        </tr>
+        <tr class="sub-category regul">
+            <td>Charges non déductibles</td>
+            <ng-container *ngIf="selectedBien=='total'">
+                <td *ngFor="let bien of documentService.document.biens">
+                    <mat-form-field appearance="standard">
+                        <input matInput [(ngModel)]="regulCharges[bien.nom].chargeNonDeductible" type="number">
+                        <mat-icon matSuffix>euro_symbol</mat-icon>
+                        <mat-hint align="end">Selon réddition charges {{this.selectedAnnee-2}}</mat-hint>
+                    </mat-form-field>
+                </td>
+                <td>{{getChargesNonDeductiblesTotal() | number: '1.0-0' | currency:'EUR':'symbol':'1.0-0'}} </td>
+            </ng-container>
+            <ng-container *ngIf="selectedBien!='total'">
+                <td>
+                    <mat-form-field appearance="standard">
+                        <input matInput [(ngModel)]="regulCharges[selectedBien].chargeNonDeductible" type="number">
+                        <mat-icon matSuffix>euro_symbol</mat-icon>
+                        <mat-hint align="end">Selon réddition charges {{this.selectedAnnee-2}}</mat-hint>
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <td>&nbsp;</td>
+        </tr>
+        <tr class="sub-category regul">
+            <td>Trop perçu de charges</td>
+            <ng-container *ngIf="selectedBien=='total'">
+                <td *ngFor="let bien of documentService.document.biens">
+                    <mat-form-field appearance="standard">
+                        <input matInput [(ngModel)]="regulCharges[bien.nom].chargeTropPercu" type="number">
+                        <mat-icon matSuffix>euro_symbol</mat-icon>
+                        <mat-hint align="end">Selon réddition charges {{this.selectedAnnee-2}}</mat-hint>
+                    </mat-form-field>
+                </td>
+                <td>{{getChargeTropPercuTotal()  | currency:'EUR':'symbol':'1.0-0' }}</td>
+            </ng-container>
+            <ng-container *ngIf="selectedBien!='total'">
+                <td>
+                    <mat-form-field appearance="standard">
+                        <input matInput [(ngModel)]="regulCharges[selectedBien].chargeTropPercu" type="number">
+                        <mat-icon matSuffix>euro_symbol</mat-icon>
+                        <mat-hint align="end">Selon réddition charges {{this.selectedAnnee-2}}</mat-hint>
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <td>&nbsp;</td>
+        </tr>
+        <tr class="main-category">
+            <td>
+                A déclarer<br><i>Revenus - Déductions + Régularisation</i><br>
+                <mat-radio-group [(ngModel)]="selectedRegime">
+                    <mat-radio-button value="1">Réel</mat-radio-button>
+                    <mat-radio-button value="2">Micro-foncier</mat-radio-button>
+                </mat-radio-group>
+            </td>
+            <ng-container *ngIf="selectedBien=='total'">
+                <td *ngFor="let bien of documentService.document.biens">
+                    {{getValueToDeclare(bien.nom, selectedAnnee-1) | currency:'EUR':'symbol':'1.0-0'}}
+                </td>
+                <td>
+                    {{getValueToDeclare('total', selectedAnnee-1) | currency:'EUR':'symbol':'1.0-0'}}
+                </td>
+            </ng-container>
+            <ng-container *ngIf="selectedBien!='total'">
+                <td>
+                    {{getValueToDeclare(selectedBien, selectedAnnee-1) | currency:'EUR':'symbol':'1.0-0'}}
+                </td>
+            </ng-container>
+            <td>4BA</td>
+        </tr>
+    </table>
+
+</div>

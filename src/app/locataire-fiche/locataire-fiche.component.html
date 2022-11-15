@@ -1,0 +1,33 @@
+<mat-toolbar color="primary" class="primary-darker sticky-toolbar">
+    <button mat-icon-button (click)="goBack()"><mat-icon>chevron_left</mat-icon></button>
+    <mat-icon>people</mat-icon>
+    <span>Fiche descriptive de locataire</span>
+    <span class="flex"></span>
+    <button mat-icon-button [matMenuTriggerFor]="menuListe">
+        <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menuListe="matMenu" yPosition="below" [overlapTrigger]="false">
+        <button mat-menu-item [routerLink]="'/locataire/'+locataire.id"><mat-icon>edit</mat-icon> Modifier</button>
+        <button mat-menu-item [routerLink]="'/locataire/new'"><mat-icon>add</mat-icon> Nouveau</button>
+        <button mat-menu-item (click)="export()"><mat-icon>file_download</mat-icon> Exporter</button>
+    </mat-menu>
+</mat-toolbar>
+
+<div id="fiche" #fiche>
+   
+    <mat-card class="card-box">
+        <mat-card-header>
+            <div mat-card-avatar class="avatar-letter">{{locataire.nom[0]}}</div>
+            <mat-card-title><mat-icon>people</mat-icon>{{locataire.nom}}</mat-card-title>
+            <mat-card-subtitle>{{locataire.mail}} - {{locataire.telephone}}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-actions data-html2canvas-ignore>
+            <button mat-icon-button color="accent" routerLink="/locataire/{{locataire.id}}" ><mat-icon>edit</mat-icon> </button>
+            <button mat-icon-button color="accent" (click)="contact(locataire.mail)"><mat-icon>email</mat-icon> </button>
+        </mat-card-actions>
+        <mat-card-footer *ngIf="locataire.commentaire">{{locataire.commentaire}}</mat-card-footer>
+    </mat-card>
+
+    <app-pieces-jointes-fiche [container]="locataire" [piecesObligatoires]="piecesObligatoires"></app-pieces-jointes-fiche>
+    
+</div>

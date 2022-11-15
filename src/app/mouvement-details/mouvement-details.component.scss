@@ -1,0 +1,27 @@
+form{
+    width: 100%;
+    margin: -5px auto 15px;
+}
+.mat-form-field {
+    width: 100%;
+    margin-bottom: 5px;
+}
+textarea{
+    min-height: 300px;
+}
+.mini-chip{
+    align-items: center;
+    border-radius: 15px;
+    border: 1px solid #DDD;
+    box-sizing: border-box;
+    display: flex;
+    height: 30px;
+    padding: 0 12px;
+    margin: 0 4px 4px 0;
+    white-space: nowrap;
+    max-width: 300px;
+}
+.mini-chip mat-icon{
+    font-size: 20px;
+    margin-top: 6px;
+}

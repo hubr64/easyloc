@@ -1,0 +1,176 @@
+<mat-toolbar color="primary" class="primary-darker sticky-toolbar" *ngIf="!embedded">
+    <button mat-icon-button (click)="goBack()"><mat-icon>chevron_left</mat-icon></button>
+    <mat-icon>assignment</mat-icon>
+    <span>Liste des baux</span>
+    <span class="flex"></span>
+    <button mat-icon-button [matMenuTriggerFor]="menuListe">
+        <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menuListe="matMenu" yPosition="below" [overlapTrigger]="false">
+        <button mat-menu-item (click)="add()"><mat-icon>add</mat-icon> Nouveau</button>
+        <button mat-menu-item [disabled]="!selection.hasValue()" [matMenuTriggerFor]="selectionnes"><mat-icon>check</mat-icon> Sélection</button>
+        <button mat-menu-item (click)="export()"><mat-icon>file_download</mat-icon> Exporter</button>
+        <button mat-menu-item routerLink="/new/bail"><mat-icon>support</mat-icon> Assistant</button>
+    </mat-menu>
+    <mat-menu #selectionnes="matMenu">
+        <button mat-menu-item (click)="deleteAll()"><mat-icon>delete</mat-icon> Supprimer</button>
+    </mat-menu>
+</mat-toolbar>
+    
+    <div class="filter-box">
+        <mat-form-field appearance="standard" *ngIf="!defaultBien">
+            <mat-label>Bien</mat-label>
+            <mat-icon matPrefix>apartment</mat-icon> 
+            <mat-select [formControl]="bienFilter">
+                <mat-option value="" selected>Tous</mat-option>
+                <mat-option *ngFor="let bien of documentService.document.biens" [value]="bien.id">
+                    {{bien.nom}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="standard" *ngIf="!defaultLocataire">
+            <mat-label>Locataire</mat-label>
+            <mat-icon matPrefix>people</mat-icon> 
+            <mat-select [formControl]="locataireFilter">
+                <mat-option value="" selected>Tous</mat-option>
+                <mat-option *ngFor="let locataire of documentService.document.locataires" [value]="locataire.id">
+                    {{locataire.nom}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="standard">
+            <mat-label>Type</mat-label>
+            <mat-icon matPrefix>other_houses</mat-icon> 
+            <mat-select [formControl]="typeFilter">
+                <mat-option value="" selected>Tous</mat-option>
+                <mat-option value="rented">Loué</mat-option>
+                <mat-option value="unrented">Non loué</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="standard">
+            <mat-label>Bail recherché</mat-label>
+            <mat-icon matPrefix>notes</mat-icon> 
+            <input [formControl]="searchFilter" matInput>
+        </mat-form-field>
+        <button color="accent" mat-flat-button (click)="clearFilter()"><mat-icon>clear</mat-icon></button>
+    </div>
+    
+    <div class="responsive">
+        <table mat-table [dataSource]="dataSource" class="full-width-table" matSort matSortActive="dateDebut" matSortDirection="desc">
+            <ng-container matColumnDef="select" *ngIf="!embedded">
+                <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox (change)="$event ? masterToggle() : null"
+                                [checked]="selection.hasValue() && isAllSelected()"
+                                [indeterminate]="selection.hasValue() && !isAllSelected()">
+                    </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="$event ? selection.toggle(row) : null"
+                                [checked]="selection.isSelected(row)">
+                    </mat-checkbox>
+                </td>
+                <td mat-footer-cell *matFooterCellDef>&nbsp;</td>
+            </ng-container>
+                        
+            <ng-container matColumnDef="locataire">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Locataire</th>
+                <td mat-cell *matCellDef="let row"><a [routerLink]="'/fiche/locataire/'+row.locataire?.id">{{row.locataire?.nom}}</a></td>
+                <td mat-footer-cell *matFooterCellDef>&nbsp;</td>
+            </ng-container>
+                        
+            <ng-container matColumnDef="bien">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Bien</th>
+                <td mat-cell *matCellDef="let row"><a [routerLink]="'/fiche/bien/'+row.bien?.id">{{row.bien?.nom}}</a></td>
+                <td mat-footer-cell *matFooterCellDef>&nbsp;</td>
+            </ng-container>
+    
+            <ng-container matColumnDef="dateDebut">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Début</th>
+                <td mat-cell *matCellDef="let row">{{row.dateDebut| date:'longDate':'fr-FR' }}</td>
+                <td mat-footer-cell *matFooterCellDef>&nbsp;</td>
+            </ng-container>
+    
+            <ng-container matColumnDef="dateFin">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Fin</th>
+                <td mat-cell *matCellDef="let row">{{row.dateFin?(row.dateFin| date:'longDate':'fr-FR'):'-' }}</td>
+                <td mat-footer-cell *matFooterCellDef>Total</td>
+            </ng-container>
+                        
+            <ng-container matColumnDef="loyer">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Loyer</th>
+                <td mat-cell *matCellDef="let row">
+                    {{row.loyer| currency:'EUR':'symbol':'1.2-2'}}
+                    <ng-container *ngVar="documentService.getLoyerToUpdate(row) as loyerToUpdate">
+                        <mat-icon title="Loyer modifiable" color="warn" *ngIf="loyerToUpdate && loyerToUpdate.toUpdate">warning</mat-icon>
+                        <mat-icon title="Loyer à jour" color="primary" *ngIf="loyerToUpdate && !loyerToUpdate.toUpdate">done</mat-icon>
+                        <mat-icon title="Loyer inactif" disabled *ngIf="!loyerToUpdate">hide_source</mat-icon>
+                    </ng-container>
+                </td>
+                <td mat-footer-cell *matFooterCellDef>{{getTotalLoyer() | currency:'EUR':'symbol':'1.2-2'}}</td>
+            </ng-container>
+                        
+            <ng-container matColumnDef="charges" *ngIf="!embedded">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Charges</th>
+                <td mat-cell *matCellDef="let row">{{row.charges| currency:'EUR':'symbol':'1.2-2'}}</td>
+                <td mat-footer-cell *matFooterCellDef>{{getTotalCharges() | currency:'EUR':'symbol':'1.2-2'}}</td>
+            </ng-container>
+                        
+            <ng-container matColumnDef="total" *ngIf="!embedded">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Total</th>
+                <td mat-cell *matCellDef="let row">{{row.loyer+row.charges| currency:'EUR':'symbol':'1.2-2'}}</td>
+                <td mat-footer-cell *matFooterCellDef>{{getTotalLoyer()+getTotalCharges() | currency:'EUR':'symbol':'1.2-2'}}</td>
+            </ng-container>
+                        
+            <ng-container matColumnDef="paiement" *ngIf="!embedded">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Paiement</th>
+                <td mat-cell *matCellDef="let row">{{row.paiementDate| date:'d':'fr-FR' }} du mois ({{bailTypePaiements[row.paiementType]}})</td>
+                <td mat-footer-cell *matFooterCellDef>&nbsp;</td>
+            </ng-container>
+                        
+            <ng-container matColumnDef="impayes">
+                <th mat-header-cell *matHeaderCellDef>Impayés</th>
+                <td mat-cell *matCellDef="let row">
+                    <ng-container *ngVar="documentService.getUnpaiedLoyer(row) as unpaiedLoyer">
+                        <mat-icon color="warn" *ngIf="unpaiedLoyer.length>0" title="{{unpaiedLoyer.length}} loyer(s) impayé(s)">error</mat-icon>
+                        <mat-icon color="accent" *ngIf="unpaiedLoyer.length==0" title="Tous les loyers à jours">done</mat-icon>
+                    </ng-container>
+                </td>
+                <td mat-footer-cell *matFooterCellDef>&nbsp;</td>
+            </ng-container>
+    
+            <ng-container matColumnDef="pieces" *ngIf="!embedded">
+                <th mat-header-cell *matHeaderCellDef>Pièces</th>
+                <td mat-cell *matCellDef="let row"><app-pieces-jointes-liste [container]="row"></app-pieces-jointes-liste></td>
+                <td mat-footer-cell *matFooterCellDef>&nbsp;</td>
+            </ng-container>
+    
+            <ng-container matColumnDef="actions" *ngIf="!embedded">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let row">
+                    <button mat-icon-button color="primary" title="Consulter" routerLink="/fiche/bail/{{row.id}}"><mat-icon>visibility</mat-icon></button>
+                    <button mat-icon-button color="primary" title="Editer" (click)="edit(row)"><mat-icon>edit</mat-icon></button>
+                    <button mat-icon-button color="primary" title="Dupliquer" (click)="duplicate(row)"><mat-icon>content_copy</mat-icon></button>
+                    <button mat-icon-button color="warn" title="Supprimer" (click)="delete(row)"><mat-icon>delete</mat-icon></button>
+                    <mat-icon *ngIf="row.commentaire">info</mat-icon>
+                </td>
+                <td mat-footer-cell *matFooterCellDef>&nbsp;</td>
+            </ng-container>
+    
+            <tr mat-header-row *matHeaderRowDef="embedded?displayedColumnsEmbedded:displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: embedded?displayedColumnsEmbedded:displayedColumns;" (click)="embedded?edit(row):''"></tr>
+            <tr class="mat-row" *matNoDataRow>
+                <td class="centered-cell mat-cell" [attr.colspan]="displayedColumns.length"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun résultat à afficher</td>
+            </tr>
+            <tr mat-footer-row *matFooterRowDef="embedded?displayedColumnsEmbedded:displayedColumns"></tr>
+    
+        </table>
+    
+        <mat-paginator #paginator
+            [pageIndex]="0"
+            [pageSize]="10"
+            [pageSizeOptions]="[5, 10, 20]"
+            showFirstLastButtons>
+        </mat-paginator>
+        
+    </div>

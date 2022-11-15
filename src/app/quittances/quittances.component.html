@@ -1,0 +1,128 @@
+<mat-toolbar color="primary" class="primary-darker sticky-toolbar">
+    <button mat-icon-button (click)="goBack()"><mat-icon>chevron_left</mat-icon></button>
+    <mat-icon>receipt_long</mat-icon>
+    <span>Génération d'une quittance</span>
+    <span class="flex"></span>
+</mat-toolbar>
+
+<form [formGroup]="quittanceForm" (ngSubmit)="generate()">
+    <mat-form-field appearance="fill">
+        <mat-label>Bail</mat-label>
+        <mat-select id="bail" formControlName="bail" required>
+            <mat-option *ngFor="let bail of documentService.document.bails" [value]="bail.id">
+                {{bail.toString()}}
+            </mat-option>
+        </mat-select>
+        <mat-icon *ngIf="quittanceForm.value.bail" matSuffix color="accent" [routerLink]="'/fiche/bail/'+quittanceForm.value.bail">visibility</mat-icon>
+        <mat-hint align="end">Bail concerné (par défaut, bail en cours. A changer si nécessaire)</mat-hint>
+        <mat-error *ngIf="bail?.errors?.required">Le bail est obligatoire.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <mat-label>Localisation</mat-label>
+        <input matInput placeholder="Votre localisation" id="localisation" formControlName="localisation" required>
+        <mat-hint align="end">Localisation pour la génération</mat-hint>
+        <mat-error *ngIf="localisation?.errors?.required">La localisation est obligatoire.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <mat-label>Mois</mat-label>
+        <input matInput placeholder="Mois concerné par le paiement" id="mois" formControlName="mois" required [matDatepicker]="picker" readonly>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-hint align="end">Choix du mois concerné par le paiement</mat-hint>
+        <mat-error *ngIf="mois?.errors?.required">Le mois est obligatoire.</mat-error>
+        <mat-datepicker #picker startView="multi-year" (monthSelected)="closeDatePicker($event, picker)"></mat-datepicker>
+    </mat-form-field>
+    <mat-checkbox id="drive" formControlName="drive">Déposer dans le drive</mat-checkbox>            
+    <mat-checkbox id="mail" formControlName="mail">Envoyer directement par mail</mat-checkbox>            
+    <div class="form-button">
+        <button mat-flat-button color="primary" type="submit" [disabled]="!quittanceForm.valid"><mat-icon>publish</mat-icon>Publier</button>
+        <button mat-flat-button color="primary" type="button" *ngIf="stepGenerate==2" (click)="save()" ><mat-icon>download</mat-icon>Télécharger</button>
+    </div>
+</form>
+<mat-card>
+    <mat-card-content>
+        <mat-list>
+            <mat-list-item>
+                <mat-icon matListIcon *ngIf="stepGenerate<=1">query_builder</mat-icon>
+                <mat-icon matListIcon *ngIf="stepGenerate==2" color="accent">done</mat-icon>
+                <mat-icon matListIcon *ngIf="stepGenerate==3" color="warn">warning</mat-icon>
+                <p matLine>Génération du document au format PDF.</p>
+                <p matLine *ngIf="stepGenerate==1"><mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar></p>
+                <p matLine *ngIf="stepGenerate==2"><mat-progress-bar color="accent" mode="determinate" [value]="100"></mat-progress-bar></p>
+                <p matLine *ngIf="stepGenerate==3"><mat-progress-bar color="warn" mode="determinate" [value]="100"></mat-progress-bar></p>
+            </mat-list-item>
+            <mat-list-item [disabled]="stepTransfer==-1">
+                <mat-icon matListIcon *ngIf="stepTransfer<=1">query_builder</mat-icon>
+                <mat-icon matListIcon *ngIf="stepTransfer==2" color="accent">done</mat-icon>
+                <mat-icon matListIcon *ngIf="stepTransfer==3" color="warn">warning</mat-icon>
+                <p matLine>Envoi du fichier sur le cloud.</p>
+                <p matLine *ngIf="stepTransfer==1"><mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar></p>
+                <p matLine *ngIf="stepTransfer==2"><mat-progress-bar color="accent" mode="determinate" [value]="100"></mat-progress-bar></p>
+                <p matLine *ngIf="stepTransfer==3"><mat-progress-bar color="warn" mode="determinate" [value]="100"></mat-progress-bar></p>
+            </mat-list-item>
+            <mat-list-item [disabled]="stepTransfer==-1">
+                <mat-icon matListIcon *ngIf="stepJoint<=1">query_builder</mat-icon>
+                <mat-icon matListIcon *ngIf="stepJoint==2" color="accent">done</mat-icon>
+                <mat-icon matListIcon *ngIf="stepJoint==3" color="warn">warning</mat-icon>
+                <p matLine>Mise en pièce jointe du bail.</p>
+                <p matLine *ngIf="stepJoint==1"><mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar></p>
+                <p matLine *ngIf="stepJoint==2"><mat-progress-bar color="accent" mode="determinate" [value]="100"></mat-progress-bar></p>
+                <p matLine *ngIf="stepJoint==3"><mat-progress-bar color="warn" mode="determinate" [value]="100"></mat-progress-bar></p>
+            </mat-list-item>
+            <mat-list-item [disabled]="stepMail==-1">
+                <mat-icon matListIcon *ngIf="stepMail<=1">query_builder</mat-icon>
+                <mat-icon matListIcon *ngIf="stepMail==2" color="accent">done</mat-icon>
+                <mat-icon matListIcon *ngIf="stepMail==3" color="warn">warning</mat-icon>
+                <p matLine>Envoi du fichier par mail {{selectedBail?.locataire?.mail}} {{selectedBail?.bien?.proprietaire?.mail}}.</p>
+                <p matLine *ngIf="stepMail==1"><mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar></p>
+                <p matLine *ngIf="stepMail==2"><mat-progress-bar color="accent" mode="determinate" [value]="100"></mat-progress-bar></p>
+                <p matLine *ngIf="stepMail==3"><mat-progress-bar color="warn" mode="determinate" [value]="100"></mat-progress-bar></p>
+            </mat-list-item>
+        </mat-list>
+    </mat-card-content>
+</mat-card>
+<div id="quittance" #quittance *ngIf="selectedBail">
+    <div id="title">Quittance de Loyer - {{bailPeriodeShort}}</div>
+    <div class="subtitle">
+        <div>Bailleur</div>
+        <div>
+            {{selectedBail.bien.proprietaire.nom}}<br/>
+            {{selectedBail.bien.proprietaire.adresse}}
+            <div *ngIf="selectedBail?.bien?.proprietaire?.immatriculation">{{selectedBail.bien.proprietaire.immatriculation}}</div>
+        </div>
+    </div>
+    <div class="subtitle">
+        <div>Locataire</div>
+        <div>{{selectedBail.locataire.nom}}<br/>{{selectedBail.bien.adresse}}</div>
+    </div>
+    <div class="texte">
+        Fait à <b>{{quittanceForm.value.localisation}}</b>, le <b>{{generationDate | date:'shortDate':'fr-FR'}}</b>
+    </div>
+    <div class="texte">
+        Je soussigné <b>{{selectedBail.bien.proprietaire.nom}}</b>, propriétaire du logement désigné ci-dessus, déclare avoir reçu de 
+        <b>{{selectedBail.locataire.nom}}</b>, la somme de <b>{{mouvement.montant}} €uros</b>, au titre du paiement du loyer, charges et accessoires pour la 
+        période de location du mois de <b>{{bailPeriodeShort}}</b> et lui en donne quittance, sous réserve de tous mes droits.
+    </div>
+    <div class="texte">
+        <u>Détails du règlement :</u>
+        <ul>
+            <li>Loyer nu : <b>{{quittanceLoyer}} €</b></li>
+            <li>Provisions de charges : <b>{{quittanceCharges}} €</b></li>
+            <li>Montant total du terme : <b>{{quittanceLoyer + quittanceCharges}} €</b></li>
+            <li>Paiement reçu : <b>{{mouvement.montant}} €</b></li>
+            <li>Solde à payer : <b>{{quittanceLoyer + quittanceCharges - mouvement.montant}} €</b></li>
+            <li>Reçu le : <b>{{mouvement.date | date:'fullDate':'fr-FR'}}</b></li>
+        </ul>
+    </div>
+    <div class="texte">
+        <br/>Signature du Bailleur<br/>
+        <img [src]="signatureImage"/>
+    </div>
+    <div id="conditions">
+        Quittance établie selon règles en vigueur établies par l'article 21 de la loi du  6 juillet 1989.
+        Le paiement de la présente n'emporte pas présomption de paiement des termes antérieurs. Cette quittance
+        ou ce reçu annule tous les reçus qui auraient pu être donnés pour acompte versé sur le présent terme. En cas
+        de congé précédemment donné, cette quittance ou ce reçu représenterait l'indemnité d'occupation et ne
+        saurait être considéré comme un titre d'occupation. Sous réserve d'encaissement. Quittance à conserver
+        pendant trois ans par le locataire (article 7-1 de la loi n° 89-462 du 6 juillet 1989).
+    </div>
+</div>

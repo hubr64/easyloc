@@ -1,0 +1,27 @@
+<div class="pieces-list" *ngIf="container">
+    <app-piece-liste [embedded]="true" [defaultPieces]="pieces" (selected)="onSelectedRemove($event)"></app-piece-liste>
+    <button type="button" mat-flat-button color="warn" [disabled]="piecesToRemove.length == 0" (click)="removePieces()">Dissocier <mat-icon>remove_circle</mat-icon></button>
+    <button type="button" mat-flat-button color="primary" (click)="addPieces()"><mat-icon>find_in_page</mat-icon> Annexer</button>
+    <button type="button" mat-flat-button color="primary" (click)="uploadPieces()"><mat-icon>note_add</mat-icon> Ajouter</button>
+</div>
+
+<div class="pieces-missed" *ngIf="documentService.checkPiecesObligatoires(container).length>0">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>
+                    <mat-icon color="warn">warning</mat-icon>Pièces manquantes :
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <span class="piece-missed">
+                <span *ngFor="let missedPiece of documentService.checkPiecesObligatoires(container)">{{pieceCode[missedPiece.split("|")[0]]}} 
+                    <span *ngIf="missedPiece.split('|')[1]">&nbsp;ou {{pieceCode[missedPiece.split("|")[1]]}}</span>
+                </span>
+            </span>
+        </mat-card-content>
+    </mat-card>
+</div>
+
+
+    
+    

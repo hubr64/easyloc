@@ -1,6 +1,9 @@
 {
   "name": "easyloc",
   "version": "0.0.0",
+  "config": {
+    "strict-ssl": false
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -11,13 +14,22 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^14.2.0",
+    "@angular/cdk": "^14.2.7",
     "@angular/common": "^14.2.0",
     "@angular/compiler": "^14.2.0",
     "@angular/core": "^14.2.0",
     "@angular/forms": "^14.2.0",
+    "@angular/material": "^14.2.7",
     "@angular/platform-browser": "^14.2.0",
     "@angular/platform-browser-dynamic": "^14.2.0",
     "@angular/router": "^14.2.0",
+    "@types/gapi": "^0.0.43",
+    "@types/gapi.auth2": "^0.0.56",
+    "echarts": "^5.4.0",
+    "html2canvas": "^1.4.1",
+    "js-base64": "^3.7.2",
+    "jspdf": "^2.5.1",
+    "ngx-echarts": "^14.0.0",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"

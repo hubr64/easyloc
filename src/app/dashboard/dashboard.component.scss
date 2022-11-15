@@ -1,0 +1,79 @@
+.grid-container {
+  margin: 20px;
+}
+.dashboard-card {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  bottom: 15px;
+}
+.dashboard-button button,
+.full-width{
+  margin-bottom: 10px;
+  width: 100%;
+}
+.more-button {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+}
+.mat-card{
+  display:flex;
+  flex-direction: column;
+}
+.mat-card-header {
+  flex-shrink: 0;
+}
+.mat-card-content{
+  flex-grow: 1;
+  overflow: hidden;
+}
+.mat-line-infos{
+  color: #999;
+  font-style: italic;
+  font-size: 12px;
+}
+mat-card-title mat-icon{
+  vertical-align: sub;
+  margin-right: 5px;
+}
+.resume-container{
+  display: flex;
+  justify-content: center;
+  flex-flow: row wrap;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
+  align-items: center;
+}
+
+.resume-box{
+  flex:1;
+  height: 115px;
+  min-width: 130px;
+  border: 1px solid #ccc;
+  margin: 5px;
+}
+.resume-box > div:first-child{
+  background: #aaa;
+  padding: 6px;
+  color:white!important;
+}
+.resume-box > div:first-child a{
+  text-transform:uppercase;
+  color:white!important;
+  font-family: 'Unica One', cursive !important;
+  font-size:18px;
+}
+.resume-box > div:first-child mat-icon{
+  vertical-align: middle;
+  margin: 0 5px;
+}
+.resume-box > div:last-child{
+  font-weight:bold;
+  text-align:center;
+  font-size:3em;
+  padding: 5px;
+  line-height: 2em;
+}

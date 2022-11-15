@@ -1,0 +1,143 @@
+<mat-toolbar color="primary" class="primary-darker sticky-toolbar" *ngIf="!embedded">
+    <mat-icon>apartment</mat-icon>
+    <span>Liste des biens</span>
+    <span class="flex"></span>
+    <button mat-icon-button [matMenuTriggerFor]="menuListe">
+        <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menuListe="matMenu" yPosition="below" [overlapTrigger]="false">
+        <button mat-menu-item (click)="add()"><mat-icon>add</mat-icon> Nouveau</button>
+        <button mat-menu-item [disabled]="!selection.hasValue()" [matMenuTriggerFor]="selectionnes"><mat-icon>check</mat-icon> Sélection</button>
+        <button mat-menu-item (click)="export()"><mat-icon>file_download</mat-icon> Exporter</button>
+    </mat-menu>
+    <mat-menu #selectionnes="matMenu">
+        <button mat-menu-item (click)="deleteAll()"><mat-icon>delete</mat-icon> Supprimer</button>
+    </mat-menu>
+</mat-toolbar>
+
+<div class="filter-box">
+    <mat-form-field appearance="standard" *ngIf="!defaultProprietaire">
+        <mat-label>Propriétaire</mat-label>
+        <mat-icon matPrefix svgIcon="bailleur"></mat-icon>
+        <mat-select [formControl]="bailleurFilter">
+            <mat-option value="" selected>Tous</mat-option>
+            <mat-option *ngFor="let bailleur of documentService.document.bailleurs" [value]="bailleur.id">
+                {{bailleur.nom}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="standard">
+        <mat-label>Bien recherché</mat-label>
+        <mat-icon matPrefix>notes</mat-icon> 
+        <input [formControl]="searchFilter" matInput>
+    </mat-form-field>
+    <button color="accent" mat-flat-button (click)="clearFilter()"><mat-icon>clear</mat-icon></button>
+</div>
+
+<div class="responsive">
+    <table mat-table [dataSource]="dataSource" class="full-width-table" matSort matSortActive="nom" matSortDirection="asc">
+        <ng-container matColumnDef="select" *ngIf="!embedded">
+            <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? masterToggle() : null"
+                            [checked]="selection.hasValue() && isAllSelected()"
+                            [indeterminate]="selection.hasValue() && !isAllSelected()">
+                </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()"
+                            (change)="$event ? selection.toggle(row) : null"
+                            [checked]="selection.isSelected(row)">
+                </mat-checkbox>
+            </td>
+        </ng-container>
+                    
+        <ng-container matColumnDef="nom">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
+            <td mat-cell *matCellDef="let row">{{row.nom}}</td>
+        </ng-container>
+                    
+        <ng-container matColumnDef="type" *ngIf="!embedded">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+            <td mat-cell *matCellDef="let row">{{bienTypes[row.type]}}</td>
+        </ng-container>
+                    
+        <ng-container matColumnDef="adresse">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Adresse</th>
+            <td mat-cell *matCellDef="let row">{{row.adresse}}</td>
+        </ng-container>
+                    
+        <ng-container matColumnDef="proprietaire" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Propriétaire</th>
+            <td mat-cell *matCellDef="let row"><a [routerLink]="'/bailleur/'+row.proprietaire.id">{{row.proprietaire.nom}}</a></td>
+        </ng-container>
+                    
+        <ng-container matColumnDef="etat" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Etat</th>
+            <td mat-cell *matCellDef="let row">
+                <ng-container *ngVar="documentService.getUnrentBien(row) as unrentBien">
+                    <ng-container *ngIf="!unrentBien">Loué</ng-container>
+                    <ng-container *ngIf="unrentBien">Non loué</ng-container>
+                </ng-container>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="syndic" *ngIf="!embedded">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Syndic</th>
+            <td mat-cell *matCellDef="let row">
+                <a href="http://{{row.syndicUrl}}" target="_blank" *ngIf="row.syndicUrl; else elseBlock">{{row.syndic}}</a>
+                <ng-template #elseBlock>{{row.syndic}}</ng-template>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="dateAchat" *ngIf="!embedded">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Achat</th>
+            <td mat-cell *matCellDef="let row">{{row.dateAchat| date:'YYYY' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="surface">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Surface</th>
+            <td mat-cell *matCellDef="let row">{{row.surface}} m²</td>
+        </ng-container>
+
+        <ng-container matColumnDef="entrees" *ngIf="!embedded">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Entrées</th>
+            <td mat-cell *matCellDef="let row">{{row.getInOutMontant(documentService.document.mouvements).total.in| currency:'EUR':'symbol':'1.2-2'}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="sorties" *ngIf="!embedded">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Sorties</th>
+            <td mat-cell *matCellDef="let row">-{{row.getInOutMontant(documentService.document.mouvements).total.out| currency:'EUR':'symbol':'1.2-2'}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="pieces" *ngIf="!embedded">
+            <th mat-header-cell *matHeaderCellDef>Pièces</th>
+            <td mat-cell *matCellDef="let row"><app-pieces-jointes-liste [container]="row"></app-pieces-jointes-liste></td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions" *ngIf="!embedded">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let row">
+                <button mat-icon-button color="primary" title="Consulter" routerLink="/fiche/bien/{{row.id}}"><mat-icon>visibility</mat-icon></button>
+                <button mat-icon-button color="primary" title="Editer" (click)="edit(row)"><mat-icon>edit</mat-icon></button>
+                <button mat-icon-button color="primary" title="Dupliquer" (click)="duplicate(row)"><mat-icon>content_copy</mat-icon></button>
+                <button mat-icon-button color="warn" title="Supprimer" (click)="delete(row)"><mat-icon>delete</mat-icon></button>
+                <mat-icon *ngIf="row.commentaire">info</mat-icon>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="embedded?displayedColumnsEmbedded:displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: embedded?displayedColumnsEmbedded:displayedColumns;" (click)="embedded?edit(row):''"></tr>
+        <tr class="mat-row" *matNoDataRow>
+            <td class="centered-cell mat-cell" [attr.colspan]="displayedColumns.length"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun résultat à afficher</td>
+        </tr>
+
+    </table>
+
+    <mat-paginator #paginator
+        [pageIndex]="0"
+        [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 20]"
+        showFirstLastButtons>
+    </mat-paginator>
+    
+</div>

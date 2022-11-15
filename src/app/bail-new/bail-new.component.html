@@ -1,0 +1,136 @@
+<mat-toolbar color="primary" class="primary-darker sticky-toolbar">
+    <button mat-icon-button (click)="goBack()"><mat-icon>chevron_left</mat-icon></button>
+    <mat-icon>support</mat-icon>
+    <span>Assistant de gestion de bail</span>
+    <span class="flex"></span>
+</mat-toolbar>
+    
+<mat-form-field appearance="standard">
+    <mat-label>Bien à louer</mat-label>
+    <mat-select [formControl]="bienControl" required>
+        <mat-option *ngFor="let bien of documentService.document.biens" [value]="bien.id">
+            {{bien.nom}}
+        </mat-option>
+    </mat-select>
+    <mat-icon *ngIf="bienALouer" matSuffix color="accent" [routerLink]="'/fiche/bien/'+bienALouer.id">visibility</mat-icon>
+</mat-form-field>
+
+<p *ngIf="!bienALouer">Veuillez choisir au préalable <b>un bien à louer</b> !</p>
+<mat-stepper orientation="vertical" #stepper *ngIf="bienALouer">
+    <mat-step state="apartment">
+        <ng-template matStepLabel><mat-icon>apartment</mat-icon>Bien à louer</ng-template>
+        <p *ngIf="annoncesBien.length>0">Vous pouvez utiliser les annonces suivantes pour mettre le bien à louer :</p>
+        <div class="piece-container" *ngIf="annoncesBien.length>0">
+            <ng-container *ngFor="let annonce of annoncesBien" [ngTemplateOutlet]="pieceBox" [ngTemplateOutletContext]="{piece: annonce}"></ng-container>
+        </div>
+        <p *ngIf="annoncesBien.length==0 && modelesAnnonce.length>0">Il n'existe <b>aucune annonce pour ce bien</b>, vous pouvez créer une nouvelle annonce en utilisant le <b>modèle suivant</b> :</p>
+        <div class="piece-container" *ngIf="annoncesBien.length==0 && modelesAnnonce.length>0">
+            <ng-container *ngFor="let annonce of modelesAnnonce" [ngTemplateOutlet]="pieceBox" [ngTemplateOutletContext]="{piece: annonce}"></ng-container>
+        </div>
+        <div class="message-warning"><mat-icon color="warn">warning</mat-icon>Le diagnostic énergétique doit être fourni dans les annonces.</div>
+        <p *ngIf="photosBien.length>0">Vous pouvez utiliser les photos suivantes pour illustrer l'annonce :</p>
+        <div class="piece-container" *ngIf="photosBien.length>0">
+            <ng-container *ngFor="let photo of photosBien" [ngTemplateOutlet]="photoBox" [ngTemplateOutletContext]="{piece: photo}"></ng-container>
+        </div>
+    </mat-step>
+    <mat-step >
+        <ng-template matStepLabel><mat-icon>people</mat-icon>Locataire à trouver</ng-template>
+        <p>Pour choisir le locataire, il faut :</p>
+        <ul>
+            <li>Idéalement, recourir au service <a href="https://www.dossierfacile.fr/" target="_blank">https://www.dossierfacile.fr/</a> mis en oeuvre par le gouvernement.</li>
+            <li>Demander la liste des pièces suivantes :
+                <ul>
+                    <li>Pour le <u>locataire</u> :
+                        <ul>
+                            <li>Une <b>pièce d'identité</b> (carte d'identitié, passeport, permis de conduire, titre de séjour)</li>
+                            <li>Un <b>justificatif de domicile</b> (3 dernières quittances de loyer ou, à défaut, une attestation du précédent propriétaire, taxe foncière, attestation sur l'honneur de l'hébergeant)</li>
+                            <li>Un ou plusieurs <b>justificatif(s) de situation professionnelle</b> (contrat de travail, carte étudiant, extrait registre du commerce, autre pièces attestant d'une activité)</li>
+                            <li>Un ou plusieurs <b>justificatif(s) de ressources</b> (bulletin de salaires, justificatif de versement, bilans comptables, justificatif d'indemnités, avis d'imposition)</li>
+                        </ul>
+                    </li>
+                    <li>Pour la <u>caution</u> :
+                            <ul>
+                                <li>Une <b>pièce d'identité</b> (carte d'identitié, passeport, permis de conduire, titre de séjour)</li>
+                                <li>Un <b>justificatif de domicile</b> (3 dernières quittances de loyer ou, à défaut, une attestation du précédent propriétaire, taxe foncière, attestation sur l'honneur de l'hébergeant)</li>
+                                <li>Un ou plusieurs <b>justificatif(s) de situation professionnelle</b> (contrat de travail, carte étudiant, extrait registre du commerce, autre pièces attestant d'une activité)</li>
+                                <li>Un ou plusieurs <b>justificatif(s) de ressources</b> (bulletin de salaires, justificatif de versement, bilans comptables, justificatif d'indemnités, avis d'imposition)</li>
+                            </ul>
+                        </li>
+                </ul>
+            </li>
+            <li>Plus d'infos sur <a href="https://www.service-public.fr/particuliers/vosdroits/F1169" target="_blank">https://www.service-public.fr/particuliers/vosdroits/F1169</a>
+        </ul>
+        <p *ngIf="modelesLocataire.length>0">Vous pouvez fournir les document suivants au locataire potentiel :</p>
+        <div class="piece-container" *ngIf="modelesLocataire.length>0">
+            <ng-container *ngFor="let locataire of modelesLocataire" [ngTemplateOutlet]="pieceBox" [ngTemplateOutletContext]="{piece: locataire}"></ng-container>
+        </div>
+    </mat-step>
+    <mat-step>
+        <ng-template matStepLabel><mat-icon>assignment</mat-icon>Bail à signer</ng-template>
+        <p *ngIf="bailsBien.length>0">Vous pouvez utiliser les documents suivantes pour créer le nouveau bail (+ d'info sur le remplissage du bail dans <a href="https://www.service-public.fr/particuliers/vosdroits/F35109/0_0?idFicheParent=F920#0_0" target="_blank">https://www.service-public.fr/particuliers/vosdroits/F35109/0_0?idFicheParent=F920#0_0</a>) :</p>
+        <div class="piece-container" *ngIf="bailsBien.length>0">
+            <ng-container *ngFor="let bail of bailsBien" [ngTemplateOutlet]="pieceBox" [ngTemplateOutletContext]="{piece: bail}"></ng-container>
+        </div>
+        <p *ngIf="bailsBien.length==0 && modelesBail.length>0">Il n'existe <b>aucun modèle de bail pour ce bien</b>, vous pouvez créer un nouveau modèle en utilisant le <b>modèle général suivant</b> (Plus d'informations sur le remplissage du bail dans <a href="https://www.service-public.fr/particuliers/vosdroits/F35109/0_0?idFicheParent=F920#0_0" target="_blank">https://www.service-public.fr/particuliers/vosdroits/F35109/0_0?idFicheParent=F920#0_0</a>) :</p>
+        <div class="piece-container" *ngIf="bailsBien.length==0 && modelesBail.length>0">
+            <ng-container *ngFor="let bail of modelesBail" [ngTemplateOutlet]="pieceBox" [ngTemplateOutletContext]="{piece: bail}"></ng-container>
+        </div>
+        <p>Les autres documents annexes au bail sont les suivants :</p>
+        <div class="piece-container" *ngIf="bailsAnnexesBien.length>0">
+            <ng-container *ngFor="let bailAnnexe of bailsAnnexesBien" [ngTemplateOutlet]="pieceBox" [ngTemplateOutletContext]="{piece: bailAnnexe}"></ng-container>
+        </div>
+        <div class="piece-container" *ngIf="modelesBailAnnexe.length>0">
+            <ng-container *ngFor="let bailAnnexe of modelesBailAnnexe" [ngTemplateOutlet]="pieceBox" [ngTemplateOutletContext]="{piece: bailAnnexe}"></ng-container>
+        </div>
+        <p>En complément de ces documents, il est possible de consulter les liens suivants :</p>
+        <ul>
+            <li><b>Notice</b> d'information : <a href="https://www.legifrance.gouv.fr/loda/id/JORFTEXT000030649902/" target="_blank">https://www.legifrance.gouv.fr/loda/id/JORFTEXT000030649902/</a></li>
+            <li><b>Etat des lieux</b> : <a href="https://www.service-public.fr/particuliers/vosdroits/F31270" target="_blank">https://www.service-public.fr/particuliers/vosdroits/F31270</a></li>
+            <li><b>Attestation d'assurance</b> contre les risques locatifs : <a href="https://www.service-public.fr/particuliers/vosdroits/F1349" target="_blank">https://www.service-public.fr/particuliers/vosdroits/F1349</a></li>
+        </ul>
+        <div class="message-warning"><mat-icon color="warn">warning</mat-icon>Ne pas oublier le dépôt de garantie (max 1 mois de loyer hors charge)</div>
+    </mat-step>
+    <mat-step>
+        <ng-template matStepLabel><mat-icon>logout</mat-icon>Départ du locataire</ng-template>
+        <p *ngIf="etatSortantBien.length>0">L'état des lieux entrant du bail en cours est le suivant : </p>
+        <div class="piece-container" *ngIf="etatSortantBien.length>0">
+            <ng-container *ngFor="let etatSortant of etatSortantBien" [ngTemplateOutlet]="pieceBox" [ngTemplateOutletContext]="{piece: etatSortant}"></ng-container>
+        </div>
+        <p *ngIf="etatSortantBien.length==0"><b>Aucun état des lieux entrant</b> trouvé pour le bail en cours ! Veuillez utiliser un état des lieux vierge tel que défini à l'étape <i>Bail à signer</i>.</p>
+        <p>Plus d'infos sur <a href="https://www.service-public.fr/particuliers/vosdroits/N339" target="_blank">https://www.service-public.fr/particuliers/vosdroits/N339</a></p>
+    </mat-step>
+    <ng-template matStepperIcon="apartment">
+        <mat-icon>apartment</mat-icon>
+    </ng-template>
+    <ng-template matStepperIcon="people">
+        <mat-icon>people</mat-icon>
+    </ng-template>
+    <ng-template matStepperIcon="assignment">
+        <mat-icon>assignment</mat-icon>
+    </ng-template>
+</mat-stepper>
+
+<ng-template #pieceBox let-piece="piece">
+    <div id="{{piece.id}}" *ngIf="!errorPieces[piece.id]">
+        <div>
+            <div>
+                <a href="{{urlPieces[piece.id]}}">
+                    <img *ngIf="thumbPieces[piece.id]" src="{{thumbPieces[piece.id]}}">
+                    <mat-icon *ngIf="!thumbPieces[piece.id]">description</mat-icon>
+                </a>
+            </div>
+            <div>
+                <div>{{piece.nom}}</div>
+                <div>{{piece.description}}</div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #photoBox let-piece="piece">
+    <div id="{{piece.id}}" *ngIf="!errorPieces[piece.id]">
+        <div class="piece-box" *ngIf="piece.code == 'BIEN_PHOT'">
+            <a href="{{urlPieces[piece.id]}}"><img class="piece-photo" title="{{piece.nom}}" src="{{thumbPieces[piece.id]}}"></a>
+        </div>
+    </div>
+</ng-template>

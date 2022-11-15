@@ -1,0 +1,93 @@
+<mat-card class="card-box" data-html2canvas-ignore>
+    <mat-card-header>
+        <div mat-card-avatar class="avatar-letter"><mat-icon>book</mat-icon></div>
+        <mat-card-title>Pièces jointes</mat-card-title>
+        <mat-card-subtitle>Annexes</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+        <div class="piece-title">Pièces obligatoires</div>
+        <div class="piece-container">
+            <ng-container *ngFor="let piece of mandatoryPieces">
+                <div id="{{piece.id}}" *ngIf="!errorPieces[piece.id]">
+                    <div *ngIf="piece.code != 'BIEN_PHOT'">
+                        <div>
+                            <a href="{{urlPieces[piece.id]}}">
+                                <img *ngIf="thumbPieces[piece.id]" src="{{thumbPieces[piece.id]}}">
+                                <mat-icon *ngIf="!thumbPieces[piece.id]">description</mat-icon>
+                            </a>
+                        </div>
+                        <div>
+                            <div>
+                                <img src="{{iconPieces[piece.id]}}"> 
+                                {{pieceCode[piece.code]}}
+                            </div>
+                            <div>{{piece.nom}}</div>
+                        </div>
+                    </div>
+                    <div class="piece-box" *ngIf="piece.code == 'BIEN_PHOT'">
+                        <img class="piece-photo" title="{{piece.nom}}" src="{{urlPieces[piece.id]}}">
+                    </div>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="mandatoryPieces.length==0">
+                <div class="no-piece"><mat-icon color="warn">warning</mat-icon> Aucune pièce obligatoire définie...</div>
+            </ng-container>
+        </div>
+        <mat-divider *ngIf="pieceSpecific && specificPieces.length>0"></mat-divider>
+        <div *ngIf="pieceSpecific && specificPieces.length>0" class="piece-title">{{pieceCode[pieceSpecific]}}</div>
+        <div class="piece-container" *ngIf="pieceSpecific && specificPieces.length>0">
+            <ng-container *ngFor="let piece of specificPieces">
+                <div id="{{piece.id}}" *ngIf="!errorPieces[piece.id]">
+                    <div *ngIf="piece.code != 'BIEN_PHOT'">
+                        <div>
+                            <a href="{{urlPieces[piece.id]}}">
+                                <img *ngIf="thumbPieces[piece.id]" src="{{thumbPieces[piece.id]}}">
+                                <mat-icon *ngIf="!thumbPieces[piece.id]">description</mat-icon>
+                            </a>
+                        </div>
+                        <div>
+                            <div>
+                                <img src="{{iconPieces[piece.id]}}"> 
+                                {{pieceCode[piece.code]}}
+                            </div>
+                            <div>{{piece.nom}}</div>
+                        </div>
+                    </div>
+                    <div class="piece-box" *ngIf="piece.code == 'BIEN_PHOT'">
+                        <img class="piece-photo" title="{{piece.nom}}" src="{{urlPieces[piece.id]}}">
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+        <mat-divider *ngIf="otherPieces.length>0"></mat-divider>
+        <div class="piece-title" *ngIf="otherPieces.length>0">Autres Pièces</div>
+        <div class="piece-container" *ngIf="otherPieces.length>0">
+            <ng-container *ngFor="let piece of otherPieces">
+                <div id="{{piece.id}}" *ngIf="!errorPieces[piece.id]">
+                    <div *ngIf="piece.code != 'BIEN_PHOT'">
+                        <div>
+                            <a href="{{urlPieces[piece.id]}}">
+                                <img *ngIf="thumbPieces[piece.id]" src="{{thumbPieces[piece.id]}}">
+                                <mat-icon *ngIf="!thumbPieces[piece.id]">description</mat-icon>
+                            </a>
+                        </div>
+                        <div>
+                            <div>
+                                <img src="{{iconPieces[piece.id]}}"> 
+                                {{pieceCode[piece.code]}}
+                            </div>
+                            <div>{{piece.nom}}</div>
+                        </div>
+                    </div>
+                    <div class="piece-box" *ngIf="piece.code == 'BIEN_PHOT'">
+                        <img class="piece-photo" title="{{piece.nom}}" src="{{urlPieces[piece.id]}}">
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </mat-card-content>
+    <mat-card-actions>
+        <button mat-icon-button color="accent" (click)="addPieces()"><mat-icon>find_in_page</mat-icon> </button>
+        <button mat-icon-button color="accent" (click)="uploadPieces()"><mat-icon>note_add</mat-icon> </button>
+    </mat-card-actions>
+</mat-card>

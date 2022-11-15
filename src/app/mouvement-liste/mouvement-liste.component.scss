@@ -1,0 +1,29 @@
+.filter-box{
+    display:flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+.filter-box mat-form-field{
+    flex: 1 1 40px;
+}
+::ng-deep .mat-form-field-wrapper{
+    margin-bottom: -1.34375em;
+ }
+ .filter-box button{
+    border-radius:0;
+ }
+.responsive{
+    max-width: 100%;
+    overflow: auto hidden;
+}
+table{
+    min-width: 1360px;
+}
+table td:nth-child(4),
+table td:nth-child(7){
+    min-width: 50px;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

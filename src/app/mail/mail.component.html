@@ -1,0 +1,37 @@
+<h2 mat-dialog-title><mat-icon>email</mat-icon> Envoi d'un mail</h2>
+<mat-dialog-content>
+    <form [formGroup]="mailForm">
+        <mat-form-field>
+            <mat-label>Emetteur</mat-label>
+            <input type="email" matInput placeholder="E-mail de l'émetteur" id="emetteur" formControlName="emetteur" required>
+            <mat-hint align="end">Email de l'émetteur (au format nom@societe.com)</mat-hint>
+            <mat-error *ngIf="emetteur?.errors?.required">Le mail est obligatoire.</mat-error>
+            <mat-error *ngIf="emetteur?.errors?.pattern">Le mail n'est pas au bon format.</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Destinataires</mat-label>
+            <input type="email" matInput placeholder="E-mails des destinataires" id="destinataires" formControlName="destinataires" required>
+            <mat-hint align="end">Email des destinataires (même format séparé par des ';')</mat-hint>
+            <mat-error *ngIf="destinataires?.errors?.required">Au moins un mail obligatoire.</mat-error>
+            <mat-error *ngIf="destinataires?.errors?.pattern">Erreur de format.</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Sujet</mat-label>
+            <input matInput placeholder="Sujet du mail" id="sujet" formControlName="sujet" required cdkFocusInitial>
+            <mat-hint align="end">Sujet du mail</mat-hint>
+            <mat-error *ngIf="sujet?.errors?.required">Le sujet est obligatoire.</mat-error>
+            <mat-error *ngIf="sujet?.errors?.minlength">Le sujet doit être d'au moins 5 caractères.</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Contenu</mat-label>
+            <textarea matInput id="contenu" formControlName="contenu" required></textarea>
+            <mat-hint align="end">Contenu libre du mail (aucun format accepté juste du texte)</mat-hint>
+            <mat-error *ngIf="contenu?.errors?.required">Le contenu du mail est obligatoire.</mat-error>
+            <mat-error *ngIf="contenu?.errors?.minlength">Le contenu doit être d'au moins 5 caractères.</mat-error>
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button color="primary" mat-flat-button (click)="sendMail()" [mat-dialog-close]="true" [disabled]="!mailForm.valid || mailService.isLoading">Envoyer</button>
+    <button color="warn" mat-flat-button [mat-dialog-close]="false">Annuler</button>
+</mat-dialog-actions>

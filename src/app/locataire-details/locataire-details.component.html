@@ -1,0 +1,51 @@
+<mat-toolbar color="primary" class="primary-darker sticky-toolbar">
+    <button mat-icon-button (click)="goBack()"><mat-icon>chevron_left</mat-icon></button>
+    <mat-icon>person_add_alt_1</mat-icon>
+    <span *ngIf="locataire">Modification d'un locataire</span>
+    <span *ngIf="!locataire">Ajout d'un nouveau locataire</span>
+    <span class="flex"></span>
+</mat-toolbar>
+
+<mat-tab-group mat-stretch-tabs mat-align-tabs="start">
+    <mat-tab>
+        <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">info</mat-icon> Détails
+        </ng-template>
+        <form [formGroup]="locataireForm" (ngSubmit)="save()">
+            <mat-form-field appearance="fill">
+                <mat-label>Nom</mat-label>
+                <input matInput placeholder="Nom" id="nom" formControlName="nom" required>
+                <mat-hint align="end">Nom du locataire</mat-hint>
+                <mat-error *ngIf="nom?.errors?.required">Le nom est obligatoire.</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Téléphone</mat-label>
+                <input type="tel" matInput placeholder="Téléphone" id="telephone" formControlName="telephone" required>
+                <mat-hint align="end">Numéro de téléphone (au format 0559121212)</mat-hint>
+                <mat-error *ngIf="telephone?.errors?.required">Le téléphone est obligatoire.</mat-error>
+                <mat-error *ngIf="telephone?.errors?.pattern">Le téléphone doit être composé de 10 chiffres.</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Mail</mat-label>
+                <input type="email" matInput placeholder="E-Mail" id="mail" formControlName="mail" required>
+                <mat-hint align="end">Email de contact (au format nom@societe.com)</mat-hint>
+                <mat-error *ngIf="mail?.errors?.required">Le mail est obligatoire.</mat-error>
+                <mat-error *ngIf="mail?.errors?.pattern">Le mail n'est pas au bon format.</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Commentaires</mat-label>
+                <textarea matInput id="commentaire" formControlName="commentaire"></textarea>
+                <mat-hint align="end">Commentaires libres pour information</mat-hint>
+            </mat-form-field>
+            <div class="form-button">
+                <button mat-flat-button color="primary" type="submit" [disabled]="!locataireForm.valid">Enregistrer</button>
+            </div>
+        </form>
+    </mat-tab>
+    <mat-tab [disabled]="!locataire">
+        <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">book</mat-icon> Pièces jointes
+        </ng-template>
+        <app-pieces-jointes-details *ngIf="locataire" [container]="locataire"></app-pieces-jointes-details>
+    </mat-tab>
+</mat-tab-group>

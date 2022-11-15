@@ -1,0 +1,85 @@
+<mat-toolbar color="primary" class="primary-darker sticky-toolbar">
+    <button mat-icon-button (click)="goBack()"><mat-icon>chevron_left</mat-icon></button>
+    <mat-icon svgIcon="bailleur"></mat-icon>
+    <span *ngIf="bailleur">Modification d'un bailleur</span>
+    <span *ngIf="!bailleur">Ajout d'un nouveau bailleur</span>
+    <span class="flex"></span>
+</mat-toolbar>
+
+<mat-tab-group mat-stretch-tabs mat-align-tabs="start">
+    <mat-tab>
+        <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">info</mat-icon> Détails
+        </ng-template>
+        <form [formGroup]="bailleurForm" (ngSubmit)="save()">
+            <mat-form-field appearance="fill">
+                <mat-label>Nom</mat-label>
+                <input matInput placeholder="Nom" id="nom" formControlName="nom" required>
+                <mat-hint align="end">Nom du bailleur</mat-hint>
+                <mat-error *ngIf="nom?.errors?.required">Le nom est obligatoire.</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Type</mat-label>
+                <select matNativeControl id="type" formControlName="type" required>
+                    <option value="Physique">Physique</option>
+                    <option value="Morale">Morale</option>
+                </select>
+                <mat-hint align="end">Type de bailleur</mat-hint>
+                <mat-error *ngIf="type?.errors?.required">Le type est obligatoire.</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Adresse</mat-label>
+                <textarea matInput id="adresse" formControlName="adresse"></textarea>
+                <mat-hint align="end">Adresse et compléments pour personne morale</mat-hint>
+                <mat-error *ngIf="adresse?.errors?.required">L'adresse est obligatoire.</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Téléphone</mat-label>
+                <input type="tel" matInput placeholder="Téléphone" id="telephone" formControlName="telephone" required>
+                <mat-hint align="end">Numéro de téléphone (au format 0559121212)</mat-hint>
+                <mat-error *ngIf="telephone?.errors?.required">Le téléphone est obligatoire.</mat-error>
+                <mat-error *ngIf="telephone?.errors?.pattern">Le téléphone doit être composé de 10 chiffres.</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Mail</mat-label>
+                <input type="email" matInput placeholder="E-Mail" id="mail" formControlName="mail" required>
+                <mat-hint align="end">Email de contact (au format nom@societe.com)</mat-hint>
+                <mat-error *ngIf="mail?.errors?.required">Le mail est obligatoire.</mat-error>
+                <mat-error *ngIf="mail?.errors?.pattern">Le mail n'est pas au bon format.</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Immatriculation</mat-label>
+                <input matInput placeholder="Immatriculation" id="immatriculation" formControlName="immatriculation">
+                <mat-hint align="end">Immatriculation au RCS</mat-hint>
+            </mat-form-field>
+            <mat-form-field  appearance="fill" class="signature-field">
+                <input matInput id="signature" formControlName="signature" hidden>
+                <img src="{{signatureImage}}"/>
+                <button type="button" mat-stroked-button color="accent" (click)="uploadSignature()" [disabled]="this.signatureImage!=''">Ajouter une signature</button>
+                <button type="button" mat-stroked-button color="warn" (click)="clearSignature()" [disabled]="this.signatureImage==''">Supprimer la signature</button>
+                <mat-hint align="end">Signature utilisée lors de production de documents</mat-hint>
+                <mat-error *ngIf="signature?.errors?.required">La signature est obligatoire.</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+                <mat-label>Commentaires</mat-label>
+                <textarea matInput id="commentaire" formControlName="commentaire"></textarea>
+                <mat-hint align="end">Commentaires libres pour information</mat-hint>
+            </mat-form-field>
+            <div class="form-button">
+                <button mat-flat-button color="primary" type="submit" [disabled]="!bailleurForm.valid">Enregistrer</button>
+            </div>
+        </form>
+    </mat-tab>
+    <mat-tab [disabled]="!bailleur">
+        <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">book</mat-icon> Pièces jointes
+        </ng-template>
+        <app-pieces-jointes-details *ngIf="bailleur" [container]="bailleur"></app-pieces-jointes-details>
+    </mat-tab>
+    <mat-tab [disabled]="!bailleur">
+        <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">apartment</mat-icon> Biens
+        </ng-template>
+        <app-bien-liste *ngIf="bailleur" [embedded]="true" [defaultProprietaire]="bailleur"></app-bien-liste>
+    </mat-tab>
+</mat-tab-group>

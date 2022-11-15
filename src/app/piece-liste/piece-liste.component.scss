@@ -1,0 +1,41 @@
+table mat-form-field{
+    width:90%;
+    margin-top:20px;
+}
+.filter-box{
+    display:flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+.filter-box mat-form-field{
+    flex: 1 1 40px;
+}
+::ng-deep .mat-form-field-wrapper{
+    margin-bottom: -1.34375em;
+ }
+ .filter-box button{
+    border-radius:0;
+ }
+.responsive{
+    width: 100%;
+    overflow: auto hidden;
+}
+table{
+    min-width:1050px;
+}
+table td:nth-child(3),
+table td:nth-child(4){
+    min-width: 50px;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+table td:last-child{
+    width:80px;
+}
+.save-button{
+    cursor:pointer;
+    font-size: 200%;
+    line-height: 2;
+}

@@ -1,0 +1,17 @@
+<h2 mat-dialog-title><mat-icon>warning</mat-icon> Version périmée</h2>
+<mat-dialog-content>
+    <p>Le document en cours d'édition ne correspond pas à la dernière version car il existe sur le serveur une version plus récente</p>
+    <ul>
+        <li><b>Version en cours</b> : {{driveService.dataFileVersion}}</li>
+        <li><b>Version sur le serveur</b> : {{data.lastVersion}}</li>
+    </ul>
+    <p>Vous pouvez : </p>
+    <ul>
+        <li><b>Annuler</b> : vous continuez d'utiliser le document mais aucune modification ne sera enregistrée.</li>
+        <li><b>Recharger</b> : vous chargez la dernière version du serveur et perdez les modifications réalisées et non enregistrées.</li>
+    </ul>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button color="warn" mat-button mat-dialog-close (click)="continue(false)">Annuler</button>
+    <button color="primary" mat-button [mat-dialog-close]="true"  (click)="continue(true)" cdkFocusInitial>Recharger</button>
+</mat-dialog-actions>

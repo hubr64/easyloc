@@ -1,0 +1,50 @@
+.mat-toolbar{
+  z-index:2!important;
+}
+.sidenav-container {
+  height: 100%;
+}
+.sidenav .mat-toolbar {
+  background: inherit;
+}
+mat-nav-list img{
+  width: 60px;
+  display: block;
+  margin: 8px auto 9px auto;
+}
+.mat-toolbar.mat-primary {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.name{
+  font-family: 'Unica One', cursive;
+  font-size:45px;
+}
+.flex{
+  width: 100%;
+}
+.connect-msg{
+  text-align: right;
+  padding-right: 30px;
+  padding-top: 10px;
+  font-style: italic;
+  color: #999;
+  font-size: 22px;
+}
+.connect-msg mat-icon:last-child {
+  transform: rotate(90deg);
+}
+.loading-message{
+  font-family: 'Unica One', cursive !important;
+  width: 378px;
+  text-align:center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.loading-message > div:nth-child(2){
+  font-size:90px;
+  line-height:90px;
+}

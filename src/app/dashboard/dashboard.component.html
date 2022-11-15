@@ -1,0 +1,154 @@
+<div class="grid-container" *ngIf="documentService.docIsLoaded">
+  <mat-grid-list [cols]="nbCols | async" rowHeight="350px">
+    <mat-grid-tile>
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>shortcut</mat-icon>Raccourcis
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content dashboard-button">
+          <button mat-stroked-button color='primary' (click)='addMouvement()'><mat-icon>euro_symbol</mat-icon><br/>Ajouter un mouvement</button>
+          <button mat-stroked-button color='primary' (click)='uploadPieces()'><mat-icon>note_add</mat-icon><br/>Ajouter des pièces</button>
+          <button mat-stroked-button color='primary' (click)='mail()'><mat-icon>mail</mat-icon><br/>Envoyer un mail</button>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+    <mat-grid-tile  [rowspan]="(rowSpanStats?rowSpanStats:1)">
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>data_usage</mat-icon>Statistiques
+            <button mat-icon-button class="more-button" (click)="rowSpanStats==1?(rowSpanStats=2):(rowSpanStats=1)">
+              <mat-icon *ngIf="rowSpanStats==1">expand_more</mat-icon>
+              <mat-icon *ngIf="rowSpanStats==2">expand_less</mat-icon>
+            </button>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+            <app-statistiques-details [simple]="true"></app-statistiques-details>
+            <button class="full-width" mat-stroked-button color='primary' routerLink="/statistiques"><mat-icon>query_stats</mat-icon>Voir les statistiques détaillées</button>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <mat-grid-tile  [rowspan]="(rowSpanWarn?rowSpanWarn:1)">
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>error</mat-icon>Attention !
+            <button mat-icon-button class="more-button" (click)="rowSpanWarn==1?(rowSpanWarn=2):(rowSpanWarn=1)">
+              <mat-icon *ngIf="rowSpanWarn==1">expand_more</mat-icon>
+              <mat-icon *ngIf="rowSpanWarn==2">expand_less</mat-icon>
+            </button>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="dashboard-card-content">
+          <mat-list>
+            <mat-list-item *ngFor="let unpaidLoyer of unpaidLoyers">
+                <mat-icon matListIcon matBadgeColor="warn" matBadge="!">euro_symbol</mat-icon>
+                <h3 mat-line>Loyer impayé de {{unpaidLoyer.bail}}</h3>
+                <span class="mat-line-infos" mat-line>{{unpaidLoyer.date| date:'longDate':'fr-FR'}}</span>
+                <button title="Ajouter le paiement et acquitter" mat-icon-button (click)="acquitter(unpaidLoyer.bail)">
+                  <mat-icon>receipt_long</mat-icon>
+                </button>
+                <button title="Relancer le locataire" mat-icon-button (click)="relancer(unpaidLoyer)">
+                  <mat-icon>mail</mat-icon>
+                </button>
+            </mat-list-item>
+          </mat-list>
+          <mat-list>
+            <mat-list-item *ngFor="let unrentBien of unrentBiens">
+              <mat-icon matListIcon matBadgeColor="warn" matBadge="!">apartment</mat-icon>
+              <h3 mat-line>{{unrentBien.bien}} n'est pas loué</h3>
+              <span class="mat-line-infos" mat-line>{{unrentBien.nbJours}} jours sans location</span>
+              <button title="Voir le bien" mat-icon-button [routerLink]="'/fiche/bien/'+unrentBien.bien.id">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </mat-list-item>
+          </mat-list>
+          <mat-list>
+            <mat-list-item *ngFor="let updateLoyerBail of updateLoyerBails">
+              <ng-container *ngIf="updateLoyerBail.toUpdate">
+                <mat-icon matListIcon matBadgeColor="warn" matBadge="!">assignment</mat-icon>
+                <h3 mat-line>Loyer de {{updateLoyerBail.bail}} à réviser</h3>
+                <span class="mat-line-infos" mat-line>Le loyer aurait pu être modifié depuis {{updateLoyerBail.nbJours}} jours</span>
+                <button title="Voir le bail" mat-icon-button [routerLink]="'/fiche/bail/'+updateLoyerBail.bail.id">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </ng-container>
+            </mat-list-item>
+          </mat-list>
+          <mat-list>
+            <mat-list-item *ngFor="let mouvement of mouvementsWithoutQuittance">
+              <mat-icon matListIcon matBadgeColor="accent" matBadge="?">euro_symbol</mat-icon>
+              <h3 mat-line>Entrée sans quittance</h3>
+              <span class="mat-line-infos" mat-line>{{mouvement.libelle}} ({{mouvement.montant| currency:'EUR':'symbol':'1.2-2'}})</span>
+              <button title="Acquitter" mat-icon-button [routerLink]="'/quittance/'+mouvement.id">
+                <mat-icon>receipt_long</mat-icon>
+              </button>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+    
+    <mat-grid-tile [colspan]="1" [rowspan]="(rowSpanPieces?rowSpanPieces:1)">
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>sim_card_alert</mat-icon> Pièces manquantes
+            <button mat-icon-button class="more-button" (click)="rowSpanPieces==1?(rowSpanPieces=2):(rowSpanPieces=1)">
+              <mat-icon *ngIf="rowSpanPieces==1">expand_more</mat-icon>
+              <mat-icon *ngIf="rowSpanPieces==2">expand_less</mat-icon>
+            </button>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-list>
+              <mat-list-item *ngFor="let missingPiece of missingPieces">
+                  <mat-icon matListIcon svgIcon="{{typeIcon['svg.'+missingPiece.piecesContainer.constructor.name]}}">{{typeIcon[missingPiece.piecesContainer.constructor.name]}}</mat-icon>
+                  <h3 mat-line>{{missingPiece.piecesContainer}}</h3>
+                  <span class="mat-line-infos" mat-line>
+                    {{getmissingPieceStr(missingPiece.piecesManquantes)}}
+                  </span>
+                  <button title="Modifier" mat-icon-button [routerLink]="'/'+missingPiece.piecesContainer.constructor.name.toLowerCase()+'/'+missingPiece.piecesContainer.id">
+                    <mat-icon>visibility</mat-icon>
+                 </button>
+                 <app-pieces-jointes-liste [container]="missingPiece.piecesContainer" badgeColor="warn"></app-pieces-jointes-liste>
+              </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="1" [rowspan]="1">
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>data_usage</mat-icon>Résumé général
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="resume-container">
+          <div class="resume-box">
+              <div><mat-icon matListIcon>apartment</mat-icon><a routerLink="/biens">Biens</a></div>
+              <div>{{documentService.document.biens.length}}</div>
+          </div>
+          <div class="resume-box">
+              <div><mat-icon matListIcon>people</mat-icon><a routerLink="/locataires">Locataires</a></div>
+              <div>{{documentService.document.locataires.length}}</div>
+          </div>
+          <div class="resume-box">
+              <div><mat-icon svgIcon="bailleur"></mat-icon><a routerLink="/bailleurs">Bailleurs</a></div>
+              <div>{{documentService.document.bailleurs.length}}</div>
+          </div>
+          <div class="resume-box">
+              <div><mat-icon matListIcon>book</mat-icon><a routerLink="/pieces">Pièces</a></div>
+              <div>{{documentService.document.pieces.length}}</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+    
+  </mat-grid-list>
+</div>

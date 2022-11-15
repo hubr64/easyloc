@@ -1,0 +1,63 @@
+<h2 mat-dialog-title><mat-icon>euro_symbol</mat-icon> Ajout d'un mouvement</h2>
+<mat-dialog-content>
+    <form [formGroup]="mouvementForm">
+        <mat-form-field appearance="fill">
+            <mat-label>Date</mat-label>
+            <input matInput placeholder="Date" id="date" formControlName="date" [disabled]="true" [matDatepicker]="picker" required>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-hint align="end">Date du mouvement</mat-hint>
+            <mat-datepicker #picker  disabled="false"></mat-datepicker>
+            <mat-error *ngIf="date?.errors?.required">La date est obligatoire.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Bien</mat-label>
+            <mat-select id="bien" formControlName="bien" required>
+                <mat-option *ngFor="let bien of documentService.document.biens" [value]="bien.id">
+                    {{bien.nom}}
+                </mat-option>
+            </mat-select>
+            <mat-icon *ngIf="mouvementForm.value.bien" matSuffix color="accent" [routerLink]="'/fiche/bien/'+mouvementForm.value.bien">visibility</mat-icon>
+            <mat-hint align="end">Bien concerné par le mouvement</mat-hint>
+            <mat-error *ngIf="bien?.errors?.required">Le bien est obligatoire.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Libellé</mat-label>
+            <input matInput placeholder="Libellé" id="libelle" formControlName="libelle" [matAutocomplete]="auto" required>
+            <mat-hint align="end">Texte libre décrivant le mouvement</mat-hint>
+            <mat-error *ngIf="libelle?.errors?.required">Le libellé est obligatoire.</mat-error>
+        </mat-form-field>
+        <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let libelleAuto of libellesAutoFiltered | async" [value]="libelleAuto">
+                {{libelleAuto}}
+            </mat-option>
+        </mat-autocomplete>
+        <mat-form-field appearance="fill">
+            <mat-label>Montant</mat-label>
+            <input matInput placeholder="Montant" id="montant" formControlName="montant" required>
+            <mat-hint align="end">Montant positif si au crédit et négatif si au débit</mat-hint>
+            <mat-error *ngIf="montant?.errors?.pattern">Le montant doit être un nombre.</mat-error>
+            <mat-error *ngIf="montant?.errors?.required">Le montant est obligatoire.</mat-error>
+        </mat-form-field>
+        <ng-container *ngVar="isMouvementForLoyer() as mouvementForLoyer">
+            <div class="mini-chip" *ngIf="mouvementForLoyer >= 0">
+                <ng-container *ngIf="mouvementForLoyer > 0"><mat-icon color="warn">error</mat-icon>Montant non conforme au loyer ({{mouvementForLoyer | currency:'EUR':'symbol':'1.2-2'}})</ng-container>
+                <ng-container *ngIf="mouvementForLoyer == 0"><mat-icon color="primary">done</mat-icon>Montant conforme au loyer</ng-container>
+            </div>
+        </ng-container>
+        <mat-form-field appearance="fill">
+            <mat-label>Tiers</mat-label>
+            <input matInput placeholder="Tiers concerné" id="tiers" formControlName="tiers" required>
+            <mat-hint align="end">Texte libre décrivant le tiers</mat-hint>
+            <mat-error *ngIf="tiers?.errors?.required">Le tiers est obligatoire.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Commentaires</mat-label>
+            <input matInput placeholder="Commentaires libres" id="commentaires" formControlName="commentaires" >
+            <mat-hint align="end">Compléments de détails</mat-hint>
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button color="primary" mat-flat-button [mat-dialog-close]="mouvementForm.value" [disabled]="!mouvementForm.valid">Enregistrer</button>
+    <button color="warn" mat-flat-button [mat-dialog-close]="false">Annuler</button>
+</mat-dialog-actions>

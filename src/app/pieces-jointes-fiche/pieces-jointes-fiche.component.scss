@@ -1,0 +1,111 @@
+
+mat-card-title mat-icon{
+    vertical-align: middle;
+    margin: 0 5px;
+}
+.avatar-letter{
+    font-size: 25px;
+    text-align: center;
+    font-weight: bold;
+    color: #FFF;
+    background: #4285f4;
+    line-height: 47px;
+}
+.mat-card-subtitle{
+    margin-bottom:0px;
+}
+mat-card-actions {
+    position: absolute;
+    right: 0;
+    top: 5px;
+    margin:0;
+    padding:0;
+}
+
+
+.piece-title{
+    font-size: 1.2em;
+    padding-left: 5px;
+    margin: 10px 0 0;
+    font-weight: 500;
+}
+.piece-container{
+    display: flex;
+    flex-wrap: wrap;
+}
+.piece-container > div{
+    flex: 1 1 226px;
+    min-width: 226px;
+    max-width: 300px;
+}
+.piece-container > div > div,
+.no-piece{
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    margin: 7px;
+    overflow: hidden;
+    position: relative;
+}
+.no-piece mat-icon{
+    vertical-align: middle;
+    margin:5px;
+}
+
+.piece-container > div > div > div:first-child{
+    height: 160px;
+    text-align: center;
+}
+.piece-container > div > div > div:first-child img{
+    height: 100%;
+}
+.piece-container > div > div > div:first-child mat-icon{
+    font-size: 10em;
+    line-height: 1.1em;
+    margin-left: -40%;
+}
+.piece-container > div > div > div:last-child{
+    height:70px;
+    border-top: 1px solid #dadce0;
+    box-sizing: border-box;
+    padding: 13px 16px;
+    position: relative;
+    width: 100%;
+}
+.piece-container > div > div > div:last-child>div:first-child{
+    font-size: 13px;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 20px;
+    padding-bottom: 4px;
+}
+.piece-container > div > div > div:last-child>div:last-child{
+    color: rgba(0,0,0,.54);
+    font-size: 12px;
+    line-height: 20px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 20px;
+    padding-bottom: 4px;
+}
+.piece-box{
+    min-width: 226px;
+    max-width: 300px;
+    height: 160px;
+}
+.piece-photo{
+    width:100%;
+    object-fit: cover;
+}
+
+.blink-piece {
+  animation: blinker 0.5s linear infinite;
+}
+@keyframes blinker {
+  50% {
+    opacity: 0.3;
+  }
+}

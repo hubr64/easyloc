@@ -1,0 +1,29 @@
+h1{
+    text-align: center;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.main-chart {
+    height: 400px;
+}
+h3{
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.simple-chart {
+    height: 250px;
+}
+.stat-title{
+    font-weight: bold;
+    text-align:right;
+    width:50%;
+    padding-right:10px;
+    display:inline-block;
+}
+mat-list-item{
+    height: 35px!important;
+}
+mat-list-item mat-icon{
+    vertical-align: middle;
+    margin: 0 0 0 5px;
+}

@@ -1,0 +1,76 @@
+.configuration-form{
+    display:flex;
+    overflow: hidden;
+}
+.configuration-form mat-form-field{
+    flex: 1px;
+}
+::ng-deep .mat-form-field-wrapper{
+    margin-bottom: -1.34375em;
+ }
+ .configuration-form button{
+    border-radius:0;
+ }
+table{
+    max-width: 1600px;
+    margin: 0 auto;
+}
+table td{
+    width: 180px;
+    text-align:center;
+}
+table td:first-child{
+    width: 300px;
+    text-align:right;
+}
+table td:last-child{
+    width: 70px;
+    font-size:0.9em;
+    font-style:italic;
+    font-weight:100;
+    color:#000;
+}
+.main-category{
+    font-weight:700;
+    background: rgb(91,155,213);
+    color:white;
+}
+.sub-category{
+    font-weight:500;
+    background: rgb(189,215,238);
+}
+.main-category.in{
+    background: #4caf50
+}
+.sub-category.in{
+    background: #a5d6a7
+}
+.main-category.out{
+    background:#f44336
+}
+.sub-category.out{
+    background:#ef9a9a
+}
+.main-category.regul{
+    background: #999
+}
+.sub-category.regul{
+    background: #ccc
+}
+td.details-category{
+    border-bottom: 1px dotted #aaa;
+    background: white;
+}
+.result input{
+    text-align: center;
+    font-weight: 500;
+    font-size: 14px;
+}
+mat-radio-group{
+    margin: 0 10px;
+    font-weight: 100;
+    display: block;
+}
+mat-radio-button{
+    margin: 10px;
+}

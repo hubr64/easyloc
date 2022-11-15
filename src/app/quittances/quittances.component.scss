@@ -1,0 +1,66 @@
+form, mat-card{
+    width: 95%;
+    max-width: 700px;
+    margin: 10px auto;
+}
+form button {
+    align-items: center;
+    margin:5px;
+}
+.mat-form-field, mat-checkbox {
+    width: 100%;
+    margin: 5px 10px 0 10px;
+    vertical-align: top;
+}
+.mat-list-item-disabled{
+    font-style: italic;
+    opacity: 0.5;
+}
+#quittance{
+    width:555.28px;
+    background:#FFF;
+    color:#000;
+    padding: 20px;
+    margin: 0 auto;
+}
+#quittance > #title{
+    width:100%;
+    background: #AAA;
+    font-weight: bold;
+    font-size:1.3em;
+    margin: 40px 0;
+    text-align:center;
+    padding: 5px;
+    border: 1px solid #000;
+}
+#quittance > .subtitle {
+    display: inline-block;
+    width: 46%;
+    margin: 10px 10px 10px 10px;
+    text-align:center;
+    border: 1px solid #000;
+    height: 125px;
+    vertical-align: top;
+}
+#quittance > .subtitle > div:first-child {
+    background: #AAA;
+    font-weight: bold;
+}
+#quittance > .subtitle > div:last-child {
+    font-size:0.8em;
+}
+#quittance > .texte{
+    margin-top: 20px;
+    text-align: justify;
+}
+
+#quittance #conditions{
+    font-size: 0.7em;
+    margin-top: 40px;
+    text-align: justify;
+    line-height: 1.2em;
+}
+
+#quittance img{
+    width: 200px;
+}

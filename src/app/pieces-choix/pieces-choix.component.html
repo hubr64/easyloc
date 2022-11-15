@@ -1,0 +1,8 @@
+<h2 mat-dialog-title><mat-icon>find_in_page</mat-icon> Choix de fichiers</h2>
+<mat-dialog-content>
+    <app-piece-liste [embedded]="true" (selected)="onSelected($event)"></app-piece-liste>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button color="primary" mat-flat-button [mat-dialog-close]="pieces" [disabled]="pieces.length == 0">Choisir</button>
+    <button color="warn" [mat-dialog-close]="false" mat-flat-button>Annuler</button>
+</mat-dialog-actions>

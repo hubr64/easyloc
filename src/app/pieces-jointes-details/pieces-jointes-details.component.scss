@@ -1,0 +1,36 @@
+.pieces-list{
+    width:100%;
+}
+.pieces-list > button{
+    margin: 5px;
+}
+.pieces-list > button:nth-child(3),
+.pieces-list > button:nth-child(4){
+    float:right;
+}
+app-piece-liste{
+    width:100%;
+}
+.pieces-missed{
+    margin-top: 10px;
+}
+.pieces-missed mat-icon{
+    vertical-align: middle;
+    margin-right: 5px;
+}
+.piece-missed{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    order: 1;
+}
+.piece-missed > span{
+    align-items: center;
+    border-radius: 15px;
+    box-shadow: inset 0 0 0 1px rgb(100 121 143 / 50%);
+    box-sizing: border-box;
+    display: flex;
+    height: 30px;
+    padding: 0 12px;
+    margin: 3px;
+}

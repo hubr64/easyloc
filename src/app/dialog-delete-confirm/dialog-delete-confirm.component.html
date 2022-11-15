@@ -1,0 +1,8 @@
+<h2 mat-dialog-title><mat-icon>help</mat-icon> Suppression</h2>
+<mat-dialog-content>
+    Êtes-vous sûr de vouloir supprimer {{data.type}} : "{{data.value}}" ?
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button color="warn" mat-button [mat-dialog-close]="false" cdkFocusInitial>Non</button>
+    <button color="primary" mat-button [mat-dialog-close]="true">Oui</button>
+</mat-dialog-actions>

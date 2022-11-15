@@ -1,1 +1,77 @@
 /* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: "Raleway"!important; }
+
+.form-button{
+    margin:10px 0;
+    text-align: center;
+}
+.dark-theme .mat-list-item-disabled {
+    background: #3C3C3C!important;
+}
+.mat-row:hover{
+    background:#DDD;
+}
+.dark-theme .mat-row:hover{
+    background:#555;
+}
+mat-toolbar.sticky-toolbar{
+    position: sticky;
+    top: 0;
+    z-index:2;
+}
+mat-toolbar.sticky-toolbar mat-icon{
+    margin-right:5px;
+}
+th.mat-table-sticky{
+    height: 64px;
+}
+tr.mat-footer-row {
+    font-weight: bold;
+}
+.flex{
+    flex:1;
+}
+.full-width-table {
+    width: 100%;
+}
+.filter-form{
+    margin:15px auto 0 auto;
+    width:95%;
+    display: block !important;
+}
+.filter-form-condensed{
+    width:100%;
+}
+.filter-form mat-icon:last-child,
+.filter-form-condensed mat-icon:last-child{
+    cursor:pointer;
+}
+.mat-elevation-z8{
+    margin-bottom:20px;
+}
+.centered-cell{
+    text-align:center;
+}
+h1 mat-icon{
+    vertical-align: middle;
+    margin-right: 5px;
+}
+table mat-icon{
+    vertical-align: middle;
+    margin-left: 5px;
+}
+.btn-icon { 
+    &:hover {
+        path {
+            fill: rgba(#00ffff, 1); 
+        }
+    }
+}
+.tab-label-icon{
+    margin-right:5px;
+}
+mat-tab-body.mat-tab-body{
+    padding:0!important;
+}

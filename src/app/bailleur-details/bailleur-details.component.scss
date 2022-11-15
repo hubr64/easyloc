@@ -1,0 +1,28 @@
+form, app-pieces-jointes-details, app-bien-liste{
+  width: 100%;
+  margin: 10px auto;
+}
+form > button {
+  align-items: center;
+}
+.mat-form-field {
+  width: 100%;
+  margin-bottom: 10px;
+}
+table{
+  width:100%;
+} 
+textarea{
+  min-height: 80px;
+  resize:none!important;
+}
+.signature-field img{
+  max-height: 70px;
+  vertical-align: middle;
+}
+.signature-field button{
+  margin-left:10px;
+}
+::ng-deep .mat-tab-body{
+  padding:5px 10px!important
+}
