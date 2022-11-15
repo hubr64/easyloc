@@ -65,7 +65,11 @@ export class ConfigurationService {
   }
 
   getValue(index: string) {
-    return this.configurationItems[index].value;
+    if(this.configurationItems[index]){
+      return this.configurationItems[index].value;
+    }else{
+      return '';
+    }
   }
 
   setValue(index: string, value: string) {
