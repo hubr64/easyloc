@@ -12,6 +12,7 @@ export const BIENTYPE: {[key: string]: string} = {
 }
 
 export class Bien {
+  className: string;
   id: string;
   nom: string;
   description: string;
@@ -31,6 +32,7 @@ export class Bien {
 
 
   constructor() {
+    this.className = 'Bien';
     this.id = '';
     this.nom = '';
     this.description = '';

@@ -1,7 +1,7 @@
 <mat-nav-list>
     <a *ngFor="let user of data.users" [routerLink]="urlUser[user.id]" (click)="openLink()" mat-list-item>
-        <mat-icon matListIcon svgIcon="{{userTypeIcon['svg.'+user.constructor.name]}}">{{userTypeIcon[user.constructor.name]}}</mat-icon>
-        <span mat-line>{{user.constructor.name}} : {{user.toString()}}</span>
+        <mat-icon matListIcon svgIcon="{{userTypeIcon['svg.'+user.className]}}">{{userTypeIcon[user.className]}}</mat-icon>
+        <span mat-line>{{user.className}} : {{user.toString()}}</span>
         <mat-icon *ngIf="data.canRemove" color="warn" (click)="detachUser(user, $event)" title="Dissocier">remove_circle</mat-icon>
     </a>
     <mat-list-item *ngIf="data.users.length == 0" disabled>

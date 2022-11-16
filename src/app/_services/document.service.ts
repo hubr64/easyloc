@@ -350,7 +350,7 @@ export class DocumentService {
     //The array with all missing pieces
     var piecesManquantes: string[] = [];
     //First get in configuration the mandatary pieces for the piece container provided
-    var piecesObligatoires = this.configurationService.getValue("piecesObligatoires"+piecesContainer.constructor.name);
+    var piecesObligatoires = this.configurationService.getValue("piecesObligatoires"+piecesContainer.className);
     //Split it into an array
     piecesObligatoires = piecesObligatoires.split(",");
     //By default the piece container is compliant

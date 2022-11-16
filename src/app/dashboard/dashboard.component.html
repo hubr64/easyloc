@@ -112,12 +112,12 @@
         <mat-card-content>
           <mat-list>
               <mat-list-item *ngFor="let missingPiece of missingPieces">
-                  <mat-icon matListIcon svgIcon="{{typeIcon['svg.'+missingPiece.piecesContainer.constructor.name]}}">{{typeIcon[missingPiece.piecesContainer.constructor.name]}}</mat-icon>
+                  <mat-icon matListIcon svgIcon="{{typeIcon['svg.'+missingPiece.piecesContainer.className]}}">{{typeIcon[missingPiece.piecesContainer.className]}}</mat-icon>
                   <h3 mat-line>{{missingPiece.piecesContainer}}</h3>
                   <span class="mat-line-infos" mat-line>
                     {{getmissingPieceStr(missingPiece.piecesManquantes)}}
                   </span>
-                  <button title="Modifier" mat-icon-button [routerLink]="'/'+missingPiece.piecesContainer.constructor.name.toLowerCase()+'/'+missingPiece.piecesContainer.id">
+                  <button title="Modifier" mat-icon-button [routerLink]="'/'+missingPiece.piecesContainer.className.toLowerCase()+'/'+missingPiece.piecesContainer.id">
                     <mat-icon>visibility</mat-icon>
                  </button>
                  <app-pieces-jointes-liste [container]="missingPiece.piecesContainer" badgeColor="warn"></app-pieces-jointes-liste>
