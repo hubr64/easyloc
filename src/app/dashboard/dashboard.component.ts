@@ -213,4 +213,16 @@ export class DashboardComponent {
 
   }
 
+  public warningCardEmpty(): boolean {
+
+    //We count the number of elements displayed in the warning
+    let displayedWarningNb = this.unpaidLoyers.length + this.unrentBiens.length + this.mouvementsWithoutQuittance.length;
+    this.updateLoyerBails.forEach(updateLoyerBail => {
+      if(updateLoyerBail.toUpdate){
+        displayedWarningNb++;
+      }
+    });
+    return displayedWarningNb == 0;
+  }
+
 }
