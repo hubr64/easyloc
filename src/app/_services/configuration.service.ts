@@ -65,6 +65,8 @@ export class ConfigurationService {
   }
 
   getValue(index: string) {
+    console.error('getValue');
+    console.dir(this.configurationItems);
     if(this.configurationItems[index]){
       return this.configurationItems[index].value;
     }else{
