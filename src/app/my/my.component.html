@@ -1,7 +1,6 @@
 <button *ngIf="isLoggedIn; else elseBlock" mat-button [matMenuTriggerFor]="my"><div mat-card-avatar class="user-avatar" [style.background-image]="'url(' + currentUser.image + ')'" ></div></button>
 <mat-menu #my="matMenu" yPosition="above" [overlapTrigger]="false">
   <button mat-menu-item routerLink="/configuration"><mat-icon>settings</mat-icon> Configuration</button>
-  <button mat-menu-item routerLink="/conditions"><mat-icon>info</mat-icon> Conditions</button>
   <button mat-menu-item [matMenuTriggerFor]="connexion"><mat-icon>cloud_queue</mat-icon> Connexion</button>
   <button mat-menu-item (click)="signOut()"><mat-icon>logout</mat-icon> Déconnexion</button>
 </mat-menu>
