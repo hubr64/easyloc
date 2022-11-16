@@ -7,6 +7,7 @@ export enum BailleurType {
 }
 
 export class Bailleur {
+  className: string;
   id: string;
   nom: string;
   type: BailleurType;
@@ -19,6 +20,7 @@ export class Bailleur {
   pieces: Piece[];
 
   constructor() {
+    this.className = 'Bailleur';
     this.id = '';
     this.nom = '';
     this.type = BailleurType.Physique;

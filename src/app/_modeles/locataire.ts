@@ -1,6 +1,7 @@
 import { Piece } from './piece';
 
 export class Locataire {
+  className: string;
   id: string;
   nom: string;
   telephone: string;
@@ -9,6 +10,7 @@ export class Locataire {
   pieces: Piece[];
 
   constructor() {
+    this.className = 'Locataire';
     this.id = '';
     this.nom = '';
     this.telephone = '';
