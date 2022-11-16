@@ -34,16 +34,17 @@
       <span class="flex"></span>
       <button mat-icon-button *ngIf="!documentService.autoSave" (click)="saveDocument()" title="Sauvegarder" [disabled]="!documentService.docIsModified"><mat-icon [matBadge]="documentService.docIsModified?'!':''" matBadgeColor="warn">save</mat-icon></button>
       <button mat-icon-button (click)="toggleTheme()" title="Changer de thème"><mat-icon *ngIf="darkModeCheck">dark_mode</mat-icon><mat-icon *ngIf="!darkModeCheck">light_mode</mat-icon></button>
+      <button mat-icon-button routerLink="/conditions" title="Conditions"><mat-icon>info</mat-icon></button>
       <app-my></app-my>
     </mat-toolbar>
-    <div *ngIf="isLoading || !isLoggedIn || !isCompliant" class="loading-message" matRipple [matRippleUnbounded]="true" [matRippleRadius]="250">
+    <div *ngIf="(isLoading || !isLoggedIn || !isCompliant) && !isNonLoggedInRoute()" class="loading-message" matRipple [matRippleUnbounded]="true" [matRippleRadius]="250">
         <img src="assets/logo_sans_titre.png" alt="EasyLoc">
         <div>Easy<b>LOC</b></div>
         <mat-progress-bar *ngIf="isLoading" color="primary" mode="indeterminate"></mat-progress-bar>
         <div *ngIf="isLoading">Chargement en cours...</div>
         <div *ngIf="!isLoading">pour vous simplifier la location...</div>
       </div>
-    <div *ngIf="(!isLoading && isLoggedIn && isCompliant)">
+    <div *ngIf="(!isLoading && isLoggedIn && isCompliant) || isNonLoggedInRoute()">
       <router-outlet></router-outlet>
     </div>
     <div *ngIf="(!isLoading && !isLoggedIn)" class="connect-msg">
