@@ -24,7 +24,6 @@ import { StatistiquesDetailsComponent } from './statistiques-details/statistique
 import { StatistiquesImpotsComponent } from './statistiques-impots/statistiques-impots.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'browse', component: BrowseComponent },
   { path: 'configuration', component: ConfigurationComponent },
