@@ -32,7 +32,7 @@
       </mat-card>
     </mat-grid-tile>
 
-    <mat-grid-tile  [rowspan]="(rowSpanWarn?rowSpanWarn:1)">
+    <mat-grid-tile [rowspan]="(rowSpanWarn?rowSpanWarn:1)">
       <mat-card class="dashboard-card">
         <mat-card-header>
           <mat-card-title>
@@ -44,6 +44,11 @@
           </mat-card-title>
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
+          <div id="warning-empty" *ngIf="warningCardEmpty()">
+            <mat-icon color="primary">sentiment_very_satisfied</mat-icon>
+            TOUT VA BIEN AUJOURD'HUI !
+          </div>
+
           <mat-list>
             <mat-list-item *ngFor="let unpaidLoyer of unpaidLoyers">
                 <mat-icon matListIcon matBadgeColor="warn" matBadge="!">euro_symbol</mat-icon>
