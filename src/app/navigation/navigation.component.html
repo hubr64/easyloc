@@ -30,7 +30,7 @@
         *ngIf="isHandset$ | async">
         <mat-icon>menu</mat-icon>
       </button>
-      <span class="name">Easy<b>Loc</b> 0.0.1.aa</span>
+      <span class="name">Easy<b>Loc</b></span>
       <span class="flex"></span>
       <button mat-icon-button *ngIf="!documentService.autoSave" (click)="saveDocument()" title="Sauvegarder" [disabled]="!documentService.docIsModified"><mat-icon [matBadge]="documentService.docIsModified?'!':''" matBadgeColor="warn">save</mat-icon></button>
       <button mat-icon-button (click)="toggleTheme()" title="Changer de thème"><mat-icon *ngIf="darkModeCheck">dark_mode</mat-icon><mat-icon *ngIf="!darkModeCheck">light_mode</mat-icon></button>

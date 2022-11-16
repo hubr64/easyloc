@@ -347,14 +347,10 @@ export class DocumentService {
 
   //Function to check all mandatory pieces for a piece container (bien, locataire, ...)
   public checkPiecesObligatoires(piecesContainer: any): string[]{
-    console.log('checkPiecesObligatoires');
-    console.dir(piecesContainer);
-    console.log(piecesContainer.constructor.name);
     //The array with all missing pieces
     var piecesManquantes: string[] = [];
     //First get in configuration the mandatary pieces for the piece container provided
-    var piecesObligatoires = this.configurationService.getValue("piecesObligatoires"+piecesContainer.constructor.name);
-    console.dir(piecesObligatoires);
+    var piecesObligatoires = this.configurationService.getValue("piecesObligatoires"+piecesContainer.className);
     //Split it into an array
     piecesObligatoires = piecesObligatoires.split(",");
     //By default the piece container is compliant

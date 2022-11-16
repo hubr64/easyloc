@@ -3,25 +3,27 @@ import { Bien } from './bien';
 import { Piece } from './piece';
 
 export class Mouvement {
-    id: string;
-    date: Date;
-    bien: Bien;
-    libelle: string;
-    montant: number;
-    tiers: string;
-    quittance: Piece | null;
-    commentaires: string;
+  className: string;
+  id: string;
+  date: Date;
+  bien: Bien;
+  libelle: string;
+  montant: number;
+  tiers: string;
+  quittance: Piece | null;
+  commentaires: string;
 
-    constructor() {
-        this.id = '';
-        this.date = new Date();
-        this.bien = new Bien();
-        this.libelle = '';
-        this.montant = 0;
-        this.tiers = '';
-        this.quittance = null;
-        this.commentaires = '';
-    }
+  constructor() {
+    this.className = 'Mouvement';
+    this.id = '';
+    this.date = new Date();
+    this.bien = new Bien();
+    this.libelle = '';
+    this.montant = 0;
+    this.tiers = '';
+    this.quittance = null;
+    this.commentaires = '';
+  }
 
   static fromJSON(input: any, docBiens: Bien[] = [], docPieces: Piece[] = []): Mouvement {
     var tmp = Object.assign(new Mouvement(), input);

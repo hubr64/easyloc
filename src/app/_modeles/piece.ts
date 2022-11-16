@@ -25,12 +25,14 @@
 }
 
 export class Piece {
+    className: string;
     id: string;
     nom: string;
     description: string;
     code: string;
 
     constructor() {
+        this.className = 'Piece';
         this.id = '';
         this.nom = '';
         this.description = '';

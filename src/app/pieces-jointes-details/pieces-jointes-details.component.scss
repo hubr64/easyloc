@@ -21,8 +21,9 @@ app-piece-liste{
 .piece-missed{
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
     order: 1;
+    flex-direction: row;
 }
 .piece-missed > span{
     align-items: center;
