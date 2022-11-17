@@ -4,13 +4,14 @@
     flex-wrap: wrap;
 }
 .filter-box mat-form-field{
-    flex: 1 1 40px;
+    flex: 5 1 40px;
 }
 ::ng-deep .mat-form-field-wrapper{
     margin-bottom: -1.34375em;
  }
  .filter-box button{
     border-radius:0;
+    flex: 1;
  }
  .responsive{
     width: 100%;
@@ -21,6 +22,11 @@ table{
 }
 table td:nth-child(3){
     width:200px;
+}
+table td:nth-child(6) mat-icon{
+    font-size: 21px;
+    margin-left: -3px!important;
+    opacity: 0.8;
 }
 table td:last-child{
     width:190px;
