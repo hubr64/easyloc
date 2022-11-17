@@ -34,7 +34,7 @@ export class NavigationComponent {
   /** Reference to the directive instance of the ripple. */
   @ViewChild(MatRipple) ripple: MatRipple;
 
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
+  isHandset$: Observable<boolean> = this.breakpointObserver.observe('(max-width: 450px)')
     .pipe(
       map(result => result.matches),
       shareReplay()

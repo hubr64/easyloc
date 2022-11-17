@@ -990,146 +990,83 @@ export class StatistiquesDetailsComponent implements OnInit {
   public computeChartOptionsForSimple(){
 
     var currentDate = new Date();
-    var inData = [];
+    var simpleSeries: SeriesOption[] = [];
     for (let keyBien in this.bilanParAn) {
       if(keyBien!="total"){
-        inData.push({
+        simpleSeries.push({
           name: keyBien,
-          value: Math.round(this.bilanParAn[keyBien][currentDate.getFullYear()]?this.bilanParAn[keyBien][currentDate.getFullYear()].in:0)
-        });
-      }
-    }
-    var outData = [];
-    for (let keyBien in this.bilanParAn) {
-      if(keyBien!="total"){
-        outData.push({
-          name: keyBien,
-          value: Math.round(this.bilanParAn[keyBien][currentDate.getFullYear()]?-this.bilanParAn[keyBien][currentDate.getFullYear()].out:0)
+          type: 'bar',
+          stack: 'total',
+          label: {
+            show: true,
+            formatter: '{c} €',
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          data: [
+            Math.round(this.bilanParAn[keyBien][currentDate.getFullYear()]?this.bilanParAn[keyBien][currentDate.getFullYear()].in:0),
+            Math.round(this.bilanParAn[keyBien][currentDate.getFullYear()]?-this.bilanParAn[keyBien][currentDate.getFullYear()].out:0)
+          ]
         });
       }
     }
 
     this.chartOptionSimple = {
-      
-      title: [
-        {
-          subtext: 'ENTREES',
-          left: '25%',
-          top: '42%',
-          padding:0,
-          textAlign: 'center',
-          subtextStyle: {
-            fontWeight: 700,
-            fontSize: 16
-          }
-        },
-        {
-          subtext: 'SORTIES',
-          left: '75%',
-          top: '42%',
-          padding:0,
-          textAlign: 'center',
-          subtextStyle: {
-            fontWeight: 700,
-            fontSize: 16
-          }
-        },
-      ],
       tooltip: {
-        trigger: 'item'
-      },
-      series: [
-        {
-          type: 'pie',
-          radius: [40, 70],
-          top: '0%',
-          width: '50%',
-          left: '0%',
-          height: 250,
-          itemStyle: {
-            borderRadius: 5,
-            borderColor: 'transparent',
-            borderWidth: 5
-          },
-          label: {
-            alignTo: 'edge',
-            formatter: '{name|{b}}\n{value|{c} €}',
-            minMargin: 5,
-            edgeDistance: 10,
-            lineHeight: 15,
-            textBorderColor :'transparent',
-            color:'inherit',
-            rich: {
-              time: {
-                fontSize: 10,
-                color: '#999'
-              }
-            }
-          },
-          labelLine: {
-            length: 15,
-            length2: 0,
-            maxSurfaceAngle: 80
-          },
-          labelLayout: (params: any) => {
-            const isLeft = params.labelRect.x < this.chartSimple.nativeElement.width / 2;
-            const points = params.labelLinePoints;
-            // Update the end point.
-            points[2][0] = isLeft
-              ? params.labelRect.x
-              : params.labelRect.x + params.labelRect.width;
-            return {
-              labelLinePoints: points
-            };
-          },
-          data: inData
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
         },
+      },
+      grid:{
+        bottom:10
+      },
+      legend: {},
+      xAxis: {
+        type: 'value',
+        show: false
+      },
+      yAxis: {
+        type: 'category',
+        data: ['Entrées', 'Sorties']
+      },
+      animationType: 'scale',
+      animationEasing: 'elasticOut',
+      series: simpleSeries,
+      media: [ 
         {
-          type: 'pie',
-          radius: [40, 70],
-          top: '0%',
-          width: '50%',
-          left: '50%',
-          height: 250,
-          itemStyle: {
-            borderRadius: 5,
-            borderColor: 'transparent',
-            borderWidth: 2
-          },
-          label: {
-            alignTo: 'edge',
-            formatter: '{name|{b}}\n{value|{c} €}',
-            minMargin: 5,
-            edgeDistance: 10,
-            lineHeight: 15,
-            textBorderColor :'transparent',
-            color:'inherit',
-            rich: {
-              time: {
-                fontSize: 10,
-                color: '#999'
-              }
+            query: {maxWidth: 400},
+            option: { 
+              xAxis: {
+                type: 'category',
+                data: ['Entrées', 'Sorties']
+              },
+              yAxis: {
+                type: 'value',
+                show: false
+              },
+              grid:{
+                bottom:20
+              },
             }
-          },
-          labelLine: {
-            length: 15,
-            length2: 0,
-            maxSurfaceAngle: 80
-          },
-          labelLayout: (params: any) => {
-            const isLeft = params.labelRect.x < this.chartSimple.nativeElement.width / 2;
-            const points = params.labelLinePoints;
-            // Update the end point.
-            points[2][0] = isLeft
-              ? params.labelRect.x
-              : params.labelRect.x + params.labelRect.width;
-            return {
-              labelLinePoints: points
-            };
-          },
-          data: outData
-        }
-      ],
+        },{
+          query: {minWidth: 400},
+          option: {
+            xAxis: {
+              type: 'value',
+              show: false
+            },
+            yAxis: {
+              type: 'category',
+              data: ['Entrées', 'Sorties']
+            },
+            grid:{
+              bottom:10
+            },
+          }
+      }
+    ]
     };
   }
 

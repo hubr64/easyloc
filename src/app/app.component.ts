@@ -8,7 +8,7 @@ import { DomSanitizer } from "@angular/platform-browser";
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'Easy^Loc';
+  title = 'EasyLoc';
 
   constructor(
     private matIconRegistry: MatIconRegistry,
