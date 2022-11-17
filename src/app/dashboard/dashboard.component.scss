@@ -65,7 +65,7 @@ mat-card-title mat-icon{
 .resume-box{
   flex:1;
   height: 115px;
-  min-width: 130px;
+  min-width: 140px;
   border: 1px solid #ccc;
   margin: 5px;
 }
@@ -90,4 +90,49 @@ mat-card-title mat-icon{
   font-size:3em;
   padding: 5px;
   line-height: 2em;
+}
+
+@media (max-width: 1000px) {
+  .resume-box{
+    height: auto;
+  }
+  .resume-box > div:last-child{
+    line-height: 1.1em;
+  }
+}
+
+@media (max-width: 500px) {
+  .resume-box{
+    height: auto;
+    min-width: 100px;
+  }
+  .resume-box > div:first-child{
+    padding: 2px;
+  }
+  .resume-box > div:first-child a{
+    font-size: 12px;
+  }
+  .resume-box > div:last-child{
+    font-size:2em;
+    line-height: 1.1em;
+  }
+}
+
+@media (max-width: 350px) {
+  .resume-box{
+    height: auto;
+    min-width: 100px;
+    margin: 2px;
+  }
+  .resume-box > div:first-child{
+    padding: 1px;
+  }
+  .resume-box > div:first-child a{
+    font-size: 12px;
+  }
+  .resume-box > div:last-child{
+    padding: 2px;
+    font-size:1.3em;
+    line-height: 1em;
+  }
 }
