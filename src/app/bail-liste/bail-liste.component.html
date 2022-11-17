@@ -102,9 +102,9 @@
                 <td mat-cell *matCellDef="let row">
                     {{row.loyer| currency:'EUR':'symbol':'1.2-2'}}
                     <ng-container *ngVar="documentService.getLoyerToUpdate(row) as loyerToUpdate">
-                        <mat-icon title="Loyer modifiable" color="warn" *ngIf="loyerToUpdate && loyerToUpdate.toUpdate">warning</mat-icon>
-                        <mat-icon title="Loyer à jour" color="primary" *ngIf="loyerToUpdate && !loyerToUpdate.toUpdate">done</mat-icon>
-                        <mat-icon title="Loyer inactif" disabled *ngIf="!loyerToUpdate">hide_source</mat-icon>
+                        <mat-icon title="Loyer modifiable" color="warn" *ngIf="loyerToUpdate && loyerToUpdate.toUpdate">restart_alt</mat-icon>
+                        <mat-icon title="Loyer à jour" color="primary" *ngIf="loyerToUpdate && !loyerToUpdate.toUpdate">check_circle</mat-icon>
+                        <mat-icon title="Loyer inactif" disabled *ngIf="!loyerToUpdate">radio_button_unchecked</mat-icon>
                     </ng-container>
                 </td>
                 <td mat-footer-cell *matFooterCellDef>{{getTotalLoyer() | currency:'EUR':'symbol':'1.2-2'}}</td>

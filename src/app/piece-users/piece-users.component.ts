@@ -18,7 +18,7 @@ export class PieceUsersComponent {
     private _bottomSheetRef: MatBottomSheetRef<PieceUsersComponent>,
     private router: Router) { 
       data.users.forEach((pieceUser: any) => {
-        this.urlUser[pieceUser.id] = "/"+pieceUser.constructor.name.toLowerCase( )+"/"+pieceUser.id;
+        this.urlUser[pieceUser.id] = "/"+pieceUser.className.toLowerCase( )+"/"+pieceUser.id;
       });
     }
 

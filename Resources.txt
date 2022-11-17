@@ -4,4 +4,4 @@ ng serve
 
 ng build --base-href /static/easyloc/ --configuration production
 
-ng build --output-path docs --base-href /easyloc.github.io/
+ng build --output-path docs --base-href /easyloc/

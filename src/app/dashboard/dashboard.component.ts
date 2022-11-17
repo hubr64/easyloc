@@ -24,7 +24,7 @@ import { UploadComponent } from '../upload/upload.component';
 })
 export class DashboardComponent {
   /** Based on the screen size, switch from standard to one column per row */
-  nbCols: any = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
+  nbCols: any = this.breakpointObserver.observe('(max-width: 1000px)').pipe(
     map(({ matches }) => {
       if (matches) {
         return 1;
@@ -211,6 +211,18 @@ export class DashboardComponent {
       },
     });
 
+  }
+
+  public warningCardEmpty(): boolean {
+
+    //We count the number of elements displayed in the warning
+    let displayedWarningNb = this.unpaidLoyers.length + this.unrentBiens.length + this.mouvementsWithoutQuittance.length;
+    this.updateLoyerBails.forEach(updateLoyerBail => {
+      if(updateLoyerBail.toUpdate){
+        displayedWarningNb++;
+      }
+    });
+    return displayedWarningNb == 0;
   }
 
 }

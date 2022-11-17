@@ -24,6 +24,7 @@ export const BAILPERIODEPAIEMENT: {[key: string]: string} = {
 }
 
 export class Bail {
+    className: string;
     id: string;
     bien: Bien;
     locataire: Locataire;
@@ -41,6 +42,7 @@ export class Bail {
     pieces: Piece[];
 
     constructor() {
+        this.className = 'Bail';
         this.id = '';
         this.bien = new Bien();
         this.locataire = new Locataire();

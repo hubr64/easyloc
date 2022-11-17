@@ -1,4 +1,5 @@
 import { Component, ChangeDetectorRef,ViewChild, Renderer2   } from '@angular/core';
+import { Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription, interval  } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
@@ -26,13 +27,14 @@ export class NavigationComponent {
   public isCompliant: boolean = false;
   public isLoading: boolean = true;
   private sub: Subscription;
+  private notLoggedInRoutes: string[] = ["/conditions"];
 
   public darkModeCheck = true;
 
   /** Reference to the directive instance of the ripple. */
   @ViewChild(MatRipple) ripple: MatRipple;
 
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
+  isHandset$: Observable<boolean> = this.breakpointObserver.observe('(max-width: 450px)')
     .pipe(
       map(result => result.matches),
       shareReplay()
@@ -41,6 +43,7 @@ export class NavigationComponent {
   constructor(private breakpointObserver: BreakpointObserver,
     private renderer: Renderer2,
     private cdr: ChangeDetectorRef,
+    public router: Router,
     public configurationService: ConfigurationService,
     public alertService: AlertService,
     public userService: UserService,
@@ -120,5 +123,18 @@ export class NavigationComponent {
     public saveDocument(){
       //When the autosave is not activated then function to save the document
       this.documentService.saveDocumentFile();
+    }
+
+    public isNonLoggedInRoute(): boolean{
+
+      let isNonLoggedInRoute: boolean = false;
+      isNonLoggedInRoute = (this.notLoggedInRoutes.indexOf(this.router.url) != -1);
+
+      if(isNonLoggedInRoute){
+        this.isLoading = false;
+        this.sub.unsubscribe();
+      }
+
+      return isNonLoggedInRoute;
     }
 }

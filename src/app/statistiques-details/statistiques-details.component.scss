@@ -13,11 +13,53 @@ h3{
 .simple-chart {
     height: 250px;
 }
-.stat-title{
+
+.compact-stat .stat-icon{
+    display: inline-block;
+}
+.compact-stat .stat-title{
+    display: inline-block;
     font-weight: bold;
-    text-align:right;
-    width:50%;
-    padding-right:10px;
+    width: 180px;
+    padding: 0 10px;
+}
+.compact-stat .generalites-current-year{
+    display: inline-block;
+}
+
+@media (max-width: 1200px) {
+    .compact-stat .stat-icon{
+        display: none;
+    }
+    .compact-stat .stat-title{
+        display: inline-block;
+        font-weight: bold;
+        width: 180px;
+        padding: 0 10px;
+    }
+    .compact-stat .generalites-current-year{
+        display: inline-block;
+    }
+}
+
+@media (max-width: 600px) {
+    .compact-stat .stat-icon{
+        display: none;
+    }
+    .compact-stat .stat-title{
+        display: inline-block;
+        font-weight: normal;
+        width: 160px;
+        font-size: 0.8em;
+        padding: 0 5px;
+    }
+    .compact-stat .generalites-current-year{
+        display: none;
+    }
+}
+
+.stat-title{
+    
     display:inline-block;
 }
 mat-list-item{
@@ -26,4 +68,14 @@ mat-list-item{
 mat-list-item mat-icon{
     vertical-align: middle;
     margin: 0 0 0 5px;
+}
+.generalites-current-year{
+    opacity: 0.8;
+    font-size: 0.8em;
+    position: absolute;
+    right: 0;
+}
+
+h3 > .generalites-current-year{
+    margin-right: 15px;
 }
