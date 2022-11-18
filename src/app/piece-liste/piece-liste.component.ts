@@ -71,7 +71,7 @@ export class PieceListeComponent implements AfterViewInit  {
   //URL for each piece
   public urlPieces: {[key: string]: string} = {};
   //404 error for each piece
-  public errorPieces: {[key: string]: boolean} = {};
+  public errorPieces: {[key: string]: number} = {};
   //PIece which description is currenlty edited (sotre descr and code in temporary variable to edit value only when user validate)
   public currentEdited: Piece;
   public currentEditedDescription: string;
@@ -139,7 +139,7 @@ export class PieceListeComponent implements AfterViewInit  {
         },
         (error:any) => {
           if(error.status==404){
-            this.errorPieces[piece.id] = true;
+            this.errorPieces[piece.id] = error.status;
             this.cdr.detectChanges();
           }
           console.error("Impossible to get metadata for " + piece.nom);
@@ -204,7 +204,7 @@ export class PieceListeComponent implements AfterViewInit  {
     const dialogRef = this.dialog.open(DialogDeleteConfirmComponent, {
       data: {
         type: "ce document",
-        value: piece.nom + ' (' + piece.description + ')',
+        value: piece.nom + ' (' + (this.errorPieces[piece.id]==404?"Attention ! Ce document ne semble plus exister dans le drive ! Sa suppression ne se fera que dans Easyloc.":piece.description) + ')',
       },
     });
 
@@ -232,7 +232,7 @@ export class PieceListeComponent implements AfterViewInit  {
               this.alertService.success('La suppression a été réalisée.');
             //An other error occurs the display it
             }else{
-              this.alertService.error("Impossible de supprimer le fichier : " + error.message);
+              this.alertService.error("Impossible de supprimer le fichier : " + error.message + "(Erreur "+ error.status +")");
             }
           });
       // If user finally change his mind
