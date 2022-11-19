@@ -66,7 +66,8 @@
             <mat-list-item *ngFor="let unrentBien of unrentBiens">
               <mat-icon matListIcon matBadgeColor="warn" matBadge="!">apartment</mat-icon>
               <h3 mat-line>{{unrentBien.bien}} n'est pas loué</h3>
-              <span class="mat-line-infos" mat-line>{{unrentBien.nbJours}} jours sans location</span>
+              <span class="mat-line-infos" mat-line *ngIf="unrentBien.nbJours < 10000">{{unrentBien.nbJours}} jours sans location</span>
+              <span class="mat-line-infos" mat-line *ngIf="unrentBien.nbJours == 10000">Jamais loué</span>
               <button title="Voir le bien" mat-icon-button [routerLink]="'/fiche/bien/'+unrentBien.bien.id">
                 <mat-icon>visibility</mat-icon>
               </button>
@@ -144,12 +145,12 @@
               <div>{{documentService.document.locataires.length}}</div>
           </div>
           <div class="resume-box">
-              <div><mat-icon svgIcon="bailleur"></mat-icon><a routerLink="/bailleurs">Bailleurs</a></div>
-              <div>{{documentService.document.bailleurs.length}}</div>
-          </div>
-          <div class="resume-box">
               <div><mat-icon matListIcon>book</mat-icon><a routerLink="/pieces">Pièces</a></div>
               <div>{{documentService.document.pieces.length}}</div>
+          </div>
+          <div class="resume-box">
+              <div><mat-icon svgIcon="bailleur"></mat-icon><a routerLink="/bailleurs">Bailleurs</a></div>
+              <div>{{documentService.document.bailleurs.length}}</div>
           </div>
         </mat-card-content>
       </mat-card>

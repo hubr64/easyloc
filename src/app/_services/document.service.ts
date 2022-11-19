@@ -523,22 +523,26 @@ export class DocumentService {
     //Number fo days since end date of bail
     var bailDeltaNbJour = 10000;
 
-    //Look in all pieces to look for the quittance of the compare period
+    //Look in all bails to look for the bien
     this.document.bails.forEach((bail:Bail) => {
       //Get the bail for the current bien
       if(bail.bien == bien){
+        //There is no end date thus the bien is rent
         if(!bail.dateFin){
           bailFound = true;
         }else{
+          //Get time difference to know since how long the bien is not rent
           const diffTime = Math.abs(currentDate.valueOf() - bail.dateFin.valueOf());
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          //If this is a shortest time than keep that time 
           if(diffDays < bailDeltaNbJour){
             bailDeltaNbJour = diffDays;
           }
         }
       }
     });
-    //If no quittance founad thus this is not paied
+    //If no bail found thus this is not rent
+    //If never rent then it returns 10000 days
     if(!bailFound){
       return {bien:bien, nbJours: bailDeltaNbJour};
     }
