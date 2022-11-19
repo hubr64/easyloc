@@ -32,7 +32,8 @@
                     </div>
                     <ng-container *ngVar="documentService.getUnrentBien(bien) as unrentBien">
                         <div class="mini-chip right" *ngIf="!unrentBien"><mat-icon>person</mat-icon>Loué</div>
-                        <div class="mini-chip right" *ngIf="unrentBien"><mat-icon color="warn">person_outline</mat-icon>Non loué depuis {{unrentBien.nbJours}} jours</div>
+                        <div class="mini-chip right" *ngIf="unrentBien && unrentBien.nbJours < 10000"><mat-icon color="warn">person_outline</mat-icon>Non loué depuis {{unrentBien.nbJours}} jours</div>
+                        <div class="mini-chip right" *ngIf="unrentBien && unrentBien.nbJours == 10000"><mat-icon>pending</mat-icon>Jamais loué</div>
                     </ng-container>
                 </div>
                 <div class="bien-infos">
