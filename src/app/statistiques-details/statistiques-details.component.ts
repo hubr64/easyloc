@@ -1077,11 +1077,11 @@ export class StatistiquesDetailsComponent implements OnInit {
     var inOutData = [];
     inOutData.push({
       name: "Entrées",
-      value: Math.round(this.bilanParAn[this.defaultBien.nom][currentDate.getFullYear()]?this.bilanParAn[this.defaultBien.nom][currentDate.getFullYear()].in:0)
+      value: Math.round(this.bilanParAn[this.defaultBien.nom]?(this.bilanParAn[this.defaultBien.nom][currentDate.getFullYear()]?this.bilanParAn[this.defaultBien.nom][currentDate.getFullYear()].in:0):0)
     });
     inOutData.push({
       name: "Sorties",
-      value: Math.round(this.bilanParAn[this.defaultBien.nom][currentDate.getFullYear()]?-this.bilanParAn[this.defaultBien.nom][currentDate.getFullYear()].out:0)
+      value: Math.round(this.bilanParAn[this.defaultBien.nom]?(this.bilanParAn[this.defaultBien.nom][currentDate.getFullYear()]?-this.bilanParAn[this.defaultBien.nom][currentDate.getFullYear()].out:0):0)
     });
 
     this.chartOptionSimpleBien = {
