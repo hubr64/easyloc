@@ -75,14 +75,19 @@ export class StatistiquesDetailsComponent implements OnInit {
 
     //Build the global object that compute totals
     this.bilanParAn["total"] = {};
+    this.bilanParAn["total"][currentDate.getFullYear()] = {in:0, out:0, gains: 0, gainsCumules:0, revenuMensuel:0, rentability:0, loyer:0, locationRate: 0};
+
+    //We first begin to fill with all biens and we add at least a value for current yeat
+    this.documentService.document.biens.forEach( (bien:Bien) => {
+      if(!this.bilanParAn[bien.nom]){
+        this.bilanParAn[bien.nom] = {};
+      }
+      this.bilanParAn[bien.nom][currentDate.getFullYear()] = {in:0, out:0, gains: 0, gainsCumules:0, revenuMensuel:0, rentability:0, loyer:0, locationRate: 0};
+    });
 
     //First analyse all mouvements to get in and outs for each bien and for each year
     this.documentService.document.mouvements.forEach( (mouvement:Mouvement) => {
 
-      // If the object for this bien still doesn't exist then create it
-      if(!this.bilanParAn[mouvement.bien.nom]){
-        this.bilanParAn[mouvement.bien.nom] = {};
-      }
       // If the object for this bien for this year still doesn't exist then create it
       if(!this.bilanParAn[mouvement.bien.nom][mouvement.date.getFullYear()]){
         this.bilanParAn[mouvement.bien.nom][mouvement.date.getFullYear()] = {in:0, out:0, gains: 0, gainsCumules:0, revenuMensuel:0, rentability:0, loyer:0, locationRate: 0};
@@ -184,7 +189,7 @@ export class StatistiquesDetailsComponent implements OnInit {
       //To computhe the mean we use a temporarry array
       var loyers: number[] = [];
       for (let keyBien in this.bilanParAn) {
-        if(keyBien!="total" && this.bilanParAn[keyBien][keyYear]){
+        if(keyBien!="total" && this.bilanParAn[keyBien][keyYear] && this.bilanParAn[keyBien][keyYear].loyer!=0){
           // Add the loyer to the temporary array
           loyers.push(this.bilanParAn[keyBien][keyYear].loyer);
         }
@@ -497,7 +502,7 @@ export class StatistiquesDetailsComponent implements OnInit {
             color: 'inherit',
             formatter: '{c} %'
           },
-          data: bienData.map(item => item.toFixed(2))
+          data: bienData.map(item => item?item.toFixed(2):'null')
         });
       }
     }
@@ -801,7 +806,7 @@ export class StatistiquesDetailsComponent implements OnInit {
     }
     legend.push("Loyer moyen global");
     seriesData.push({
-      name: "Loyer moyen globalng ",
+      name: "Loyer moyen global",
       type: 'line',
       smooth: true,
       label: {
@@ -1077,11 +1082,11 @@ export class StatistiquesDetailsComponent implements OnInit {
     var inOutData = [];
     inOutData.push({
       name: "Entrées",
-      value: Math.round(this.bilanParAn[this.defaultBien.nom][currentDate.getFullYear()]?this.bilanParAn[this.defaultBien.nom][currentDate.getFullYear()].in:0)
+      value: Math.round(this.bilanParAn[this.defaultBien.nom]?(this.bilanParAn[this.defaultBien.nom][currentDate.getFullYear()]?this.bilanParAn[this.defaultBien.nom][currentDate.getFullYear()].in:0):0)
     });
     inOutData.push({
       name: "Sorties",
-      value: Math.round(this.bilanParAn[this.defaultBien.nom][currentDate.getFullYear()]?-this.bilanParAn[this.defaultBien.nom][currentDate.getFullYear()].out:0)
+      value: Math.round(this.bilanParAn[this.defaultBien.nom]?(this.bilanParAn[this.defaultBien.nom][currentDate.getFullYear()]?-this.bilanParAn[this.defaultBien.nom][currentDate.getFullYear()].out:0):0)
     });
 
     this.chartOptionSimpleBien = {
