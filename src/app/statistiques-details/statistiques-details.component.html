@@ -31,10 +31,12 @@
 
 <ng-container *ngVar="(defaultBien?defaultBien.nom:'total') as elementToDisplay">
 <div class="main-container" [ngClass]="{'compact-stat': defaultBien?false:true}" *ngIf="simple &&  this.bilan[elementToDisplay]">
-    <h3>Entrées/Sorties {{currentYear}}</h3>
+    <h3><mat-icon>savings</mat-icon>Entrées/Sorties {{currentYear}}</h3>
     <div *ngIf="!defaultBien" #chartSimple echarts [options]="chartOptionSimple" [loading]="true" class="simple-chart"></div>
     <div *ngIf="defaultBien" #chartSimple echarts [options]="chartOptionSimpleBien" [loading]="true" class="simple-chart"></div>
-    <h3>Généralités <span class="generalites-current-year">{{currentYear}}</span></h3>
+    <h3 *ngIf="defaultBien"><mat-icon>query_stats</mat-icon>Evolution du loyer</h3>
+    <div *ngIf="defaultBien" echarts [options]="chartOptionSimpleLoyers" [loading]="true" class="simple-chart"></div>
+    <h3><mat-icon>euro</mat-icon>Généralités <span class="generalites-current-year">{{currentYear}}</span></h3>
     <mat-list>
         <mat-list-item><mat-icon class="stat-icon" color="primary">north_east</mat-icon><span class="stat-title">Entrées</span><span>{{this.bilan[elementToDisplay].in | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].in | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
         <mat-list-item><mat-icon class="stat-icon" color="warn">south_east</mat-icon><span class="stat-title">Sorties</span><span>{{this.bilan[elementToDisplay].out | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].out | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>

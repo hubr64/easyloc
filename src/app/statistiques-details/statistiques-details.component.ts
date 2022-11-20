@@ -59,6 +59,7 @@ export class StatistiquesDetailsComponent implements OnInit {
   @ViewChild('chartSimple') chartSimple: ElementRef;
   public chartOptionSimple: EChartsOption;
   public chartOptionSimpleBien: EChartsOption;
+  public chartOptionSimpleLoyers: EChartsOption;
 
   public currentYear: number = new Date().getFullYear();
 
@@ -301,6 +302,7 @@ export class StatistiquesDetailsComponent implements OnInit {
     }else{
       this.computeChartOptionsForSimple();
       if(this.defaultBien){
+        this.computeChartOptionsForLoyers();
         this.computeChartOptionsForSimpleBien();
       }
     }
@@ -781,7 +783,7 @@ export class StatistiquesDetailsComponent implements OnInit {
         if(this.bilanParAn[elementToDisplay][keyYear]){
           bienData.push(Math.round(this.bilanParAn[elementToDisplay][keyYear].loyer));
         }else{
-          bienData.push(0);
+          bienData.push('null');
         }
       }
       seriesData.push({
@@ -798,10 +800,8 @@ export class StatistiquesDetailsComponent implements OnInit {
 
     var loyerMeanData = [];
     for (let keyYear in this.bilanParAn["total"]) {
-      if(this.bilanParAn["total"][keyYear]){
+      if(this.bilanParAn["total"][keyYear] && this.bilanParAn[elementToDisplay][keyYear]){
         loyerMeanData.push(Math.round(this.bilanParAn["total"][keyYear].loyer));
-      }else{
-        loyerMeanData.push(0);
       }
     }
     legend.push("Loyer moyen global");
@@ -855,6 +855,38 @@ export class StatistiquesDetailsComponent implements OnInit {
         type: 'value',
         name: 'Loyer',
         min: 400,
+        axisLabel: {
+          formatter: '{value} €'
+        }
+      },
+      series: seriesData,
+    };
+
+    this.chartOptionSimpleLoyers = {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        }
+      },
+      legend: {
+        show: true,
+        orient: 'vertical',
+        data: legend
+      },
+      toolbox: {
+        show: false,
+      },
+      xAxis: {
+        type: 'category',
+        data: xAxisArray,
+      },
+      yAxis: {
+        type: 'value',
+        name: 'Loyer',
+        min: function (value) {
+          return 10*Math.floor((value.min - 20)/10);
+        },
         axisLabel: {
           formatter: '{value} €'
         }
