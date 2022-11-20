@@ -1,4 +1,5 @@
-<h2 mat-dialog-title><mat-icon>euro_symbol</mat-icon> Ajout d'un mouvement</h2>
+<h2 mat-dialog-title *ngIf="data.mouvement"><mat-icon>edit_square</mat-icon> Modification d'un mouvement</h2>
+<h2 mat-dialog-title *ngIf="!data.mouvement"><mat-icon>note_add</mat-icon> Ajout d'un mouvement</h2>
 <mat-dialog-content>
     <form [formGroup]="mouvementForm">
         <mat-form-field appearance="fill">
