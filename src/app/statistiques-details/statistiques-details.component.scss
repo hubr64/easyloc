@@ -14,16 +14,19 @@ h3{
     height: 250px;
 }
 
-.compact-stat .stat-icon{
+.compact-stat .stat-icon,
+.stat-icon{
     display: inline-block;
 }
-.compact-stat .stat-title{
+.compact-stat .stat-title,
+.stat-title{
     display: inline-block;
     font-weight: bold;
     width: 180px;
     padding: 0 10px;
 }
-.compact-stat .generalites-current-year{
+.compact-stat .generalites-current-year,
+.generalites-current-year{
     display: inline-block;
 }
 
@@ -43,25 +46,24 @@ h3{
 }
 
 @media (max-width: 600px) {
-    .compact-stat .stat-icon{
+    .compact-stat .stat-icon,
+    .stat-icon{
         display: none;
     }
-    .compact-stat .stat-title{
+    .compact-stat .stat-title,
+    .stat-title{
         display: inline-block;
         font-weight: normal;
         width: 160px;
         font-size: 0.8em;
         padding: 0 5px;
     }
-    .compact-stat .generalites-current-year{
+    .compact-stat .generalites-current-year,
+    .generalites-current-year{
         display: none;
     }
 }
 
-.stat-title{
-    
-    display:inline-block;
-}
 mat-list-item{
     height: 35px!important;
 }
