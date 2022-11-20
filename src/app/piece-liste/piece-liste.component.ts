@@ -17,6 +17,7 @@ import { ExportCsvService }      from '../_services/export-csv.service';
 import { Piece } from '../_modeles/piece';
 import { PIECECODE as pieceCodes } from '../_modeles/piece';
 import { DialogDeleteConfirmComponent } from '../dialog-delete-confirm/dialog-delete-confirm.component';
+import { PieceDetailsComponent } from '../piece-details/piece-details.component';
 import { UploadComponent } from '../upload/upload.component';
 import { PieceUsersComponent } from '../piece-users/piece-users.component';
 
@@ -175,11 +176,28 @@ export class PieceListeComponent implements AfterViewInit  {
   }
 
   edit(piece: Piece): void {
-    //Set current edited to current piece
-    this.currentEdited = piece;
-    this.currentEditedDescription = piece.description;
-    this.currentEditedCode = piece.code;
+    //Display a confirmation dialog
+    const dialogRef = this.dialog.open(PieceDetailsComponent, {
+      data: {
+        piece: piece
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result:any) => {
+      //If user confirm update
+      if(result){
+        piece.id = result.id;
+        piece.nom = result.nom;
+        piece.description = result.description;
+        piece.code = result.code;
+      // If user finally change his mind
+      }else{
+        this.alertService.error('La modification a été annulée...');
+      }
+    });
+
   }
+  /*
   save(piece: Piece, event: any = undefined): void {
     // Prevent to edit the piece after deletion
     if(event){
@@ -193,6 +211,7 @@ export class PieceListeComponent implements AfterViewInit  {
     this.currentEditedDescription = "";
     this.currentEditedCode = "";
   }
+  */
 
   delete(piece: Piece, event: any = undefined): void {
     // Prevent to edit the piece after deletion
