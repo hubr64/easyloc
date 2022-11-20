@@ -71,6 +71,7 @@ import { BienDetailsComponent } from './bien-details/bien-details.component';
 import { BienListeComponent } from './bien-liste/bien-liste.component';
 import { BienFicheComponent } from './bien-fiche/bien-fiche.component';
 import { PieceListeComponent } from './piece-liste/piece-liste.component';
+import { PieceDetailsComponent } from './piece-details/piece-details.component';
 import { PiecesJointesComponent } from './pieces-jointes/pieces-jointes.component';
 import { PiecesJointesFicheComponent } from './pieces-jointes-fiche/pieces-jointes-fiche.component';
 import { PiecesChoixComponent } from './pieces-choix/pieces-choix.component';
@@ -138,7 +139,8 @@ const globalRippleConfig: RippleGlobalOptions = {
     DialogReloadComponent,
     StatistiquesDetailsComponent,
     StatistiquesImpotsComponent,
-    BailNewComponent
+    BailNewComponent,
+    PieceDetailsComponent
   ],
   imports: [
     BrowserModule,
