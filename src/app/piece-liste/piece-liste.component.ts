@@ -62,6 +62,7 @@ export class PieceListeComponent implements AfterViewInit  {
   public initialSelection = [];
   public allowMultiSelect: boolean = true;
   public selection: SelectionModel<Piece> = new SelectionModel<Piece>(this.allowMultiSelect, this.initialSelection);
+  public lastPieces: Piece[];
   // String to manage the search filter
   public typeFilter = new FormControl('');
   public searchFilter = new FormControl('');
@@ -89,7 +90,9 @@ export class PieceListeComponent implements AfterViewInit  {
     public dialog: MatDialog,
     private _bottomSheet: MatBottomSheet,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    this.lastPieces = [];
+  }
 
   ngAfterViewInit(): void {
     // Subscribe in case the document was reloaded
@@ -197,21 +200,6 @@ export class PieceListeComponent implements AfterViewInit  {
     });
 
   }
-  /*
-  save(piece: Piece, event: any = undefined): void {
-    // Prevent to edit the piece after deletion
-    if(event){
-      event.stopPropagation();
-    }
-    //STore new value in the edited piece
-    piece.description = this.currentEditedDescription;
-    piece.code = this.currentEditedCode;
-    //Replace current edited by a fake piece
-    this.currentEdited = new Piece();
-    this.currentEditedDescription = "";
-    this.currentEditedCode = "";
-  }
-  */
 
   delete(piece: Piece, event: any = undefined): void {
     // Prevent to edit the piece after deletion
@@ -280,6 +268,7 @@ export class PieceListeComponent implements AfterViewInit  {
     dialogRef.afterClosed().subscribe((result:any) => {
       //If user has choosed a file
       if(result){
+        this.lastPieces = [];
         if(result.length>0){
           result.forEach((fichier:any) => {
             let tmpPiece = new Piece();
@@ -288,6 +277,7 @@ export class PieceListeComponent implements AfterViewInit  {
             tmpPiece.code = fichier.code;
             tmpPiece.description = fichier.name.split('.').slice(0, -1).join('.');
             this.documentService.document.pieces.push(tmpPiece);
+            this.lastPieces.push(tmpPiece);
           });
         }
         // Update data source

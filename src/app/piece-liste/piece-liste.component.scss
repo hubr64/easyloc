@@ -42,11 +42,18 @@ table.list-table td:nth-child(4){
     overflow: hidden;
     text-overflow: ellipsis;
 }
+table.list-table td:nth-child(5){
+    min-width:270px;
+}
 table.list-table td:last-child{
-    width:120px;
+    min-width:120px;
 }
 .save-button{
     cursor:pointer;
     font-size: 200%;
     line-height: 2;
+}
+.success-alert .success-border{
+    border-left-width: 5px;
+    border-left-style: solid;
 }
