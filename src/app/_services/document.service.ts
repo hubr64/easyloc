@@ -35,6 +35,9 @@ export class DocumentService {
   public docIsModified: boolean = false;
   public autoSave: boolean = false;
   private autoSaveDuration: number = 1;
+  // Variables used to track document synchronisation with server
+  private autoSyncExecution: boolean = false;
+  private autoSyncDuration: number = 1;
 
   constructor(
     private ref: ApplicationRef,
@@ -54,6 +57,8 @@ export class DocumentService {
     //Retrieve configuration from service
     this.autoSaveDuration = parseInt(this.configurationService.getValue('autoSaveDuration'));
     this.autoSave = (this.configurationService.getValue('autoSave')==true || this.configurationService.getValue('autoSave')=="true") ;
+    this.autoSyncDuration = parseInt(this.configurationService.getValue('autoSyncDuration'));
+    this.autoSyncExecution = false;
     // By default the document is not loading as we wait for the drive to be ready
     this.isLoading = false;
     //Load the document from the drive as soon as it is available
@@ -69,24 +74,36 @@ export class DocumentService {
     }
   }
 
-  public load(){
+  public load(reloadVersion: number = -1){
 
+    if(reloadVersion!=-1){
+      //console.dir(this.document);
+      //First indicate that the document has to be loaded
+      this.docIsLoadedChange.next(false);
+    }
     //Indicate that we load
     this.isLoading = true;
-    //Data can be loade donly if the drive is compliant
+    //Data can be loaded only if the drive is compliant
     if(this.driveService.driveIsCompliant){
       this.driveService.download(this.driveService.dataFileId).then( (response: any) => {
         //Transform JSON file into data locally
         this.document = EasylocData.fromJSON(response.result);
         //console.dir(this.document);
+        //If this is a version reload then refresh the version of the file
+        if(reloadVersion!=-1){
+          this.driveService.dataFileVersion = reloadVersion;
+        }
         console.log("Document version "+this.driveService.dataFileVersion+" is loaded");
         this.isLoading = false;
         this.docIsLoadedChange.next(true);
         //Memorize the document for modification tracking change
         this.oldDocument = JSON.stringify(this.document.toJSON());
         this.docIsModified = false;
-        // Launch modification tracking change function
-        setInterval(() => this.watchDocumentModification(), this.autoSaveDuration * 1000);
+        // Launch modification tracking change function if first load only
+        if(reloadVersion==-1){
+          setInterval(() => this.watchDocumentSync(), this.autoSyncDuration * 1000);
+          setInterval(() => this.watchDocumentModification(), this.autoSaveDuration * 1000);
+        }
       });
     }else{
       // If drive is not compliant we are not loading
@@ -95,8 +112,7 @@ export class DocumentService {
   }
 
   public saveDocumentFile(){
-
-    //FIrst check if a more recent file existe on the server (which is not good)
+    //First check if a more recent file existe on the server (which is not good)
     this.driveService.get(this.driveService.dataFileId).then( 
       (response: any) => {
         if(response && response.result && response.result.version && this.driveService.dataFileVersion == response.result.version){
@@ -136,7 +152,7 @@ export class DocumentService {
           dialogRef.afterClosed().subscribe((result:boolean) => {
             //User wants to reload
             if(result){
-              this.load();
+              this.load(response.result.version);
             }else{
               console.log("User wants to keep current version.")
             }
@@ -148,8 +164,52 @@ export class DocumentService {
         console.dir(error);
       }
     );
+  }
 
-    
+  private watchDocumentSync(){
+    //Do not sync if a sync is in execution
+    if(this.autoSyncExecution == false){
+      //A sync is in execution
+      this.autoSyncExecution = true;
+      // If there is a document and if the drive is compliant
+      if (this.document && this.driveService.driveIsCompliant && this.driveService.dataFileVersion) {
+        //Check if a more recent file existe on the server (which may be a problem)
+        this.driveService.get(this.driveService.dataFileId).then( 
+          (response: any) => {
+            if(response && response.result && response.result.version && response.result.version > this.driveService.dataFileVersion){
+              console.dir("File is not the last version. Reload should be proposed");
+              //New version on server then ask user what to do
+              const dialogRef = this.dialog.open(DialogReloadComponent, {
+                data: {
+                  lastVersion: response.result.version,
+                }
+              });
+              this.ref.tick();
+            
+              //Catch user answer
+              dialogRef.afterClosed().subscribe((result:boolean) => {
+                //User wants to reload
+                if(result){
+                  this.load(response.result.version);
+                }else{
+                  console.log("User wants to keep current version.")
+                }
+                this.autoSyncExecution = false;
+              });
+            }else{
+              this.autoSyncExecution = false;
+            }
+          },
+          (error: any) => {
+            console.error("Impossible to get data file version.");
+            console.dir(error);
+            this.autoSyncExecution = false;
+          }
+        );
+      }else{
+        this.autoSyncExecution = false;
+      }
+    }
   }
 
   private watchDocumentModification() {
