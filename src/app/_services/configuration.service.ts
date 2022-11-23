@@ -31,6 +31,7 @@ export class ConfigurationService {
       'messageDuration': { advanced: true, title: 'Durée des messages (en s)', value: Configuration.CONFIG["messageDuration"], categorie: 'tune' },
       'autoSave': { advanced: false, title: 'Sauvegarde automatique des modifications', value: Configuration.CONFIG["autoSave"], categorie: 'save' },
       'autoSaveDuration': { advanced: true, title: 'Fréquence de détection des modifications (en s)', value: Configuration.CONFIG["autoSaveDuration"], categorie: 'save' },
+      'autoSyncDuration': { advanced: true, title: 'Fréquence de détection de synchronisation (en s)', value: Configuration.CONFIG["autoSyncDuration"], categorie: 'save' },
       'defaultTheme': { advanced: false, title: 'Thème par défaut (light|dark)', value: Configuration.CONFIG["defaultTheme"], categorie: 'web_asset' },
       'quittanceLocalisation': { advanced: false, title: 'Lieu par défaut pour la quittance', value: Configuration.CONFIG["quittanceLocalisation"], categorie: 'receipt_long' },
       'quittanceFileNamePrefix': { advanced: false, title: 'Préfixe des fichiers de quittance', value: Configuration.CONFIG["quittanceFileNamePrefix"], categorie: 'receipt_long' },

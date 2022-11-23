@@ -5,6 +5,7 @@ export const CONFIG: { [key: string]: any } = {
   "configurationPrefix": 'config-',
   "messageDuration" : 3,
   'autoSaveDuration': 1,
+  'autoSyncDuration': 10,
   'autoSave': true,
   'defaultTheme': 'dark',
   'quittanceFileNamePrefix': 'quittance_',
