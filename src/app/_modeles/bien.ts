@@ -188,4 +188,12 @@ export class Bien {
 
     return inOut;
   }
+
+  public get descriptionHTML(){
+    return this.description.replace(/\n/g,"<br/>");
+  }
+  public get commentaireHTML() {
+    return this.commentaire.replace(/\n/g,"<br/>");
+  }
+
 }

@@ -153,6 +153,7 @@ export class DocumentService {
             //User wants to reload
             if(result){
               this.load(response.result.version);
+              this.ref.tick();
             }else{
               console.log("User wants to keep current version.")
             }
@@ -191,6 +192,7 @@ export class DocumentService {
                 //User wants to reload
                 if(result){
                   this.load(response.result.version);
+                  this.ref.tick();
                 }else{
                   console.log("User wants to keep current version.")
                 }

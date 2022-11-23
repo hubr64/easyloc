@@ -23,10 +23,7 @@
         </mat-card-header>
         <mat-card-content>
             <mat-list>
-                <mat-list-item>
-                    <mat-icon matListIcon>info</mat-icon>
-                    <span class="title">Informations</span>
-                    <span class="text-details">{{bien.description}} </span>
+                <mat-list-item class="description-details" [innerHTML]="bien.descriptionHTML">
                 </mat-list-item>
                 <mat-list-item *ngIf="bien.type">
                     <mat-icon matListIcon></mat-icon>
@@ -86,7 +83,7 @@
                 </ng-container>
             </div>
         </mat-card-content>
-        <mat-card-footer *ngIf="bien.commentaire">{{bien.commentaire}}</mat-card-footer>
+        <mat-card-footer *ngIf="bien.commentaire" [innerHTML]="bien.commentaireHTML"></mat-card-footer>
     </mat-card>
 
     <mat-card class="card-box" *ngFor="let bail of bails">
