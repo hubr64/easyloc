@@ -4,7 +4,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { FormControl } from '@angular/forms';
 
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, Sort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { MatTableDataSource} from '@angular/material/table';
 import { MatDialog} from '@angular/material/dialog';
@@ -44,6 +44,7 @@ export class MouvementListeComponent implements AfterViewInit {
   public initialSelection = [];
   public allowMultiSelect: boolean = true;
   public selection: SelectionModel<Mouvement> = new SelectionModel<Mouvement>(this.allowMultiSelect, this.initialSelection);
+  public lastMouvement: Mouvement;
   // String to manage the search filter
   public bienFilter = new FormControl('');
   public typeFilter = new FormControl('');
@@ -162,7 +163,7 @@ export class MouvementListeComponent implements AfterViewInit {
         tmpNew.id = this.documentService.getUniqueId(4);
         this.documentService.document.mouvements.push(tmpNew);
         this.alertService.success('Le mouvement est maintenant ajouté.');
-
+        this.lastMouvement = tmpNew;
         // Update data source
         this.getData();
       // If user finally change his mind
@@ -193,6 +194,10 @@ export class MouvementListeComponent implements AfterViewInit {
             mouvement.bien = docBien;
           }
         });
+
+        //Refresh sort (as it doesn't sort automaticlly after update)
+        const sortState: Sort = {active: this.sort.active, direction: this.sort.direction};
+        this.sort.sortChange.emit(sortState);
 
       // If user finally change his mind
       }else{
@@ -241,9 +246,9 @@ export class MouvementListeComponent implements AfterViewInit {
     newMouvement.quittance = null;
     //Add the current mouvement once again
     this.documentService.document.mouvements.push(newMouvement);
+    this.lastMouvement = newMouvement;
     // Update data source
     this.dataSource.data = this.documentService.document.mouvements;
-    this.dataSource.sort = this.sort;
     //Dislpay message
     this.alertService.success('La duplication est terminée.');
     //SHow edition form
