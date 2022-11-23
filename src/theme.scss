@@ -70,4 +70,7 @@ a {
     background: mat-color($warn, A100)!important;
     color: mat-color($warn, A700)!important;
 }
+.success-border{
+    border-color: mat-color($primary, A700);
+}
     

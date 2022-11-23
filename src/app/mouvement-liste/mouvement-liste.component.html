@@ -52,7 +52,7 @@
                             [indeterminate]="selection.hasValue() && !isAllSelected()">
                 </mat-checkbox>
             </th>
-            <td mat-cell *matCellDef="let row">
+            <td mat-cell *matCellDef="let row" [ngClass]="{'success-border': lastMouvement==row?true:false}">
                 <mat-checkbox (click)="$event.stopPropagation()"
                             (change)="$event ? selection.toggle(row) : null"
                             [checked]="selection.isSelected(row)">
@@ -116,8 +116,8 @@
             <td mat-footer-cell *matFooterCellDef>-</td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="embedded?displayedColumnsEmbedded:displayedColumns sticky:true"></tr>
-        <tr mat-row *matRowDef="let row; columns: embedded?displayedColumnsEmbedded:displayedColumns;"></tr>
+        <tr mat-header-row *matHeaderRowDef="embedded?displayedColumnsEmbedded:displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: embedded?displayedColumnsEmbedded:displayedColumns;" [ngClass]="{'success-alert': lastMouvement==row?true:false}"></tr>
         <tr class="mat-row" *matNoDataRow>
             <td class="centered-cell mat-cell" [attr.colspan]="displayedColumns.length"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun résultat à afficher...</td>
         </tr>
