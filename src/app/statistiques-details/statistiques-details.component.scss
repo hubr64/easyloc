@@ -1,7 +1,9 @@
-h1{
-    text-align: center;
-    margin-top: 0px;
-    margin-bottom: 0px;
+.main-container{
+    padding: 15px;
+}
+.mat-expansion-panel-header-description {
+    justify-content: space-between;
+    align-items: center;
 }
 .main-chart {
     height: 400px;
@@ -11,11 +13,12 @@ h3{
     margin-bottom: 0px;
 }
 .simple-chart {
-    height: 250px;
+    height: 220px;
 }
-
-.main-container{
-    padding: 0 16px;
+@media print {
+    .simple-chart{
+        break-inside: avoid;
+    }
 }
 .compact-stat{
     padding:0!important;

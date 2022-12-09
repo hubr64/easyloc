@@ -38,6 +38,7 @@ import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatRadioModule} from '@angular/material/radio';
 import { MatStepperModule} from '@angular/material/stepper';
+import {MatExpansionModule} from '@angular/material/expansion';
 //Other libraries
 import { NgxEchartsModule } from 'ngx-echarts';
 //Services
@@ -178,6 +179,7 @@ const globalRippleConfig: RippleGlobalOptions = {
     MatAutocompleteModule,
     MatRadioModule,
     MatStepperModule,
+    MatExpansionModule,
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts'), 
     }),

@@ -6,7 +6,7 @@
 </mat-toolbar>
 
 <div class="configuration-form">
-    <mat-form-field appearance="standard">
+    <mat-form-field>
         <mat-label>Exercice fiscal</mat-label>
         <mat-select #annee required [(ngModel)]="selectedAnnee" [disabled]="computeEnded">
             <mat-option *ngFor="let number of annees" [value]="number">
@@ -14,7 +14,7 @@
             </mat-option>
         </mat-select>
     </mat-form-field>
-    <mat-form-field appearance="standard" *ngIf="!defaultBien">
+    <mat-form-field *ngIf="!defaultBien">
         <mat-label>Bien déclaré</mat-label>
         <mat-select #bien required [(ngModel)]="selectedBien" [disabled]="computeEnded">
             <mat-option [value]="'total'">Tous</mat-option>
@@ -182,7 +182,7 @@
             <td>Charges non déductibles</td>
             <ng-container *ngIf="selectedBien=='total'">
                 <td *ngFor="let bien of documentService.document.biens">
-                    <mat-form-field appearance="standard">
+                    <mat-form-field>
                         <input matInput [(ngModel)]="regulCharges[bien.nom].chargeNonDeductible" type="number">
                         <mat-icon matSuffix>euro_symbol</mat-icon>
                         <mat-hint align="end">Selon réddition charges {{this.selectedAnnee-2}}</mat-hint>
@@ -192,7 +192,7 @@
             </ng-container>
             <ng-container *ngIf="selectedBien!='total'">
                 <td>
-                    <mat-form-field appearance="standard">
+                    <mat-form-field>
                         <input matInput [(ngModel)]="regulCharges[selectedBien].chargeNonDeductible" type="number">
                         <mat-icon matSuffix>euro_symbol</mat-icon>
                         <mat-hint align="end">Selon réddition charges {{this.selectedAnnee-2}}</mat-hint>
@@ -205,7 +205,7 @@
             <td>Trop perçu de charges</td>
             <ng-container *ngIf="selectedBien=='total'">
                 <td *ngFor="let bien of documentService.document.biens">
-                    <mat-form-field appearance="standard">
+                    <mat-form-field>
                         <input matInput [(ngModel)]="regulCharges[bien.nom].chargeTropPercu" type="number">
                         <mat-icon matSuffix>euro_symbol</mat-icon>
                         <mat-hint align="end">Selon réddition charges {{this.selectedAnnee-2}}</mat-hint>
@@ -215,7 +215,7 @@
             </ng-container>
             <ng-container *ngIf="selectedBien!='total'">
                 <td>
-                    <mat-form-field appearance="standard">
+                    <mat-form-field>
                         <input matInput [(ngModel)]="regulCharges[selectedBien].chargeTropPercu" type="number">
                         <mat-icon matSuffix>euro_symbol</mat-icon>
                         <mat-hint align="end">Selon réddition charges {{this.selectedAnnee-2}}</mat-hint>

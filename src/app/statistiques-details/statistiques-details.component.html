@@ -6,45 +6,61 @@
 </mat-toolbar>
 
 <div class="main-container" *ngIf="!simple">
-    <h1>Rentabilité globale</h1>
-    <div echarts [options]="chartOptionGlobaRentability" [loading]="true" class="main-chart"></div>
-    <mat-divider></mat-divider>
-
-    <ng-container *ngIf="!defaultBien">
-        <h1>Rentabilité ventilée par bien</h1>
-        <div echarts [options]="chartOptionBienRentability" [loading]="true" class="main-chart"></div>
-        <mat-divider></mat-divider>
-    </ng-container>
-
-    <h1>Gains nets et cumulés</h1>
-    <div echarts [options]="chartOptionGains" [loading]="true" class="main-chart"></div>
-    <mat-divider></mat-divider>
-
-    <h1>Evolution des loyers</h1>
-    <div echarts [options]="chartOptionLoyers" [loading]="true" class="main-chart"></div>
-    <mat-divider></mat-divider>
-
-    <h1>Taux de location par bien</h1>
-    <div echarts [options]="chartOptionTaux" [loading]="true" class="main-chart"></div>
-    <mat-divider></mat-divider>
+    <mat-accordion multi>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Rentabilité globale</mat-panel-title>
+                <mat-panel-description>Rentabilité générale par année sur l'ensemble des biens détenus<mat-icon>stacked_line_chart</mat-icon></mat-panel-description>
+            </mat-expansion-panel-header>
+            <div echarts [options]="chartOptionGlobaRentability" [loading]="true" class="main-chart mat-elevation-z1"></div>
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Rentabilité ventilée par bien</mat-panel-title>
+                <mat-panel-description>Rentabilité par bien par année<mat-icon>query_stats</mat-icon></mat-panel-description>
+            </mat-expansion-panel-header>
+            <div echarts [options]="chartOptionBienRentability" [loading]="true" class="main-chart mat-elevation-z1"></div>
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Gains</mat-panel-title>
+                <mat-panel-description>Gains nets et cumulés par année<mat-icon>savings</mat-icon></mat-panel-description>
+            </mat-expansion-panel-header>
+            <div echarts [options]="chartOptionGains" [loading]="true" class="main-chart mat-elevation-z1"></div>
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Evolution des loyers</mat-panel-title>
+                <mat-panel-description>Evolution moyenne des loyers par année<mat-icon>apartment</mat-icon></mat-panel-description>
+            </mat-expansion-panel-header>
+            <div echarts [options]="chartOptionLoyers" [loading]="true" class="main-chart mat-elevation-z1"></div>
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Taux de location</mat-panel-title>
+                <mat-panel-description>Taux de location par bien et moyenné par année<mat-icon>key</mat-icon></mat-panel-description>
+            </mat-expansion-panel-header>
+            <div echarts [options]="chartOptionTaux" [loading]="true" class="main-chart mat-elevation-z1"></div>
+        </mat-expansion-panel>
+    </mat-accordion>
 </div>
 
 <ng-container *ngVar="(defaultBien?defaultBien.nom:'total') as elementToDisplay">
-<div class="main-container" [ngClass]="{'compact-stat': defaultBien?false:true}" *ngIf="simple &&  this.bilan[elementToDisplay]">
-    <h3><mat-icon>savings</mat-icon>Entrées/Sorties {{currentYear}}</h3>
-    <div *ngIf="!defaultBien" #chartSimple echarts [options]="chartOptionSimple" [loading]="true" class="simple-chart"></div>
-    <div *ngIf="defaultBien" #chartSimple echarts [options]="chartOptionSimpleBien" [loading]="true" class="simple-chart"></div>
-    <h3 *ngIf="defaultBien"><mat-icon>query_stats</mat-icon>Evolution du loyer</h3>
-    <div *ngIf="defaultBien" echarts [options]="chartOptionSimpleLoyers" [loading]="true" class="simple-chart"></div>
-    <h3><mat-icon>euro</mat-icon>Généralités <span class="generalites-current-year">{{currentYear}}</span></h3>
-    <mat-list>
-        <mat-list-item><mat-icon class="stat-icon" color="primary">north_east</mat-icon><span class="stat-title">Entrées</span><span>{{this.bilan[elementToDisplay].in | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].in | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
-        <mat-list-item><mat-icon class="stat-icon" color="warn">south_east</mat-icon><span class="stat-title">Sorties</span><span>{{this.bilan[elementToDisplay].out | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].out | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
-        <mat-list-item><mat-icon class="stat-icon">savings</mat-icon><span class="stat-title">Gains cumulés</span><span>{{this.bilan[elementToDisplay].gains | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].gains | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
-        <mat-list-item><mat-icon class="stat-icon">query_stats</mat-icon><span class="stat-title">Rentabilité Moyenne</span><span>{{this.bilan[elementToDisplay].rentability*100 | number: '1.1-1' }} % <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].rentability*100 | number: '1.1-1' }} %</span></span></mat-list-item>
-        <mat-list-item><mat-icon class="stat-icon">event_upcoming</mat-icon><span class="stat-title">Revenus par mois</span><span>{{this.bilan[elementToDisplay].revenuMensuel | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].revenuMensuel | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
-        <mat-list-item><mat-icon class="stat-icon">key</mat-icon><span class="stat-title">Taux de location</span><span>{{this.bilan[elementToDisplay].locationRate*100 | number: '1.1-1' }} % <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].locationRate*100 | number: '1.1-1' }} %</span></span></mat-list-item>
-        <mat-list-item><mat-icon class="stat-icon">apartment</mat-icon><span class="stat-title">Loyer moyen</span><span>{{this.bilan[elementToDisplay].loyer | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].loyer | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
-    </mat-list>
-</div>
+    <div class="main-container" [ngClass]="{'compact-stat': defaultBien?false:true}" *ngIf="simple &&  this.bilan[elementToDisplay]">
+        <h3><mat-icon>savings</mat-icon>Entrées/Sorties {{currentYear}}</h3>
+        <div *ngIf="!defaultBien" #chartSimple echarts [options]="chartOptionSimple" [loading]="true" class="simple-chart"></div>
+        <div *ngIf="defaultBien" #chartSimple echarts [options]="chartOptionSimpleBien" [loading]="true" class="simple-chart"></div>
+        <h3 *ngIf="defaultBien"><mat-icon>query_stats</mat-icon>Evolution du loyer</h3>
+        <div *ngIf="defaultBien" echarts [options]="chartOptionSimpleLoyers" [loading]="true" class="simple-chart"></div>
+        <h3><mat-icon>euro</mat-icon>Généralités <span class="generalites-current-year">{{currentYear}}</span></h3>
+        <mat-list>
+            <mat-list-item><mat-icon class="stat-icon" color="primary">north_east</mat-icon><span class="stat-title">Entrées</span><span>{{this.bilan[elementToDisplay].in | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].in | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
+            <mat-list-item><mat-icon class="stat-icon" color="warn">south_east</mat-icon><span class="stat-title">Sorties</span><span>{{this.bilan[elementToDisplay].out | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].out | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
+            <mat-list-item><mat-icon class="stat-icon">savings</mat-icon><span class="stat-title">Gains cumulés</span><span>{{this.bilan[elementToDisplay].gains | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].gains | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
+            <mat-list-item><mat-icon class="stat-icon">query_stats</mat-icon><span class="stat-title">Rentabilité Moyenne</span><span>{{this.bilan[elementToDisplay].rentability*100 | number: '1.1-1' }} % <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].rentability*100 | number: '1.1-1' }} %</span></span></mat-list-item>
+            <mat-list-item><mat-icon class="stat-icon">event_upcoming</mat-icon><span class="stat-title">Revenus par mois</span><span>{{this.bilan[elementToDisplay].revenuMensuel | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].revenuMensuel | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
+            <mat-list-item><mat-icon class="stat-icon">key</mat-icon><span class="stat-title">Taux de location</span><span>{{this.bilan[elementToDisplay].locationRate*100 | number: '1.1-1' }} % <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].locationRate*100 | number: '1.1-1' }} %</span></span></mat-list-item>
+            <mat-list-item><mat-icon class="stat-icon">apartment</mat-icon><span class="stat-title">Loyer moyen</span><span>{{this.bilan[elementToDisplay].loyer | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].loyer | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
+        </mat-list>
+    </div>
 </ng-container>

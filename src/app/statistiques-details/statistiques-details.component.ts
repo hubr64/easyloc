@@ -1057,9 +1057,12 @@ export class StatistiquesDetailsComponent implements OnInit {
         },
       },
       grid:{
+        top:10,
         bottom:10
       },
-      legend: {},
+      legend: {
+        show: false
+      },
       xAxis: {
         type: 'value',
         show: false
@@ -1069,7 +1072,6 @@ export class StatistiquesDetailsComponent implements OnInit {
         data: ['Entrées', 'Sorties']
       },
       animationType: 'scale',
-      animationEasing: 'elasticOut',
       series: simpleSeries,
       media: [ 
         {
@@ -1099,6 +1101,7 @@ export class StatistiquesDetailsComponent implements OnInit {
               data: ['Entrées', 'Sorties']
             },
             grid:{
+              top:10,
               bottom:10
             },
           }
