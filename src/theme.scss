@@ -1,32 +1,42 @@
-@import '~@angular/material/theming';
-@include mat-core();
+@use '@angular/material' as mat;
+@include mat.core();
 
-$custom-typography: mat-typography-config(
-    $font-family: 'Raleway'
+$custom-typography: mat.define-typography-config(
+    /*$font-family: 'Raleway'*/
 );
 
-$light-app-theme: mat-light-theme((
+$my-primary-light: mat.define-palette(mat.$green-palette, A400, A200, A700);
+$my-accent-light: mat.define-palette(mat.$light-blue-palette);
+$my-warn-light: mat.define-palette(mat.$red-palette);
+
+$light-app-theme: mat.define-light-theme((
         color: (
-                primary: mat-palette($mat-green, A400, A200, A700),
-                accent: mat-palette($mat-light-blue),
-                warn: mat-palette($mat-red),
+                primary: $my-primary-light,
+                accent: $my-accent-light,
+                warn: $my-warn-light
         ),
-        typography: $custom-typography
+        typography: $custom-typography,
+        density: 0
 ));
 
-$dark-app-theme:   mat-dark-theme((
+$my-primary-dark: mat.define-palette(mat.$light-blue-palette, A400, A200, A700);
+$my-accent-dark: mat.define-palette(mat.$teal-palette);
+$my-warn-dark: mat.define-palette(mat.$red-palette);
+$dark-app-theme:   mat.define-dark-theme((
         color: (
-                primary: mat-palette($mat-light-blue, A400, A200, A700),
-                accent: mat-palette($mat-teal),
-                warn: mat-palette($mat-red),
+            primary: $my-primary-dark,
+            accent: $my-accent-dark,
+            warn: $my-warn-dark
         ),
-        typography: $custom-typography
+        typography: $custom-typography,
+        density: 0
 ));
 
-@include angular-material-theme($light-app-theme);
+@include mat.core-theme($light-app-theme);
+@include mat.all-component-themes($light-app-theme);
 
 .dark-theme {
-  @include angular-material-color($dark-app-theme);
+    @include mat.all-component-colors($dark-app-theme);
 }
 
 $primary: map-get($dark-app-theme, primary);
@@ -34,14 +44,14 @@ $accent: map-get($dark-app-theme, accent);
 $warn: map-get($dark-app-theme, warn);
 
 .dark-theme .primary-lighter {
-    background: mat-color($primary, A200)!important;
+    background: mat.get-color-from-palette($primary, A200)!important;
 }
 .dark-theme .primary-darker {
-    background: mat-color($primary, A700)!important;
+    background: mat.get-color-from-palette($primary, A700)!important;
 }
 
 .dark-theme a {
-    color: mat-color($accent, 100);
+    color: mat.get-color-from-palette($accent, 100);
     text-decoration: none;
 }
 
@@ -50,27 +60,27 @@ $accent: map-get($light-app-theme, accent);
 $warn: map-get($light-app-theme, warn);
 
 .primary-lighter {
-    background: mat-color($primary, A200)!important;
+    background: mat.get-color-from-palette($primary, A200)!important;
 }
 .primary-darker {
-    background: mat-color($primary, A700)!important;
+    background: mat.get-color-from-palette($primary, A700)!important;
 }
 a {
-    color: mat-color($accent, 700);
+    color: mat.get-color-from-palette($accent, 700);
     text-decoration: none;
 }
 .mat-nav-accent{
-    background: mat-color($primary, A400)!important;
+    background: mat.get-color-from-palette($primary, A400)!important;
 }
 .success-alert{
-    background: mat-color($primary, A100)!important;
-    color: mat-color($primary, A700)!important;
+    background: mat.get-color-from-palette($primary, A100)!important;
+    color: mat.get-color-from-palette($primary, A700)!important;
 }
 .error-alert{
-    background: mat-color($warn, A100)!important;
-    color: mat-color($warn, A700)!important;
+    background: mat.get-color-from-palette($warn, A100)!important;
+    color: mat.get-color-from-palette($warn, A700)!important;
 }
 .success-border{
-    border-color: mat-color($primary, A700);
+    border-color: mat.get-color-from-palette($primary, A700);
 }
     

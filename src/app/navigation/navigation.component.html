@@ -1,11 +1,11 @@
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #drawer class="sidenav" fixedInViewport
+  <mat-sidenav #drawer class="sidenav no-print" fixedInViewport
       [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
       [mode]="(isHandset$ | async) ? 'over' : 'side'"
       [opened]="(isHandset$ | async) === false">
     <mat-nav-list>
       <img src="assets/logo_sans_titre_small.png" alt="EasyLoc">
-      <a mat-list-item routerLink="/dashboard" title="Tableau de bord" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>dashboard</mat-icon></a>
+      <a mat-list-item routerLink="/dashboard" title="Tableau de bord" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>dashboard_outlined</mat-icon></a>
       <a mat-list-item routerLink="/browse" title="Parcourir" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>view_stream</mat-icon></a>
       <mat-divider></mat-divider>
       <a mat-list-item routerLink="/biens" title="Biens" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>apartment</mat-icon></a>
@@ -21,7 +21,14 @@
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
-    <mat-toolbar color="primary">
+    <mat-toolbar class="just-print">
+      <span class="name">Easy<b>Loc</b></span>
+      <span class="flex"></span>
+      <span>{{currentDate | date:'medium'}}</span>
+      <span class="flex"></span>
+      <span>{{currentUser.nom}}</span>
+    </mat-toolbar>
+    <mat-toolbar color="primary" class="no-print">
       <button
         type="button"
         aria-label="Toggle sidenav"

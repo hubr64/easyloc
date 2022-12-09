@@ -10,7 +10,6 @@
 }
 .dashboard-button button,
 .full-width{
-  margin-bottom: 10px;
   width: 100%;
 }
 .more-button {
@@ -18,15 +17,7 @@
   top: 5px;
   right: 10px;
 }
-.mat-card{
-  display:flex;
-  flex-direction: column;
-}
-.mat-card-header {
-  flex-shrink: 0;
-}
-.mat-card-content{
-  flex-grow: 1;
+.mat-mdc-card-content{
   overflow: hidden;
 }
 #warning-empty{
@@ -43,96 +34,13 @@
   flex: 1;
   width: 100%;
 }
-.mat-line-infos{
-  color: #999;
-  font-style: italic;
-  font-size: 12px;
+/* TOFIX with angular material */
+.mdc-list-item__end{
+  pointer-events:inherit!important;
 }
-mat-card-title mat-icon{
-  vertical-align: sub;
-  margin-right: 5px;
-}
-.resume-container{
-  display: flex;
-  justify-content: center;
-  flex-flow: row wrap;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-content: center;
-  align-items: center;
-}
-
-.resume-box{
-  flex:1;
-  height: 115px;
-  min-width: 140px;
-  border: 1px solid #ccc;
-  margin: 5px;
-}
-.resume-box > div:first-child{
-  background: #aaa;
-  padding: 6px;
-  color:white!important;
-}
-.resume-box > div:first-child a{
-  text-transform:uppercase;
-  color:white!important;
-  font-family: 'Unica One', cursive !important;
-  font-size:18px;
-}
-.resume-box > div:first-child mat-icon{
-  vertical-align: middle;
-  margin: 0 5px;
-}
-.resume-box > div:last-child{
-  font-weight:bold;
-  text-align:center;
-  font-size:3em;
-  padding: 5px;
-  line-height: 2em;
-}
-
-@media (max-width: 1000px) {
-  .resume-box{
-    height: auto;
-  }
-  .resume-box > div:last-child{
-    line-height: 1.1em;
-  }
-}
-
-@media (max-width: 500px) {
-  .resume-box{
-    height: auto;
-    min-width: 100px;
-  }
-  .resume-box > div:first-child{
-    padding: 2px;
-  }
-  .resume-box > div:first-child a{
-    font-size: 12px;
-  }
-  .resume-box > div:last-child{
-    font-size:2em;
-    line-height: 1.1em;
-  }
-}
-
-@media (max-width: 350px) {
-  .resume-box{
-    height: auto;
-    min-width: 100px;
-    margin: 2px;
-  }
-  .resume-box > div:first-child{
-    padding: 1px;
-  }
-  .resume-box > div:first-child a{
-    font-size: 12px;
-  }
-  .resume-box > div:last-child{
-    padding: 2px;
-    font-size:1.3em;
-    line-height: 1em;
-  }
+/* TOFIX with angular material */
+.resume-value{
+  font-size: 2em;
+  font-weight: bold;
+  margin-top: auto!important;
 }

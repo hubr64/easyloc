@@ -10,10 +10,10 @@ body { margin: 0; font-family: "Raleway"!important; }
 .dark-theme .mat-list-item-disabled {
     background: #3C3C3C!important;
 }
-.mat-row:hover{
+.mat-mdc-row:hover{
     background:#DDD;
 }
-.dark-theme .mat-row:hover{
+.dark-theme .mat-mdc-row:hover{
     background:#555;
 }
 mat-toolbar.sticky-toolbar{
@@ -24,10 +24,10 @@ mat-toolbar.sticky-toolbar{
 mat-toolbar.sticky-toolbar mat-icon{
     margin-right:5px;
 }
-th.mat-table-sticky{
+th.mat-mdc-table-sticky{
     height: 64px;
 }
-tr.mat-footer-row {
+tr.mat-mdc-footer-row {
     font-weight: bold;
 }
 .flex{
@@ -58,10 +58,6 @@ h1 mat-icon{
     vertical-align: middle;
     margin-right: 5px;
 }
-table mat-icon{
-    vertical-align: middle;
-    margin-left: 5px;
-}
 .btn-icon { 
     &:hover {
         path {
@@ -70,8 +66,23 @@ table mat-icon{
     }
 }
 .tab-label-icon{
-    margin-right:5px;
+    margin-right: 5px;
+    vertical-align: middle;
 }
-mat-tab-body.mat-tab-body{
+mat-tab-body.mat-mdc-tab-body{
     padding:0!important;
+}
+.mat-mdc-tab-body-content {
+    overflow-y: hidden!important;
+}
+.just-print, .just-print *{
+    display: none !important;
+}
+@media print{    
+    .no-print, .no-print *{
+        display: none !important;
+    }
+    .just-print, .just-print *{
+        display: flex !important;
+    }
 }

@@ -1,87 +1,141 @@
 <div class="global-box" *ngFor="let bien of documentService.document.biens; let i = index">
     <ng-container *ngVar="getBail(bien) as bail">
-        <mat-card class="bailleur-card" *ngIf="visibility?visibility[i]:false" [ngStyle]="{'border-color': colors[i]}" (click)="toggle(i)">
+        <mat-card appearance="outlined" class="bailleur-card" *ngIf="visibility?visibility[i]:false" [ngStyle]="{'border-color': colors[i]}" (click)="toggle(i)">
             <mat-card-header>
                 <div mat-card-avatar class="bailleur-avatar-letter" [ngStyle]="{'background': colors[i]}">{{bien.proprietaire.nom[0]}}</div>
                 <mat-card-title>{{bien.proprietaire.nom}}</mat-card-title>
-                <mat-card-subtitle>{{bien.proprietaire.adresse}}</mat-card-subtitle>
+                <mat-card-subtitle>Bailleur {{bien.proprietaire.type}}</mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
-                <div class="bailleur-infos">
-                    <div class="mini-chip" *ngIf="bien.surface"><mat-icon>phone</mat-icon>{{bien.proprietaire.telephone}}</div>
-                    <div class="mini-chip" *ngIf="bien.surface"><mat-icon>mail</mat-icon>{{bien.proprietaire.mail}}</div>
-                </div>
+                <mat-list>
+                    <mat-list-item>
+                        <mat-icon matListItemIcon>location_on</mat-icon>
+                        <div matListItemTitle>Adresse</div>
+                        <span matListItemLine [innerHTML]="bien.proprietaire.adresseHTML"></span>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <mat-icon matListItemIcon>phone</mat-icon>
+                        <div matListItemTitle>Téléphone</div>
+                        <span matListItemMeta>{{bien.proprietaire.telephone}}</span>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <mat-icon matListItemIcon>mail</mat-icon>
+                        <div matListItemTitle>E-mail</div>
+                        <span matListItemMeta>{{bien.proprietaire.mail}}</span>
+                    </mat-list-item>
+                </mat-list>
             </mat-card-content>
-            <mat-card-actions>
-                <button mat-icon-button routerLink="/bailleur/{{bien.proprietaire.id}}"><mat-icon>edit</mat-icon></button>
+            <mat-card-actions class="no-print">
+                <button mat-icon-button color="accent" routerLink="/bailleur/{{bien.proprietaire.id}}"><mat-icon>edit</mat-icon></button>
             </mat-card-actions>
         </mat-card>
         <div class="card-link" *ngIf="visibility?visibility[i]:false" [ngStyle]="{'background': colors[i]}">&nbsp;</div>
-        <mat-card class="bien-card" [ngStyle]="{'border-color': colors[i]}" (click)="toggle(i)">
+        <mat-card appearance="outlined" class="bien-card" [ngStyle]="{'border-color': colors[i]}" (click)="toggle(i)">
             <mat-card-header>
                 <div mat-card-avatar class="bien-avatar-letter" [ngStyle]="{'background': colors[i]}">{{bien.nom[0]}}</div>
                 <mat-card-title>{{bien.nom}}</mat-card-title>
-                <mat-card-subtitle>{{bien.adresse}}</mat-card-subtitle>
+                <mat-card-subtitle>{{bienType[bien.type]}}</mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
-                <div class="bien-infos">
-                    <div class="mini-chip"><mat-icon>savings</mat-icon>{{(bien.getYearRentability(documentService.document.mouvements) * 100)| number: '1.0-1'}} %</div>
-                    <div class="mini-chip" *ngVar="bien.getInOutMontant(documentService.document.mouvements) as bienInOut">
-                        <mat-icon color="warn">south_east</mat-icon>{{bienInOut.total.out| currency:'EUR':'symbol':'1.2-2'}}
-                        <mat-icon color="primary">north_east</mat-icon>{{bienInOut.total.in| currency:'EUR':'symbol':'1.2-2'}}
-                    </div>
-                    <ng-container *ngVar="documentService.getUnrentBien(bien) as unrentBien">
-                        <div class="mini-chip right" *ngIf="!unrentBien"><mat-icon>person</mat-icon>Loué</div>
-                        <div class="mini-chip right" *ngIf="unrentBien && unrentBien.nbJours < 10000"><mat-icon color="warn">person_outline</mat-icon>Non loué depuis {{unrentBien.nbJours}} jours</div>
-                        <div class="mini-chip right" *ngIf="unrentBien && unrentBien.nbJours == 10000"><mat-icon>pending</mat-icon>Jamais loué</div>
-                    </ng-container>
-                </div>
-                <div class="bien-infos">
-                    <div class="mini-chip" *ngIf="bien.type">
-                        <mat-icon *ngIf="bien.type.includes('Meuble')">weekend</mat-icon>
-                        <mat-icon *ngIf="!bien.type.includes('Maison')">apartment</mat-icon>
-                        <mat-icon *ngIf="bien.type.includes('Maison')">gite</mat-icon>
-                    </div>
-                    <div class="mini-chip" *ngIf="bien.surface"><mat-icon>straighten</mat-icon>{{bien.surface}} m²</div>
-                    <div class="mini-chip" *ngIf="bien.nbPieces"><mat-icon>numbers</mat-icon>{{bien.nbPieces}} pièces</div>
-                </div>
+                <mat-list>
+                    <mat-list-item>
+                        <mat-icon matListItemIcon>location_on</mat-icon>
+                        <div matListItemTitle>Adresse</div>
+                        <span matListItemLine [innerHTML]="bien.adresseHTML"></span>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <mat-icon matListItemIcon>savings</mat-icon>
+                        <div matListItemTitle>Rentabilité sur l'année</div>
+                        <span matListItemMeta>{{(bien.getYearRentability(documentService.document.mouvements) * 100)| number: '1.2-2'}} %</span>
+                    </mat-list-item>
+                    <mat-list-item *ngVar="bien.getInOutMontant(documentService.document.mouvements) as bienInOut">
+                        <mat-icon matListItemIcon color="warn">south_east</mat-icon>
+                        <div matListItemTitle>Total des sorties</div>
+                        <span matListItemMeta>{{bienInOut.total.out| currency:'EUR':'symbol':'1.0-0'}}</span>
+                    </mat-list-item>
+                    <mat-list-item *ngVar="bien.getInOutMontant(documentService.document.mouvements) as bienInOut">
+                        <mat-icon matListItemIcon color="primary">north_east</mat-icon>
+                        <div matListItemTitle>Total des entrées</div>
+                        <span matListItemMeta>{{bienInOut.total.in| currency:'EUR':'symbol':'1.0-0'}}</span>
+                    </mat-list-item>
+                    <mat-list-item *ngVar="documentService.getUnrentBien(bien) as unrentBien">
+                        <mat-icon matListItemIcon>person</mat-icon>
+                        <div matListItemTitle>Etat de location actuelle</div>
+                        <span matListItemMeta *ngIf="!unrentBien">Loué</span>
+                        <span matListItemMeta *ngIf="unrentBien && unrentBien.nbJours < 10000">Non loué depuis {{unrentBien.nbJours}} jours</span>
+                        <span matListItemMeta *ngIf="unrentBien && unrentBien.nbJours == 10000">Jamais loué</span>
+                    </mat-list-item>
+                    <mat-list-item *ngIf="bien.surface">
+                        <mat-icon matListItemIcon>expand</mat-icon>
+                        <div matListItemTitle>Surface totale annoncée</div>
+                        <span matListItemMeta>{{bien.surface}} m²</span>
+                    </mat-list-item>
+                    <mat-list-item *ngIf="bien.nbPieces">
+                        <mat-icon matListItemIcon>auto_awesome_mosaic</mat-icon>
+                        <div matListItemTitle>Nombre de pièces</div>
+                        <span matListItemMeta>{{bien.nbPieces}} pièces</span>
+                    </mat-list-item>
+                </mat-list>
             </mat-card-content>
-            <mat-card-actions>
-                <button mat-icon-button routerLink="/fiche/bien/{{bien.id}}"><mat-icon>visibility</mat-icon></button>
-                <button mat-icon-button routerLink="/bien/{{bien.id}}"><mat-icon>edit</mat-icon></button>
+            <mat-card-actions class="no-print">
+                <button mat-icon-button color="accent" routerLink="/fiche/bien/{{bien.id}}"><mat-icon>visibility</mat-icon></button>
+                <button mat-icon-button color="accent" routerLink="/bien/{{bien.id}}"><mat-icon>edit</mat-icon></button>
             </mat-card-actions>
         </mat-card>
         <div class="card-link" *ngIf="visibility?visibility[i]:false" [ngStyle]="{'background': colors[i]}">&nbsp;</div>
-        <mat-card class="locataire-card" *ngIf="bail && visibility?visibility[i]:false" [ngStyle]="{'border-color': colors[i]}" (click)="toggle(i)">
+        <mat-card appearance="outlined" class="locataire-card" *ngIf="bail && visibility?visibility[i]:false" [ngStyle]="{'border-color': colors[i]}" (click)="toggle(i)">
             <mat-card-header>
                 <div mat-card-avatar class="locataire-avatar-letter" [ngStyle]="{'background': colors[i]}">{{bail.locataire.nom[0]}}</div>
                 <mat-card-title>{{bail.locataire.nom}}</mat-card-title>
-                <mat-card-subtitle>{{bail.locataire.mail}} - {{bail.locataire.telephone}}</mat-card-subtitle>
+                <mat-card-subtitle></mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
-                <div class="locataire-infos">
-                    <div class="mini-chip" *ngVar="documentService.getUnpaiedLoyer(bail) as unpaiedLoyer">
-                        <ng-container *ngIf="unpaiedLoyer.length>0"><mat-icon color="warn">error</mat-icon>{{unpaiedLoyer.length}} loyer(s) impayé(s)</ng-container>
-                        <ng-container *ngIf="unpaiedLoyer.length==0"><mat-icon color="accent">done</mat-icon>Aucun impayé</ng-container>
-                    </div>
-                </div>
-                <div class="locataire-infos">
-                    <div class="mini-chip"><mat-icon>euro_symbol</mat-icon>{{(bail.charges+bail.loyer)| currency:'EUR':'symbol':'1.2-2'}}</div>
-                    <div class="mini-chip"><mat-icon>today</mat-icon>{{bail.paiementDate| date:'d':'fr-FR' }} du mois</div>
-                    <div class="mini-chip"><mat-icon>login</mat-icon>{{bail.dateDebut | date:'shortDate':'fr-FR'}}</div>
-                </div>
+                <mat-list>
+                    <mat-list-item>
+                        <mat-icon matListItemIcon>mail</mat-icon>
+                        <div matListItemTitle>E-mail</div>
+                        <span matListItemMeta>{{bail.locataire.mail}}</span>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <mat-icon matListItemIcon>phone</mat-icon>
+                        <div matListItemTitle>Téléphone</div>
+                        <span matListItemMeta>{{bail.locataire.telephone}}</span>
+                    </mat-list-item>
+                    <mat-list-item *ngVar="documentService.getUnpaiedLoyer(bail) as unpaiedLoyer">
+                        <mat-icon *ngIf="unpaiedLoyer.length>0" matListItemIcon color="warn">error</mat-icon>
+                        <mat-icon *ngIf="unpaiedLoyer.length==0" matListItemIcon color="accent">done</mat-icon>
+                        <div matListItemTitle>Statut de paiement</div>
+                        <span matListItemMeta *ngIf="unpaiedLoyer.length>0">{{unpaiedLoyer.length}} loyer(s) impayé(s)</span>
+                        <span matListItemMeta *ngIf="unpaiedLoyer.length==0">Aucun impayé</span>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <mat-icon matListItemIcon>euro_symbol</mat-icon>
+                        <div matListItemTitle>Loyer et charges</div>
+                        <span matListItemMeta>{{(bail.charges+bail.loyer)| currency:'EUR':'symbol':'1.2-2'}}</span>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <mat-icon matListItemIcon>today</mat-icon>
+                        <div matListItemTitle>Date de paiement</div>
+                        <span matListItemMeta>{{bail.paiementDate| date:'d':'fr-FR' }} du mois</span>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <mat-icon matListItemIcon>login</mat-icon>
+                        <div matListItemTitle>Début du bail</div>
+                        <span matListItemMeta>{{bail.dateDebut | date:'shortDate':'fr-FR'}}</span>
+                    </mat-list-item>
+                </mat-list>
             </mat-card-content>
-            <mat-card-actions>
-                <button mat-icon-button routerLink="/fiche/bail/{{bail.id}}"><mat-icon>visibility</mat-icon></button>
-                <button mat-icon-button routerLink="/bail/{{bail.id}}"><mat-icon>edit</mat-icon></button>
-                <button mat-icon-button (click)="contact(bail.locataire, $event)"><mat-icon>mail</mat-icon></button>
+            <mat-card-actions class="no-print">
+                <button mat-icon-button color="accent" routerLink="/fiche/bail/{{bail.id}}"><mat-icon>visibility</mat-icon></button>
+                <button mat-icon-button color="accent" routerLink="/bail/{{bail.id}}"><mat-icon>edit</mat-icon></button>
+                <button mat-icon-button color="accent" (click)="contact(bail.locataire, $event)"><mat-icon>mail</mat-icon></button>
             </mat-card-actions>
         </mat-card>
-        <mat-card class="locataire-card" *ngIf="!bail && visibility?visibility[i]:false" [ngStyle]="{'border-color': colors[i]}" (click)="toggle(i)">
+        <mat-card appearance="outlined" class="locataire-card" *ngIf="!bail && visibility?visibility[i]:false" [ngStyle]="{'border-color': colors[i]}" (click)="toggle(i)">
             <mat-card-header>
                 <div mat-card-avatar class="locataire-avatar-letter" [ngStyle]="{'background': colors[i]}">!</div>
                 <mat-card-title>Non Loué</mat-card-title>
-                <mat-card-subtitle>Ce bien n'est plus loué...</mat-card-subtitle>
+                <mat-card-subtitle>Ce bien n'est pas loué...</mat-card-subtitle>
             </mat-card-header>
         </mat-card>
         <mat-divider *ngIf="i < documentService.document.biens.length-1"></mat-divider>

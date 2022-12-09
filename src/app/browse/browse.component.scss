@@ -10,11 +10,11 @@
     cursor:pointer;
     box-shadow: none;
     border:2px solid #CCC;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 .card-link{
     width:2px;
-    height: 8px;
+    height: 15px;
     background: #CCC;
     margin:0 auto;
 }
@@ -27,40 +27,16 @@
     color: #FFF;
     line-height: 40px;
 }
-mat-card-content{
-    margin-bottom:0!important;
+.mdc-list-item--with-one-line{
+    height:44px!important;
 }
-.bien-infos,
-.locataire-infos,
-.bailleur-infos{
-    display: flex;
-    margin-bottom: 3px;
-    margin-left: 2px;
-    margin-top: 7px;
-    order: 1;
-    width: 100%;
-    justify-content: space-between;
-    flex-flow: row wrap;
-}
-.mini-chip{
-    align-items: center;
-    border-radius: 15px;
-    box-shadow: inset 0 0 0 1px rgb(100 121 143 / 50%);
-    box-sizing: border-box;
-    display: flex;
-    height: 30px;
-    padding: 0 12px;
-    margin: 0 4px 4px 0;
-    white-space: nowrap;
-}
-.mini-chip mat-icon{
-    font-size: 20px;
-    margin-top: 6px;
+.mdc-list-item__end{
+    font-size: 1em;
 }
 mat-card-actions {
     position: absolute;
     right: 0;
-    top: 0;
+    top: 5px;
     margin:0;
     padding:0;
 }

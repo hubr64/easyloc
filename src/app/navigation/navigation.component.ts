@@ -23,6 +23,7 @@ import { User } from '../_modeles/user';
 export class NavigationComponent {
 
   public currentUser: User = new User();
+  public currentDate: Date = new Date();
   public isLoggedIn: boolean = false;
   public isCompliant: boolean = false;
   public isLoading: boolean = true;

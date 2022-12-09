@@ -4,6 +4,15 @@
 .sidenav-container {
   height: 100%;
 }
+@media print{    
+  .sidenav-container{
+    height:auto;
+  }
+  mat-sidenav-content{
+    margin-left:0px!important;
+  }
+}
+
 .sidenav .mat-toolbar {
   background: inherit;
 }
