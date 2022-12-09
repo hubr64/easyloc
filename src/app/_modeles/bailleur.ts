@@ -75,5 +75,9 @@ export class Bailleur {
   toString(): string{
     return this.nom + (this.immatriculation?' ('+this.immatriculation+')':'');
   }
+  
+  public get adresseHTML() {
+    return this.adresse.replace(/\n/g,"<br/>");
+  }
 
 }

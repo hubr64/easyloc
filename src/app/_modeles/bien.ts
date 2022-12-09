@@ -195,5 +195,8 @@ export class Bien {
   public get commentaireHTML() {
     return this.commentaire.replace(/\n/g,"<br/>");
   }
+  public get adresseHTML() {
+    return this.adresse.replace(/\n/g,"<br/>");
+  }
 
 }

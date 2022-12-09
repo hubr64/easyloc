@@ -57,4 +57,7 @@ export class Locataire {
   toString(): string{
     return this.nom;
   }
+  public get commentaireHTML() {
+    return this.commentaire.replace(/\n/g,"<br/>");
+  }
 }

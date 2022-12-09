@@ -133,5 +133,8 @@ export class Bail {
   toString(): string{
     return this.locataire.nom +" ("+ this.bien.nom+ ")";
   }
+  public get commentaireHTML() {
+    return this.commentaire.replace(/\n/g,"<br/>");
+  }
 
 }
