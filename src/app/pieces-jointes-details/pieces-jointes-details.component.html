@@ -6,7 +6,7 @@
 </div>
 
 <div class="pieces-missed" *ngIf="documentService.checkPiecesObligatoires(container).length>0">
-    <mat-card>
+    <mat-card appearance="outlined">
         <mat-card-header>
             <mat-card-title>
                     <mat-icon color="warn">warning</mat-icon>Pièces manquantes :

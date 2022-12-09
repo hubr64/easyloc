@@ -12,118 +12,126 @@
             <mat-icon class="tab-label-icon">info</mat-icon> Détails
         </ng-template>
         <form [formGroup]="bailForm" (ngSubmit)="save()">
-            <h1><mat-icon>share</mat-icon>Parties prenantes</h1>
-            <mat-form-field appearance="fill">
-                <mat-label>Locataire</mat-label>
-                <mat-select id="locataire" formControlName="locataire" required>
-                    <mat-option *ngFor="let locataire of documentService.document.locataires" [value]="locataire.id">
-                        {{locataire.nom}}
-                    </mat-option>
-                </mat-select>
-                <mat-icon *ngIf="bailForm.value.locataire" matSuffix color="accent" [routerLink]="'/fiche/locataire/'+bailForm.value.locataire">visibility</mat-icon>
-                <mat-hint align="end">Locataire du bien</mat-hint>
-                <mat-error *ngIf="locataire?.errors?.required">Le locataire est obligatoire.</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="fill">
-                <mat-label>Bien loué</mat-label>
-                <mat-select id="bien" formControlName="bien" required>
-                    <mat-option *ngFor="let bien of documentService.document.biens" [value]="bien.id">
-                        {{bien.nom}}
-                    </mat-option>
-                </mat-select>
-                <mat-icon *ngIf="bailForm.value.bien" matSuffix color="accent" [routerLink]="'/fiche/bien/'+bailForm.value.bien">visibility</mat-icon>
-                <mat-hint align="end">Bien loué</mat-hint>
-                <mat-error *ngIf="bien?.errors?.required">Le bien est obligatoire.</mat-error>
-            </mat-form-field>
-            <h1><mat-icon>info</mat-icon>Caractéristiques principales</h1>
-            <mat-form-field appearance="fill">
-                <mat-label>Début</mat-label>
-                <input matInput placeholder="Date de début du bail" id="dateDebut" formControlName="dateDebut" required [matDatepicker]="picker">
-                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-hint align="end">Date de début du bail</mat-hint>
-                <mat-error *ngIf="dateDebut?.errors?.required">La date de début est obligatoire.</mat-error>
-                <mat-datepicker #picker startView="year"></mat-datepicker>
-            </mat-form-field>
-            <mat-form-field appearance="fill">
-                <mat-label>Fin</mat-label>
-                <input matInput placeholder="Date de fin du bail" id="dateFin" formControlName="dateFin" [matDatepicker]="picker2">
-                <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-                <mat-hint align="end">Date de fin du bail (départ du locataire)</mat-hint>
-                <mat-datepicker #picker2 startView="year"></mat-datepicker>
-            </mat-form-field>
-            <mat-form-field appearance="fill">
-                <mat-label>Durée</mat-label>
-                <input type="number" matInput placeholder="Nombre de pièces" id="duree" formControlName="duree" required>
-                <mat-hint align="end">Durée du contrat en année</mat-hint>
-                <mat-error *ngIf="duree?.errors?.pattern">La durée du contrat doit être un nombre.</mat-error>
-                <mat-error *ngIf="duree?.errors?.required">La durée du contrat est obligatoire.</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="fill">
-                <mat-label>Loyer</mat-label>
-                <input type="number" matInput placeholder="Montant du loyer" id="loyer" formControlName="loyer" required>
-                <mat-hint align="end">Montant du loyer en euros (hors charges)</mat-hint>
-                <mat-error *ngIf="loyer?.errors?.pattern">Le loyer doit être un nombre.</mat-error>
-                <mat-error *ngIf="loyer?.errors?.required">Le loyer est obligatoire.</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="fill">
-                <mat-label>Charges</mat-label>
-                <input type="number" matInput placeholder="Montant des charges" id="charges" formControlName="charges" required>
-                <mat-hint align="end">Montant des charges en euros</mat-hint>
-                <mat-error *ngIf="charges?.errors?.pattern">Les charges doivent être un nombre.</mat-error>
-                <mat-error *ngIf="charges?.errors?.required">Les charges sont obligatoires.</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="fill">
-                <mat-label>Révision du loyer</mat-label>
-                <input matInput placeholder="Date de révision du loyer" id="dateRevisionLoyer" formControlName="dateRevisionLoyer" [matDatepicker]="picker3">
-                <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
-                <mat-hint align="end">Date de la prochaine révision du loyer</mat-hint>
-                <mat-datepicker #picker3 startView="year"></mat-datepicker>
-            </mat-form-field>
-            <h1><mat-icon>euro</mat-icon>Paiement</h1>
-            <mat-form-field appearance="fill">
-                <mat-label>Périodicité du paiement</mat-label>
-                <mat-select id="paiementPeriodicite" formControlName="paiementPeriodicite" required>
-                    <mat-option *ngFor="let bailPeriodePaiement of bailPeriodePaiements | keyvalue" [value]="bailPeriodePaiement.key">
-                        {{bailPeriodePaiement.value}}
-                    </mat-option>
-                </mat-select>
-                <mat-hint align="end">Périodicité du versement du loyer</mat-hint>
-                <mat-error *ngIf="paiementPeriodicite?.errors?.required">La périodicité est obligatoire.</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="fill">
-                <mat-label>Terme du paiement</mat-label>
-                <mat-select id="paiementTerme" formControlName="paiementTerme" required>
-                    <mat-option *ngFor="let bailTermePaiement of bailTermePaiements | keyvalue" [value]="bailTermePaiement.key">
-                        {{bailTermePaiement.value}}
-                    </mat-option>
-                </mat-select>
-                <mat-hint align="end">Terme du paiement</mat-hint>
-                <mat-error *ngIf="paiementTerme?.errors?.required">Le terme est obligatoire.</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="fill">
-                <mat-label>Type de paiement</mat-label>
-                <mat-select id="paiementType" formControlName="paiementType" required>
-                    <mat-option *ngFor="let bailTypePaiement of bailTypePaiements | keyvalue" [value]="bailTypePaiement.key">
-                        {{bailTypePaiement.value}}
-                    </mat-option>
-                </mat-select>
-                <mat-hint align="end">Terme du paiement</mat-hint>
-                <mat-error *ngIf="paiementType?.errors?.required">Le type de paiement est obligatoire.</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="fill">
-                <mat-label>Date de paiement</mat-label>
-                <input matInput placeholder="Date de paiement du loyer" id="paiementDate" formControlName="paiementDate" required [matDatepicker]="picker4">
-                <mat-datepicker-toggle matSuffix [for]="picker4"></mat-datepicker-toggle>
-                <mat-hint align="end">Date du paiement du loyer dans la périodicité</mat-hint>
-                <mat-datepicker #picker4 startView="year"></mat-datepicker>
-                <mat-error *ngIf="paiementDate?.errors?.required">La date de paiement est obligatoire.</mat-error>
-            </mat-form-field>
-            <h1><mat-icon>info</mat-icon>Divers</h1>
-            <mat-form-field appearance="fill">
-                <mat-label>Commentaires</mat-label>
-                <textarea matInput id="commentaire" formControlName="commentaire"></textarea>
-                <mat-hint align="end">Commentaires libres pour information</mat-hint>
-            </mat-form-field>
+            <h3><button mat-mini-fab color="accent"><mat-icon>share</mat-icon></button> Parties prenantes</h3>
+            <div class="form-group">
+                <mat-form-field appearance="fill">
+                    <mat-label>Locataire</mat-label>
+                    <mat-select id="locataire" formControlName="locataire" required>
+                        <mat-option *ngFor="let locataire of documentService.document.locataires" [value]="locataire.id">
+                            {{locataire.nom}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-icon *ngIf="bailForm.value.locataire" matSuffix color="accent" [routerLink]="'/fiche/locataire/'+bailForm.value.locataire">visibility</mat-icon>
+                    <mat-hint align="end">Locataire du bien</mat-hint>
+                    <mat-error *ngIf="locataire?.errors?.required">Le locataire est obligatoire.</mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                    <mat-label>Bien loué</mat-label>
+                    <mat-select id="bien" formControlName="bien" required>
+                        <mat-option *ngFor="let bien of documentService.document.biens" [value]="bien.id">
+                            {{bien.nom}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-icon *ngIf="bailForm.value.bien" matSuffix color="accent" [routerLink]="'/fiche/bien/'+bailForm.value.bien">visibility</mat-icon>
+                    <mat-hint align="end">Bien loué</mat-hint>
+                    <mat-error *ngIf="bien?.errors?.required">Le bien est obligatoire.</mat-error>
+                </mat-form-field>
+            </div>
+            <h3><button mat-mini-fab color="accent"><mat-icon>key</mat-icon></button> Caractéristiques principales</h3>
+            <div class="form-group">
+                <mat-form-field appearance="fill">
+                    <mat-label>Début</mat-label>
+                    <input matInput placeholder="Date de début du bail" id="dateDebut" formControlName="dateDebut" required [matDatepicker]="picker">
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-hint align="end">Date de début du bail</mat-hint>
+                    <mat-error *ngIf="dateDebut?.errors?.required">La date de début est obligatoire.</mat-error>
+                    <mat-datepicker #picker startView="year"></mat-datepicker>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                    <mat-label>Fin</mat-label>
+                    <input matInput placeholder="Date de fin du bail" id="dateFin" formControlName="dateFin" [matDatepicker]="picker2">
+                    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                    <mat-hint align="end">Date de fin du bail (départ du locataire)</mat-hint>
+                    <mat-datepicker #picker2 startView="year"></mat-datepicker>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                    <mat-label>Durée</mat-label>
+                    <input type="number" matInput placeholder="Nombre de pièces" id="duree" formControlName="duree" required>
+                    <mat-hint align="end">Durée du contrat en année</mat-hint>
+                    <mat-error *ngIf="duree?.errors?.pattern">La durée du contrat doit être un nombre.</mat-error>
+                    <mat-error *ngIf="duree?.errors?.required">La durée du contrat est obligatoire.</mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                    <mat-label>Loyer</mat-label>
+                    <input type="number" matInput placeholder="Montant du loyer" id="loyer" formControlName="loyer" required>
+                    <mat-hint align="end">Montant du loyer en euros (hors charges)</mat-hint>
+                    <mat-error *ngIf="loyer?.errors?.pattern">Le loyer doit être un nombre.</mat-error>
+                    <mat-error *ngIf="loyer?.errors?.required">Le loyer est obligatoire.</mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                    <mat-label>Charges</mat-label>
+                    <input type="number" matInput placeholder="Montant des charges" id="charges" formControlName="charges" required>
+                    <mat-hint align="end">Montant des charges en euros</mat-hint>
+                    <mat-error *ngIf="charges?.errors?.pattern">Les charges doivent être un nombre.</mat-error>
+                    <mat-error *ngIf="charges?.errors?.required">Les charges sont obligatoires.</mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                    <mat-label>Révision du loyer</mat-label>
+                    <input matInput placeholder="Date de révision du loyer" id="dateRevisionLoyer" formControlName="dateRevisionLoyer" [matDatepicker]="picker3">
+                    <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+                    <mat-hint align="end">Date de la prochaine révision du loyer</mat-hint>
+                    <mat-datepicker #picker3 startView="year"></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <h3><button mat-mini-fab color="accent"><mat-icon>euro</mat-icon></button> Paiement</h3>
+            <div class="form-group">
+                <mat-form-field appearance="fill">
+                    <mat-label>Périodicité du paiement</mat-label>
+                    <mat-select id="paiementPeriodicite" formControlName="paiementPeriodicite" required>
+                        <mat-option *ngFor="let bailPeriodePaiement of bailPeriodePaiements | keyvalue" [value]="bailPeriodePaiement.key">
+                            {{bailPeriodePaiement.value}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-hint align="end">Périodicité du versement du loyer</mat-hint>
+                    <mat-error *ngIf="paiementPeriodicite?.errors?.required">La périodicité est obligatoire.</mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                    <mat-label>Terme du paiement</mat-label>
+                    <mat-select id="paiementTerme" formControlName="paiementTerme" required>
+                        <mat-option *ngFor="let bailTermePaiement of bailTermePaiements | keyvalue" [value]="bailTermePaiement.key">
+                            {{bailTermePaiement.value}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-hint align="end">Terme du paiement</mat-hint>
+                    <mat-error *ngIf="paiementTerme?.errors?.required">Le terme est obligatoire.</mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                    <mat-label>Type de paiement</mat-label>
+                    <mat-select id="paiementType" formControlName="paiementType" required>
+                        <mat-option *ngFor="let bailTypePaiement of bailTypePaiements | keyvalue" [value]="bailTypePaiement.key">
+                            {{bailTypePaiement.value}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-hint align="end">Terme du paiement</mat-hint>
+                    <mat-error *ngIf="paiementType?.errors?.required">Le type de paiement est obligatoire.</mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="fill">
+                    <mat-label>Date de paiement</mat-label>
+                    <input matInput placeholder="Date de paiement du loyer" id="paiementDate" formControlName="paiementDate" required [matDatepicker]="picker4">
+                    <mat-datepicker-toggle matSuffix [for]="picker4"></mat-datepicker-toggle>
+                    <mat-hint align="end">Date du paiement du loyer dans la périodicité</mat-hint>
+                    <mat-datepicker #picker4 startView="year"></mat-datepicker>
+                    <mat-error *ngIf="paiementDate?.errors?.required">La date de paiement est obligatoire.</mat-error>
+                </mat-form-field>
+            </div>
+            <h3><button mat-mini-fab color="accent"><mat-icon>comment</mat-icon></button> Divers</h3>
+            <div class="form-group">
+                <mat-form-field appearance="fill">
+                    <mat-label>Commentaires</mat-label>
+                    <textarea matInput id="commentaire" formControlName="commentaire"></textarea>
+                    <mat-hint align="end">Commentaires libres pour information</mat-hint>
+                </mat-form-field>
+            </div>
             <div class="form-button">
                 <button mat-flat-button color="primary" type="submit" [disabled]="!bailForm.valid">Enregistrer</button>
             </div>

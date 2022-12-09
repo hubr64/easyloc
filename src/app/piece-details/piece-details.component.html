@@ -1,7 +1,7 @@
 <h2 mat-dialog-title *ngIf="data.piece"><mat-icon>edit_document</mat-icon> Modification d'une pièce</h2>
 <h2 mat-dialog-title *ngIf="!data.piece"><mat-icon>attach_file_add</mat-icon> Ajout d'une pièce</h2>
 <mat-dialog-content>
-    <mat-card class="mat-elevation-z8">
+    <mat-card appearance="outlined" class="mat-elevation-z8">
         <mat-card-title><mat-icon color="warn">warning</mat-icon>Attention !</mat-card-title>
         <mat-card-content>La modification de l'identifiant et du nom de fichier est déconseillée. Cette modification ne doit être réalisée que pour corriger un écart entre le drive et Easyloc.</mat-card-content>
     </mat-card>

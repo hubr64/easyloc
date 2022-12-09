@@ -5,7 +5,7 @@ form, app-pieces-jointes-details, app-bien-liste{
 form > button {
   align-items: center;
 }
-.mat-form-field {
+.mat-mdc-form-field {
   width: 100%;
   margin-bottom: 10px;
 }
@@ -23,6 +23,6 @@ textarea{
 .signature-field button{
   margin-left:10px;
 }
-::ng-deep .mat-tab-body{
+::ng-deep .mat-mdc-tab-body{
   padding:5px 10px!important
 }

@@ -32,19 +32,17 @@
                 {{libelleAuto}}
             </mat-option>
         </mat-autocomplete>
-        <mat-form-field appearance="fill">
+        <mat-form-field appearance="fill" *ngVar="isMouvementForLoyer() as mouvementForLoyer">
             <mat-label>Montant</mat-label>
             <input matInput placeholder="Montant" id="montant" formControlName="montant" required>
-            <mat-hint align="end">Montant positif si au crédit et négatif si au débit</mat-hint>
-            <mat-error *ngIf="montant?.errors?.pattern">Le montant doit être un nombre.</mat-error>
+            <mat-icon *ngIf="mouvementForLoyer > 0" matSuffix color="warn">error</mat-icon>
+            <mat-icon *ngIf="mouvementForLoyer == 0" matSuffix color="primary">done</mat-icon>
+            <mat-hint class="mat-mdc-form-field-error" align="start" *ngIf="mouvementForLoyer > 0">Montant non conforme au loyer ({{mouvementForLoyer | currency:'EUR':'symbol':'1.2-2'}}).</mat-hint>
+            <mat-hint align="start" *ngIf="mouvementForLoyer == 0">Montant conforme au loyer.</mat-hint>
+            <mat-hint align="end">Montant positif si au crédit et négatif si au débit (mettre un '-' avant).</mat-hint>
+            <mat-error *ngIf="montant?.errors?.pattern">Le montant doit être un nombre (utiliser un '.' pour les décimales).</mat-error>
             <mat-error *ngIf="montant?.errors?.required">Le montant est obligatoire.</mat-error>
         </mat-form-field>
-        <ng-container *ngVar="isMouvementForLoyer() as mouvementForLoyer">
-            <div class="mini-chip" *ngIf="mouvementForLoyer >= 0">
-                <ng-container *ngIf="mouvementForLoyer > 0"><mat-icon color="warn">error</mat-icon>Montant non conforme au loyer ({{mouvementForLoyer | currency:'EUR':'symbol':'1.2-2'}})</ng-container>
-                <ng-container *ngIf="mouvementForLoyer == 0"><mat-icon color="primary">done</mat-icon>Montant conforme au loyer</ng-container>
-            </div>
-        </ng-container>
         <mat-form-field appearance="fill">
             <mat-label>Tiers</mat-label>
             <input matInput placeholder="Tiers concerné" id="tiers" formControlName="tiers" required>
