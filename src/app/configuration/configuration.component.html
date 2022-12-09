@@ -3,11 +3,17 @@
     <span>Configuration</span>
     <span class="flex"></span>
 </mat-toolbar>
-<ng-container *ngFor='let configCategories of configurationService.categories'>
-    <h2><mat-icon>{{configCategories.id}}</mat-icon>{{configCategories.title}}</h2>
-    <mat-form-field *ngFor='let configItem of configurationService.configurationItems | filterConfiguration:configCategories' appearance="fill">
-        <mat-label>{{configItem.title}}</mat-label>
-        <input  (blur)="setValue(configItem.id, $event)" matInput value="{{configItem.value}}"/>
-        <button mat-icon-button matSuffix color="warn" (click)="reset(configItem.id)" title="Revenir à la valeur par défaut"><mat-icon >restart_alt</mat-icon></button>
-    </mat-form-field>
-</ng-container>
+
+<mat-tab-group>
+    <mat-tab *ngFor='let configCategories of configurationService.categories'>
+        <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">{{configCategories.id}}</mat-icon>
+            {{configCategories.title}}
+        </ng-template>
+        <mat-form-field *ngFor='let configItem of configurationService.configurationItems | filterConfiguration:configCategories' appearance="fill">
+            <mat-label>{{configItem.title}}</mat-label>
+            <input  (blur)="setValue(configItem.id, $event)" matInput value="{{configItem.value}}"/>
+            <button mat-icon-button matSuffix color="warn" (click)="reset(configItem.id)" title="Revenir à la valeur par défaut"><mat-icon >restart_alt</mat-icon></button>
+        </mat-form-field>
+    </mat-tab>
+</mat-tab-group>
