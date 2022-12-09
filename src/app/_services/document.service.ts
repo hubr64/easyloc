@@ -135,7 +135,7 @@ export class DocumentService {
               );
             },
             (error:any) => {
-              this.alertService.error("Impossible de sauvegarder le document. Veuillez vérifier votre connexion.",true);
+              this.alertService.error("Impossible de sauvegarder le document. Veuillez vérifier votre connexion.");
               console.error('Modification not saved : ');
               console.dir(error);
             });

@@ -1,5 +1,5 @@
 ﻿import { Injectable } from '@angular/core';
-import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
+import {MatSnackBar, MatSnackBarVerticalPosition, MatSnackBarHorizontalPosition} from '@angular/material/snack-bar';
 import { ConfigurationService } from './configuration.service';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class AlertService {
             this.messageDuration = parseInt(this.configurationService.getValue('messageDuration'));
     }
 
-    success(message: string, keepAfterNavigationChange = false) {
+    success(message: string) {
 
         this.message = message;
         this.type = 'success';
@@ -29,7 +29,7 @@ export class AlertService {
           });
     }
 
-    error(message: string, keepAfterNavigationChange = false) {
+    error(message: string) {
         this.message = message;
         this.type = 'error';
         this._snackBar.open(message, 'OK', {
