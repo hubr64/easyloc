@@ -5,7 +5,7 @@
     <span class="flex"></span>
 </mat-toolbar>
     
-<mat-form-field appearance="standard">
+<mat-form-field>
     <mat-label>Bien à louer</mat-label>
     <mat-select [formControl]="bienControl" required>
         <mat-option *ngFor="let bien of documentService.document.biens" [value]="bien.id">

@@ -2,28 +2,36 @@
 <mat-dialog-content>
     <div class="container" appDnd (fileDropped)="onFileDropped($event)">
         <input type="file" #fileDropRef id="fileDropRef" [multiple]="data.multiple" (change)="fileBrowseHandler($event)" />
-        <mat-icon>file_upload</mat-icon>
+        <mat-icon>upload</mat-icon>
         <h3>Glisser et déposer vos fichiers ici</h3>
-        <h4>OU</h4>
-        <label class="mat-button" for="fileDropRef">Choisir des fichiers</label>
+        <h3>OU</h3>
+        <label for="fileDropRef">Choisir des fichiers</label>
     </div>
     <mat-list dense>
-        <mat-list-item *ngFor="let file of files; let i = index">
-            <mat-icon *ngIf="file.progressMode == 'indeterminate'" mat-list-icon>file_upload</mat-icon>
-            <mat-icon *ngIf="file.progressMode == 'determinate'" color="primary" mat-list-icon>insert_drive_file</mat-icon>
-            <mat-icon *ngIf="file.progressMode == 'buffer'" color="warn" mat-list-icon title="Impossible de charger le fichier, veuillez réessayer">warning</mat-icon>
-            <h3 mat-line>
-                <span>{{ file?.name }}</span>
-                <span class="file-code">{{ codes[file?.code] }}<button mat-icon-button [matMenuTriggerFor]="codeListe"><mat-icon>expand_more</mat-icon></button></span>
-                <mat-menu #codeListe="matMenu" yPosition="below" [overlapTrigger]="false">
-                    <button *ngFor="let code of codes | keyvalue:compareCodes" mat-menu-item (click)="file.code = code.key">{{code.value}}</button>
-                </mat-menu>
-            </h3>
-            <div mat-line>{{ formatBytes(file?.size, 0) }}</div>
-            <div mat-line><mat-progress-bar [color]="file.progressColor" [mode]="file.progressMode" [value]="file.progressMode == 'determinate'?100:0"></mat-progress-bar></div>
-            <mat-icon *ngIf="file.progressMode == 'determinate'" (click)="deleteFile(i)">delete</mat-icon>
-            <mat-icon *ngIf="file.progressMode == 'buffer'"  (click)="retry(i)">refresh</mat-icon>
-        </mat-list-item>
+        <ng-container *ngFor="let file of files; let i = index">
+            <mat-list-item>
+                <mat-icon *ngIf="file.progressMode == 'indeterminate'" matListItemIcon>file_upload</mat-icon>
+                <mat-icon *ngIf="file.progressMode == 'determinate'" color="primary" matListItemIcon>insert_drive_file</mat-icon>
+                <mat-icon *ngIf="file.progressMode == 'buffer'" color="warn" matListItemIcon title="Impossible de charger le fichier, veuillez réessayer">warning</mat-icon>
+                <h3 matListItemTitle>{{ file?.name }}</h3>
+                <div matListItemLine>{{ codes[file?.code] }}</div>
+                <div matListItemLine>{{ formatBytes(file?.size, 0) }}</div>
+                <span matListItemMeta>
+                    <button mat-icon-button [matMenuTriggerFor]="codeListe"><mat-icon>expand_more</mat-icon></button>
+                    <mat-menu #codeListe="matMenu" yPosition="below" [overlapTrigger]="false">
+                        <button *ngFor="let code of codes | keyvalue:compareCodes" mat-menu-item (click)="file.code = code.key">{{code.value}}</button>
+                    </mat-menu>
+                    <button mat-icon-button>
+                        <mat-icon *ngIf="file.progressMode == 'determinate'" (click)="deleteFile(i)">delete</mat-icon>
+                        <mat-icon *ngIf="file.progressMode == 'buffer'"  (click)="retry(i)">refresh</mat-icon>
+                    </button>
+                </span>
+            </mat-list-item>
+            <mat-list-item class="mat-list-progress">
+                <mat-progress-bar [color]="file.progressColor" [mode]="file.progressMode" [value]="file.progressMode == 'determinate'?100:0"></mat-progress-bar>
+            </mat-list-item>
+            <mat-divider></mat-divider>
+        </ng-container>
     </mat-list>
     
 </mat-dialog-content>

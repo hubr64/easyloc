@@ -1,27 +1,34 @@
-<mat-nav-list>
-    <a *ngFor="let piece of pieces" [href]="urlPieces[piece.id]" mat-list-item target="_blank">
-        <mat-icon matListIcon>insert_drive_file</mat-icon>
-        <h3 mat-line>{{piece.nom}}</h3>
-        <span mat-line>{{pieceCode[piece.code]}}</span>
-        <span mat-line>{{piece.description}}</span>
-        <mat-icon *ngIf="data.canRemove" color="warn" (click)="deletePiece(piece, $event)" title="Dissocier">remove_circle</mat-icon>
-    </a>
-    <mat-list-item *ngIf="pieces.length == 0" disabled>
-        <mat-icon matListIcon color="accent">help</mat-icon>
-        <span mat-line>Aucune pièce jointe</span>
-    </mat-list-item>
-    <mat-list-item *ngIf="data.canAdd" (click)="addPiece()" class="half-list-item">
-        <mat-icon matListIcon color="primary">note_add</mat-icon>
-        <span mat-line>Ajouter pièce jointe</span>
-    </mat-list-item>
-    <mat-list-item *ngIf="data.canAdd" (click)="addPieceExisting()" class="half-list-item">
-        <mat-icon matListIcon color="primary">find_in_page</mat-icon>
-        <span mat-line>Annexer pièce jointe</span>
-    </mat-list-item>
+<mat-action-list>
+    <button mat-list-item *ngIf="data.canAdd" (click)="addPiece()">
+        <mat-icon matListItemIcon color="primary">note_add</mat-icon>
+        <span matListItemTitle>Ajouter pièce jointe</span>
+        <span matListItemMeta><mat-icon color='primary'>play_arrow</mat-icon></span>
+    </button>
+    <button mat-list-item *ngIf="data.canAdd" (click)="addPieceExisting()">
+        <mat-icon matListItemIcon color="primary">find_in_page</mat-icon>
+        <span matListItemTitle>Annexer pièce jointe</span>
+        <span matListItemMeta><mat-icon color='primary'>play_arrow</mat-icon></span>
+    </button>
+    <mat-divider></mat-divider>
+    <button mat-list-item *ngFor="let piece of pieces" >
+        <mat-icon matListItemIcon>insert_drive_file</mat-icon>
+        <h3 matListItemTitle>{{piece.nom}}</h3>
+        <span matListItemLine>{{pieceCode[piece.code]}}</span>
+        <span matListItemLine>{{piece.description}}</span>
+        <span matListItemMeta>
+            <a *ngIf="urlPieces[piece.id]" mat-icon-button color="primary" title="Télécharger" [href]="urlPieces[piece.id]" target="_blank"><mat-icon>cloud_download</mat-icon></a>
+            <a (click)="deletePiece(piece, $event)" title="Dissocier"><mat-icon *ngIf="data.canRemove" color="warn">remove_circle</mat-icon></a>
+        </span>
+    </button>
+    <button mat-list-item *ngIf="pieces.length == 0" [disabled]="true">
+        <mat-icon matListItemIcon color="accent">help</mat-icon>
+        <span matListItemTitle>Aucune pièce jointe</span>
+    </button>
+    
     <mat-list-item *ngIf="missedPieces.length>0">
-        <mat-icon matListIcon color="warn">error</mat-icon>
-        <h3 mat-line *ngIf="missedPieces.length>1">{{missedPieces.length}} pièces manquantes :</h3>
-        <h3 mat-line *ngIf="missedPieces.length==1">1 pièce manquante :</h3>
-        <span *ngFor="let missedPiece of missedPieces" mat-line>{{pieceCode[missedPiece.split("|")[0]]}} <span *ngIf="missedPiece.split('|')[1]">ou {{pieceCode[missedPiece.split("|")[1]]}}</span></span>
+        <mat-icon matListItemIcon color="warn">error</mat-icon>
+        <h3 matListItemTitle *ngIf="missedPieces.length>1">{{missedPieces.length}} pièces manquantes :</h3>
+        <h3 matListItemLine *ngIf="missedPieces.length==1">1 pièce manquante :</h3>
+        <span *ngFor="let missedPiece of missedPieces" matListItemLine>{{pieceCode[missedPiece.split("|")[0]]}} <span *ngIf="missedPiece.split('|')[1]">ou {{pieceCode[missedPiece.split("|")[1]]}}</span></span>
     </mat-list-item>
-</mat-nav-list>
+</mat-action-list>
