@@ -16,7 +16,7 @@
 </mat-toolbar>
 
 <div class="filter-box">
-    <mat-form-field appearance="standard" *ngIf="!defaultProprietaire">
+    <mat-form-field *ngIf="!defaultProprietaire">
         <mat-label>Propriétaire</mat-label>
         <mat-icon matPrefix svgIcon="bailleur"></mat-icon>
         <mat-select [formControl]="bailleurFilter">
@@ -26,7 +26,7 @@
             </mat-option>
         </mat-select>
     </mat-form-field>
-    <mat-form-field appearance="standard">
+    <mat-form-field>
         <mat-label>Bien recherché</mat-label>
         <mat-icon matPrefix>notes</mat-icon> 
         <input [formControl]="searchFilter" matInput>
@@ -117,11 +117,15 @@
         <ng-container matColumnDef="actions" *ngIf="!embedded">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let row">
-                <button mat-icon-button color="primary" title="Consulter" routerLink="/fiche/bien/{{row.id}}"><mat-icon>visibility</mat-icon></button>
-                <button mat-icon-button color="primary" title="Editer" (click)="edit(row)"><mat-icon>edit</mat-icon></button>
-                <button mat-icon-button color="primary" title="Dupliquer" (click)="duplicate(row)"><mat-icon>content_copy</mat-icon></button>
-                <button mat-icon-button color="warn" title="Supprimer" (click)="delete(row)"><mat-icon>delete</mat-icon></button>
-                <mat-icon *ngIf="row.commentaire">info</mat-icon>
+                <button mat-icon-button [matMenuTriggerFor]="menuItem">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menuItem="matMenu" yPosition="below" [overlapTrigger]="false">
+                    <button mat-menu-item title="Consulter" routerLink="/fiche/bien/{{row.id}}"><mat-icon color="primary">visibility</mat-icon> Consulter</button>
+                    <button mat-menu-item title="Editer" (click)="edit(row)"><mat-icon color="primary">edit</mat-icon> Editer</button>
+                    <button mat-menu-item title="Dupliquer" (click)="duplicate(row)"><mat-icon color="primary">content_copy</mat-icon> Dupliquer</button>
+                    <button mat-menu-item title="Supprimer" (click)="delete(row)"><mat-icon color="warn">delete</mat-icon> Supprimer</button>
+                </mat-menu>
             </td>
         </ng-container>
 

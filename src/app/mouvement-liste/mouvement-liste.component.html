@@ -6,7 +6,7 @@
         <mat-icon>more_vert</mat-icon>
     </button>
     <mat-menu #menuListe="matMenu" yPosition="below" [overlapTrigger]="false">
-        <button mat-menu-item (click)="add()"><mat-icon>note_add</mat-icon> Ajouter</button>
+        <button mat-menu-item (click)="add()"><mat-icon>add</mat-icon> Ajouter</button>
         <button mat-menu-item [disabled]="!selection.hasValue()" [matMenuTriggerFor]="selectionnes"><mat-icon>check</mat-icon> Sélection</button>
         <button mat-menu-item (click)="export()"><mat-icon>file_download</mat-icon> Exporter</button>
     </mat-menu>
@@ -16,7 +16,7 @@
 </mat-toolbar>
 
 <div class="filter-box">
-    <mat-form-field appearance="standard" *ngIf="!defaultBien">
+    <mat-form-field *ngIf="!defaultBien">
         <mat-label>Bien</mat-label>
         <mat-icon matPrefix>apartment</mat-icon> 
         <mat-select [formControl]="bienFilter">
@@ -26,7 +26,7 @@
             </mat-option>
         </mat-select>
     </mat-form-field>
-    <mat-form-field appearance="standard">
+    <mat-form-field>
         <mat-label>Type</mat-label>
         <mat-icon matPrefix>shuffle</mat-icon> 
         <mat-select [formControl]="typeFilter">
@@ -35,7 +35,7 @@
             <mat-option value="out">Sorties</mat-option>
         </mat-select>
     </mat-form-field>
-    <mat-form-field appearance="standard">
+    <mat-form-field>
         <mat-label>Mouvement recherché</mat-label>
         <mat-icon matPrefix>notes</mat-icon> 
         <input [formControl]="searchFilter" matInput>
@@ -107,11 +107,16 @@
         <ng-container matColumnDef="actions" *ngIf="!embedded">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let row">
-                <button mat-icon-button color="accent" title="Générer quittance" (click)="generateQuittance(row)"><mat-icon>receipt_long</mat-icon></button>
-                <button mat-icon-button color="accent" title="Associer quittance" (click)="addQuittance(row)"><mat-icon matBadgeColor="accent" matBadge="+" >receipt_long</mat-icon></button>
-                <button mat-icon-button color="primary" title="Editer" (click)="edit(row)"><mat-icon>edit</mat-icon></button>
-                <button mat-icon-button color="primary" title="Dupliquer" (click)="duplicate(row)"><mat-icon>content_copy</mat-icon></button>
-                <button mat-icon-button color="warn" title="Supprimer" (click)="delete(row)"><mat-icon>delete</mat-icon></button>
+                <button mat-icon-button [matMenuTriggerFor]="menuItem">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menuItem="matMenu" yPosition="below" [overlapTrigger]="false">
+                    <button mat-menu-item title="Générer quittance" (click)="generateQuittance(row)"><mat-icon color="accent">receipt_long</mat-icon> Générer quittance</button>
+                    <button mat-menu-item title="Associer quittance" (click)="addQuittance(row)"><mat-icon color="accent" matBadgeColor="accent" matBadge="+">receipt_long</mat-icon> Associer quittance</button>
+                    <button mat-menu-item title="Editer" (click)="edit(row)"><mat-icon color="primary">edit</mat-icon> Editer</button>
+                    <button mat-menu-item title="Dupliquer" (click)="duplicate(row)"><mat-icon color="primary">content_copy</mat-icon> Dupliquer</button>
+                    <button mat-menu-item title="Supprimer" (click)="delete(row)"><mat-icon color="warn">delete</mat-icon> Supprimer</button>
+                </mat-menu>
             </td>
             <td mat-footer-cell *matFooterCellDef>-</td>
         </ng-container>

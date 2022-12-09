@@ -1,5 +1,4 @@
 import { AfterViewInit, Component, ViewChild, Inject, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
-import { Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { FormControl } from '@angular/forms';
 
@@ -57,7 +56,7 @@ export class PieceListeComponent implements AfterViewInit  {
 
   // Columns displayed in the table. Columns IDs can be added, removed, or reordered.
   public displayedColumns = ['select', 'id', 'nom', 'description', 'code', 'utilisation', 'actions'];
-  public displayedColumnsEmbedded = ['select', 'nom', 'description', 'code'];
+  public displayedColumnsEmbedded = ['select', 'id', 'nom', 'description', 'code', 'actions'];
   //Multi selection management
   public initialSelection = [];
   public allowMultiSelect: boolean = true;
@@ -65,9 +64,11 @@ export class PieceListeComponent implements AfterViewInit  {
   public lastPieces: Piece[];
   // String to manage the search filter
   public typeFilter = new FormControl('');
+  public utilisationFilter = new FormControl('');
   public searchFilter = new FormControl('');
   public filterValues: any = {
     type: '',
+    utilisation: '',
     search: ''
   }
   //URL for each piece
@@ -86,7 +87,6 @@ export class PieceListeComponent implements AfterViewInit  {
     public driveService: DriveService,
     public documentService: DocumentService,
     private exportCsvService: ExportCsvService,
-    private router: Router,
     public dialog: MatDialog,
     private _bottomSheet: MatBottomSheet,
     private cdr: ChangeDetectorRef
@@ -112,6 +112,10 @@ export class PieceListeComponent implements AfterViewInit  {
   private fieldListener() {
     this.typeFilter.valueChanges.subscribe((type:string | null) => {
       this.filterValues.type = type;
+      this.dataSource.filter = JSON.stringify(this.filterValues);
+    });
+    this.utilisationFilter.valueChanges.subscribe((utilisation:string | null) => {
+      this.filterValues.utilisation = utilisation;
       this.dataSource.filter = JSON.stringify(this.filterValues);
     });
     this.searchFilter.valueChanges.subscribe((search:string | null) => {
@@ -165,9 +169,10 @@ export class PieceListeComponent implements AfterViewInit  {
   }
 
   private createFilter(): (piece: Piece, filter: string) => boolean {
-    let filterFunction = function (piece: Piece, filter: string): boolean {
+    let filterFunction = (piece: Piece, filter: string): boolean => {
       let searchTerms = JSON.parse(filter);
       return (searchTerms.type.length==0 || (searchTerms.type.length>0 && piece.code.indexOf(searchTerms.type) !== -1) )
+        && (searchTerms.utilisation.length==0 || (searchTerms.utilisation.length>0 && ( (searchTerms.utilisation == "true" && this.documentService.getPieceUsage(piece).length > 0) || (searchTerms.utilisation == "false" && this.documentService.getPieceUsage(piece).length == 0)) ) )
         && JSON.stringify(piece.toJSON()).toLowerCase().indexOf(searchTerms.search.toLowerCase()) !== -1;
     }
     return filterFunction;

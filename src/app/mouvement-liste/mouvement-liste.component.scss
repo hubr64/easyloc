@@ -4,15 +4,17 @@
     flex-wrap: wrap;
 }
 .filter-box mat-form-field{
-    flex: 5 1 40px;
+    flex: 5 1 200px;
 }
-::ng-deep .mat-form-field-wrapper{
-    margin-bottom: -1.34375em;
- }
- .filter-box button{
-    border-radius:0;
+.filter-box ::ng-deep .mat-mdc-form-field-subscript-wrapper{
+    display: none;
+}
+.filter-box button{
+    border-radius: 0;
     flex: 1;
- }
+    height: auto;
+    min-height: 48px;
+}
 .responsive{
     max-width: 100%;
     overflow: auto hidden;
@@ -21,6 +23,7 @@ table{
     min-width: 1360px;
 }
 table td:nth-child(4),
+table td:nth-child(6),
 table td:nth-child(7){
     min-width: 50px;
     max-width: 300px;
@@ -28,17 +31,20 @@ table td:nth-child(7){
     overflow: hidden;
     text-overflow: ellipsis;
 }
+table td:nth-child(6){
+    max-width: 200px;
+}
 table th:nth-child(2),
 table td:nth-child(2){
-    width: 90px;
+    min-width: 110px;
     text-align: center;
 }
-table td:nth-child(5){
-    width: 100px;
-    text-align: left;
+table td:nth-child(3){
+    min-width: 160px;
 }
-table td:last-child{
-    width: 200px;
+table td:nth-child(5){
+    min-width: 125px;
+    text-align: left;
 }
 .success-alert .success-border{
     border-left-width: 5px;

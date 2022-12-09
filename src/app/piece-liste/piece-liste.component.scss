@@ -1,57 +1,50 @@
-table mat-form-field{
-    width:90%;
-    margin-top:20px;
-}
 .filter-box{
     display:flex;
     flex-direction: row;
     flex-wrap: wrap;
 }
 .filter-box mat-form-field{
-    flex: 5 1 40px;
+    flex: 5 1 200px;
 }
-::ng-deep .mat-form-field-wrapper{
-    margin-bottom: -1.34375em;
- }
+.filter-box ::ng-deep .mat-mdc-form-field-subscript-wrapper{
+    display: none;
+}
  .filter-box button{
-    border-radius:0;
+    border-radius: 0;
     flex: 1;
+    height: auto;
+    min-height: 48px;
  }
 .responsive{
     width: 100%;
     overflow: auto hidden;
 }
-table.list-table{
-    width: 100%;
+table{
     min-width:1050px;
+    width: 100%;
 }
-table.list-table td:nth-child(2){
-    width:115px;
+table td:nth-child(2){
+    width:130px;
     font-family: monospace;
     font-size: 0.9em;
     padding-left: 5px;
 }
-table.list-table td:nth-child(2) mat-icon{
-    margin-left: -10px;
-}
-table.list-table td:nth-child(3),
-table.list-table td:nth-child(4){
+table td:nth-child(3),
+table td:nth-child(4){
     min-width: 50px;
     max-width: 300px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-table.list-table td:nth-child(5){
+table td:nth-child(5){
     min-width:270px;
 }
-table.list-table td:last-child{
-    min-width:120px;
+table td:last-child{
+    min-width:130px;
 }
-.save-button{
-    cursor:pointer;
-    font-size: 200%;
-    line-height: 2;
+table .code-cell mat-icon{
+    vertical-align: middle;
 }
 .success-alert .success-border{
     border-left-width: 5px;
