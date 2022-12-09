@@ -1,7 +1,6 @@
 
 mat-card-title mat-icon{
     vertical-align: middle;
-    margin: 0 5px;
 }
 .avatar-letter{
     font-size: 25px;
@@ -11,9 +10,6 @@ mat-card-title mat-icon{
     background: #4285f4;
     line-height: 47px;
 }
-.mat-card-subtitle{
-    margin-bottom:0px;
-}
 mat-card-actions {
     position: absolute;
     right: 0;
@@ -21,7 +17,6 @@ mat-card-actions {
     margin:0;
     padding:0;
 }
-
 
 .piece-title{
     font-size: 1.2em;
@@ -32,6 +27,7 @@ mat-card-actions {
 .piece-container{
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-evenly;
 }
 .piece-container > div{
     flex: 1 1 226px;
@@ -49,6 +45,17 @@ mat-card-actions {
 .no-piece mat-icon{
     vertical-align: middle;
     margin:5px;
+}
+@media print {
+    .piece-container{
+        display: block;
+    }
+    .piece-container > div{
+        display: inline-block;
+    }
+    .piece-container > div > div, .no-piece{
+        break-inside: avoid;
+    }
 }
 
 .piece-container > div > div > div:first-child{

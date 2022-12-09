@@ -2,14 +2,13 @@ import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angula
 import { Router, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { MatTableDataSource} from '@angular/material/table';
 import { MatDialog} from '@angular/material/dialog';
 
+import { BIENTYPE } from '../_modeles/bien';
 import { Bail } from '../_modeles/bail';
 import { BAILTERMEPAIEMENT as bailTermePaiements } from '../_modeles/bail';
 import { BAILTYPEPAIEMENT as bailTypePaiements } from '../_modeles/bail';
@@ -30,6 +29,7 @@ export class BailFicheComponent implements OnInit, AfterViewInit {
 
   //The current bail
   public bail: Bail;
+  public bienType = BIENTYPE;
   //Conversion of types in text
   public bailTermePaiements = bailTermePaiements;
   public bailTypePaiements = bailTypePaiements;
@@ -124,29 +124,8 @@ export class BailFicheComponent implements OnInit, AfterViewInit {
     });
   }
 
-  export(){
-    //Create the PDF file with set properties
-    var ficheDoc = new jsPDF('p','pt', 'a4');
-
-    //Compute file name
-    const pdfFileName = "Bail_"+this.bail.bien.nom+"-"+this.bail.locataire.nom+".pdf";
-
-    //COnvert HTML into canvas (general use because jsPDF is not powerfull enough to get CSS)
-    html2canvas(this.fiche.nativeElement, { scale: 3 }).then((canvas: any) => {
-      //Get converted HTML in the canvas
-      var imgData = canvas.toDataURL('image/png');              
-      //Add the canvas in the pdf
-      ficheDoc.addImage(imgData, 'JPEG', 40, 40, 500, 300, 'alias', 'FAST', 0);
-
-      //Get pdf as a blob
-      const blobPdf = ficheDoc.output('blob');
-      //Convert blob to file
-      const filePdf = new File([blobPdf], pdfFileName, { type: "application/pdf", });
-
-      //And download it
-      ficheDoc.save(pdfFileName);
-    });
-
+  public printFiche(){
+    setTimeout(()=>window.print(),1000);
   }
 
   scroll(anchor:string){

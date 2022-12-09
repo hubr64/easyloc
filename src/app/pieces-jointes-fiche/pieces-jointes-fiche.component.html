@@ -1,4 +1,4 @@
-<mat-card class="card-box" data-html2canvas-ignore>
+<mat-card appearance="outlined" class="card-box">
     <mat-card-header>
         <div mat-card-avatar class="avatar-letter"><mat-icon>book</mat-icon></div>
         <mat-card-title>Pièces jointes</mat-card-title>
@@ -11,8 +11,8 @@
                 <div id="{{piece.id}}" *ngIf="!errorPieces[piece.id]">
                     <div *ngIf="piece.code != 'BIEN_PHOT'">
                         <div>
-                            <a href="{{urlPieces[piece.id]}}">
-                                <img *ngIf="thumbPieces[piece.id]" src="{{thumbPieces[piece.id]}}">
+                            <a href="{{urlPieces[piece.id]}}" target="_blank">
+                                <img *ngIf="thumbPieces[piece.id]" src="{{thumbPieces[piece.id]}}" referrerpolicy="no-referrer">
                                 <mat-icon *ngIf="!thumbPieces[piece.id]">description</mat-icon>
                             </a>
                         </div>
@@ -86,7 +86,7 @@
             </ng-container>
         </div>
     </mat-card-content>
-    <mat-card-actions>
+    <mat-card-actions class="no-print">
         <button mat-icon-button color="accent" (click)="addPieces()"><mat-icon>find_in_page</mat-icon> </button>
         <button mat-icon-button color="accent" (click)="uploadPieces()"><mat-icon>note_add</mat-icon> </button>
     </mat-card-actions>

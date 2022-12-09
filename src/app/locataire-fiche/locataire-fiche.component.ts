@@ -2,8 +2,6 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
 import { MatDialog} from '@angular/material/dialog';
 
 import { Locataire } from '../_modeles/locataire';
@@ -90,29 +88,8 @@ export class LocataireFicheComponent implements OnInit {
     this.location.back();
   }
 
-  export(){
-    //Create the PDF file with set properties
-    var ficheDoc = new jsPDF('p','pt', 'a4');
-
-    //Compute file name
-    const pdfFileName = "Locataire_"+this.locataire.nom+".pdf";
-
-    //COnvert HTML into canvas (general use because jsPDF is not powerfull enough to get CSS)
-    html2canvas(this.fiche.nativeElement, { scale: 3 }).then((canvas: any) => {
-      //Get converted HTML in the canvas
-      var imgData = canvas.toDataURL('image/png');              
-      //Add the canvas in the pdf
-      ficheDoc.addImage(imgData, 'JPEG', 40, 40, 500, 400, 'alias', 'FAST', 0);
-
-      //Get pdf as a blob
-      const blobPdf = ficheDoc.output('blob');
-      //Convert blob to file
-      const filePdf = new File([blobPdf], pdfFileName, { type: "application/pdf", });
-
-      //And download it
-      ficheDoc.save(pdfFileName);
-    });
-
+  public printFiche(){
+    setTimeout(()=>window.print(),1000);
   }
 
   public contact(mail:string){

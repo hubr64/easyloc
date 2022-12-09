@@ -1,4 +1,4 @@
-<mat-toolbar color="primary" class="primary-darker sticky-toolbar">
+<mat-toolbar color="primary" class="primary-darker sticky-toolbar no-print">
     <button mat-icon-button (click)="goBack()"><mat-icon>chevron_left</mat-icon></button>
     <mat-icon>apartment</mat-icon>
     <span>Fiche descriptive de bien</span>
@@ -9,129 +9,86 @@
     <mat-menu #menuListe="matMenu" yPosition="below" [overlapTrigger]="false">
         <button mat-menu-item [routerLink]="'/bien/'+bien.id"><mat-icon>edit</mat-icon> Modifier</button>
         <button mat-menu-item [routerLink]="'/bien/new'"><mat-icon>add</mat-icon> Nouveau</button>
-        <button mat-menu-item (click)="export()"><mat-icon>file_download</mat-icon> Exporter</button>
+        <button mat-menu-item (click)="printFiche()"><mat-icon>print</mat-icon> Imprimer</button>
     </mat-menu>
 </mat-toolbar>
 
 <div id="fiche" #fiche>
-
-    <mat-card class="card-box">
+    <mat-card appearance="outlined" class="card-box">
         <mat-card-header>
             <div mat-card-avatar class="avatar-letter"><mat-icon>apartment</mat-icon></div>
             <mat-card-title>{{bien.nom}}</mat-card-title>
-            <mat-card-subtitle>{{bien.adresse}}</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-            <mat-list>
-                <mat-list-item class="description-details" [innerHTML]="bien.descriptionHTML">
-                </mat-list-item>
-                <mat-list-item *ngIf="bien.type">
-                    <mat-icon matListIcon></mat-icon>
-                    <span class="title">&nbsp;</span>
-                    <span>
-                        <mat-icon *ngIf="!bien.type.includes('Maison')">apartment</mat-icon>
-                        <mat-icon *ngIf="bien.type.includes('Maison')">gite</mat-icon>
-                        <mat-icon *ngIf="bien.type.includes('Meuble')">weekend</mat-icon>
-                    </span>
-                </mat-list-item>
-                <mat-list-item class="half-list-item">
-                        <mat-icon matListIcon svgIcon="bailleur"></mat-icon>
-                        <span class="title">Bailleur</span>
-                        <span class="text-details">{{bien.proprietaire.nom}} </span>
-                </mat-list-item>
-                <mat-list-item class="half-list-item">
-                    <mat-icon matListIcon>handyman</mat-icon>
-                    <span class="title">Année construction</span>
-                    <span class="text-details">{{bien.dateFabrication| date:'YYYY':'fr-FR'}} </span>
-                </mat-list-item>
-                <mat-list-item class="half-list-item">
-                    <mat-icon matListIcon>event</mat-icon>
-                    <span class="title">Date Achat</span>
-                    <span class="text-details">{{bien.dateAchat| date:'YYYY':'fr-FR'}} </span>
-                </mat-list-item>
-                <mat-list-item class="half-list-item">
-                    <mat-icon matListIcon>euro_symbol</mat-icon>
-                    <span class="title">Montant Achat</span>
-                    <span class="text-details">{{bien.prixAchat| currency:'EUR':'symbol':'1.0-0'}}</span>
-                </mat-list-item>
-                <mat-list-item class="half-list-item">
-                    <mat-icon matListIcon>straighten</mat-icon>
-                    <span class="title">Surface</span>
-                    <span class="text-details">{{bien.surface}} m²</span>
-                </mat-list-item>
-                <mat-list-item class="half-list-item">
-                    <mat-icon matListIcon>numbers</mat-icon>
-                    <span class="title">Nombre de pièces</span>
-                    <span class="text-details">{{bien.nbPieces}}</span>
-                </mat-list-item>
-                <mat-list-item class="half-list-item">
-                    <mat-icon matListIcon>local_parking</mat-icon>
-                    <span class="title">Parking</span>
-                    <span class="text-details">{{bien.parking}}</span>
-                </mat-list-item>
-                <mat-list-item  class="half-list-item" *ngIf="bien.syndic">
-                    <mat-icon matListIcon>home_repair_service</mat-icon>
-                    <span class="title">Syndic gestion</span>
-                    <span class="text-details">{{bien.syndic}} <ng-container *ngIf="bien.syndicUrl">(<a href="{{bien.syndicUrl}}" target="_blank">{{bien.syndicUrl}}</a>)</ng-container></span>
-                </mat-list-item>
-            </mat-list>
-            <div class="complement-infos">
-                <ng-container *ngVar="documentService.getUnrentBien(bien) as unrentBien">
-                    <div class="mini-chip right" *ngIf="!unrentBien"><mat-icon>person</mat-icon>Loué</div>
-                    <div class="mini-chip right" *ngIf="unrentBien && unrentBien.nbJours < 10000"><mat-icon color="warn">person_outline</mat-icon>Non loué depuis {{unrentBien.nbJours}} jours</div>
-                    <div class="mini-chip right" *ngIf="unrentBien && unrentBien.nbJours == 10000"><mat-icon>pending</mat-icon>Jamais loué</div>
-                </ng-container>
-            </div>
-        </mat-card-content>
-        <mat-card-footer *ngIf="bien.commentaire" [innerHTML]="bien.commentaireHTML"></mat-card-footer>
-    </mat-card>
-
-    <mat-card class="card-box" *ngFor="let bail of bails">
-        <mat-card-header>
-            <div mat-card-avatar class="avatar-letter" [ngClass]="{'old': bail.dateFin}"><mat-icon>assignment</mat-icon></div>
-            <mat-card-title><mat-icon>apartment</mat-icon>{{bail.bien.nom}}<mat-icon>multiple_stop</mat-icon>{{bail.locataire.nom}}<mat-icon>people</mat-icon></mat-card-title>
-            <mat-card-subtitle>Bail de location <ng-container *ngIf="bail.dateFin">in</ng-container>actif</mat-card-subtitle>
+            <mat-card-subtitle>{{bienType[bien.type]}}</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
             <mat-list>
                 <mat-list-item>
-                    <mat-icon matListIcon>date_range</mat-icon>
-                    <span class="title">Dates entrée/sortie</span>
-                    <span>{{bail.dateDebut| date:'longDate':'fr-FR'}}</span>
-                    <span *ngIf="bail.dateFin">&nbsp;-&nbsp;{{bail.dateFin| date:'longDate':'fr-FR'}}</span>
+                    <mat-icon matListItemIcon>feed</mat-icon>
+                    <div matListItemTitle>Description</div>
+                    <span matListItemLine [innerHTML]="bien.descriptionHTML"></span>
                 </mat-list-item>
-                <mat-list-item class="half-list-item">
-                    <mat-icon matListIcon>euro_symbol</mat-icon>
-                    <span class="title">Montant</span>
-                    <span>{{(bail.loyer + bail.charges)| currency:'EUR':'symbol':'1.0-0'}}</span>
+                <mat-list-item>
+                    <mat-icon matListItemIcon>location_on</mat-icon>
+                    <div matListItemTitle>Adresse</div>
+                    <span matListItemLine [innerHTML]="bien.adresseHTML"></span>
                 </mat-list-item>
-                <mat-list-item class="half-list-item">
-                    <mat-icon matListIcon>receipt_long</mat-icon>
-                    <span class="title">Date paiement</span>
-                    <span>
-                        {{bailPeriodePaiements[bail.paiementPeriodicite]}} - {{bail.paiementDate| date:'d':'fr-FR' }} du mois
-                    </span>
+                <mat-list-item>
+                    <mat-icon matListItemIcon svgIcon="bailleur"></mat-icon>
+                    <div matListItemTitle>Bailleur</div>
+                    <span matListItemMeta>{{bien.proprietaire.nom}}</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <mat-icon matListItemIcon>handyman</mat-icon>
+                    <div matListItemTitle>Année construction</div>
+                    <span matListItemMeta>{{bien.dateFabrication| date:'YYYY':'fr-FR'}}</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <mat-icon matListItemIcon>event</mat-icon>
+                    <div matListItemTitle>Date Achat</div>
+                    <span matListItemMeta>{{bien.dateAchat| date:'YYYY':'fr-FR'}}</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <mat-icon matListItemIcon>euro_symbol</mat-icon>
+                    <div matListItemTitle>Montant Achat</div>
+                    <span matListItemMeta>{{bien.prixAchat| currency:'EUR':'symbol':'1.0-0'}}</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <mat-icon matListItemIcon>expand</mat-icon>
+                    <div matListItemTitle>Surface</div>
+                    <span matListItemMeta>{{bien.surface}} m²</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <mat-icon matListItemIcon>auto_awesome_mosaic</mat-icon>
+                    <div matListItemTitle>Nombre de pièces</div>
+                    <span matListItemMeta>{{bien.nbPieces}}</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <mat-icon matListItemIcon>local_parking</mat-icon>
+                    <div matListItemTitle>Parking</div>
+                    <span matListItemMeta>{{bien.parking}}</span>
+                </mat-list-item>
+                <mat-list-item *ngIf="bien.syndic">
+                    <mat-icon matListItemIcon>home_repair_service</mat-icon>
+                    <div matListItemTitle>Syndic gestion</div>
+                    <span matListItemMeta>{{bien.syndic}} <ng-container *ngIf="bien.syndicUrl">(<a href="{{bien.syndicUrl}}" target="_blank">{{bien.syndicUrl}}</a>)</ng-container></span>
+                </mat-list-item>
+                <mat-list-item *ngVar="documentService.getUnrentBien(bien) as unrentBien">
+                    <mat-icon matListItemIcon>person</mat-icon>
+                    <div matListItemTitle>Etat de location actuelle</div>
+                    <span matListItemMeta *ngIf="!unrentBien">Loué <mat-icon color="primary">done</mat-icon></span>
+                    <span matListItemMeta *ngIf="unrentBien && unrentBien.nbJours < 10000">Non loué depuis {{unrentBien.nbJours}} jours <mat-icon color="warn">warning</mat-icon></span>
+                    <span matListItemMeta *ngIf="unrentBien && unrentBien.nbJours == 10000">Jamais loué <mat-icon>pending</mat-icon></span>
+                </mat-list-item>
+                <mat-list-item *ngIf="bien.commentaire">
+                    <mat-icon matListItemIcon>feed</mat-icon>
+                    <div matListItemTitle>Commentaires</div>
+                    <span matListItemLine [innerHTML]="bien.commentaireHTML"></span>
                 </mat-list-item>
             </mat-list>
-            <div class="complement-infos">
-                <div class="mini-chip" *ngVar="documentService.getUnpaiedLoyer(bail) as unpaiedLoyer">
-                    <ng-container *ngIf="unpaiedLoyer.length>0"><mat-icon color="warn">error</mat-icon>{{unpaiedLoyer.length}} loyer(s) impayé(s)</ng-container>
-                    <ng-container *ngIf="unpaiedLoyer.length==0"><mat-icon color="accent">done</mat-icon>Aucun impayé</ng-container>
-                </div>
-                <div class="mini-chip" *ngVar="documentService.getLoyerToUpdate(bail) as loyerToUpdate">
-                    <ng-container *ngIf="loyerToUpdate && loyerToUpdate.toUpdate"><mat-icon color="warn">error</mat-icon>Loyer à modifier (depuis {{loyerToUpdate.nbJours}} jours)</ng-container>
-                    <ng-container *ngIf="loyerToUpdate && !loyerToUpdate.toUpdate"><mat-icon color="primary">done</mat-icon>Loyer à jour</ng-container>
-                    <ng-container *ngIf="!loyerToUpdate"><mat-icon disabled>hide_source</mat-icon>Bail terminé</ng-container>
-                </div>
-            </div>
         </mat-card-content>
-        <mat-card-actions data-html2canvas-ignore>
-            <button mat-icon-button color="accent" routerLink="/fiche/bail/{{bail.id}}" ><mat-icon>visibility</mat-icon> </button>
-            <button mat-icon-button color="accent" routerLink="/bail/{{bail.id}}" ><mat-icon>edit</mat-icon> </button>
-        </mat-card-actions>
     </mat-card>
 
-    <mat-card class="card-box">
+    <mat-card appearance="outlined" class="card-box">
         <mat-card-header>
             <div mat-card-avatar class="avatar-letter"><mat-icon>euro_symbol</mat-icon></div>
             <mat-card-title>Mouvements</mat-card-title>
@@ -139,7 +96,6 @@
         </mat-card-header>
         <mat-card-content>
             <app-statistiques-details [simple]="true" [defaultBien]="bien"></app-statistiques-details>
-
             <table mat-table [dataSource]="dataSource" class="full-width-table" matSort matSortActive="date" matSortDirection="desc">      
                 <ng-container matColumnDef="type">
                     <th mat-header-cell *matHeaderCellDef>Type</th>
@@ -171,15 +127,69 @@
                     <td class="centered-cell mat-cell" [attr.colspan]="displayedColumns.length"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun résultat à afficher</td>
                 </tr>
             </table>
-            <mat-paginator #paginator
+            <mat-paginator class="no-print" #paginator
                 [pageIndex]="0"
                 [pageSize]="10"
                 [pageSizeOptions]="[10, 20, 50]"
                 showFirstLastButtons>
             </mat-paginator>
         </mat-card-content>
-        <mat-card-actions data-html2canvas-ignore>
-            <button mat-icon-button color="accent" routerLink="/mouvements" ><mat-icon>edit</mat-icon> </button>
+        <mat-card-actions class="no-print">
+            <button mat-icon-button color="accent" routerLink="/mouvements" ><mat-icon>edit</mat-icon></button>
+        </mat-card-actions>
+    </mat-card>
+
+    <mat-card appearance="outlined" class="card-box" *ngFor="let bail of bails">
+        <mat-card-header>
+            <div mat-card-avatar class="avatar-letter" [ngClass]="{'old': bail.dateFin}"><mat-icon>assignment</mat-icon></div>
+            <mat-card-title><mat-icon>apartment</mat-icon>{{bail.bien.nom}}<mat-icon>multiple_stop</mat-icon>{{bail.locataire.nom}}<mat-icon>people</mat-icon></mat-card-title>
+            <mat-card-subtitle>Bail de location <ng-container *ngIf="bail.dateFin">in</ng-container>actif</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-list>
+                <mat-list-item>
+                    <mat-icon matListItemIcon>date_range</mat-icon>
+                    <span matListItemTitle>Date entrée<ng-container *ngIf="bail.dateFin">/sortie</ng-container></span>
+                    <span matListItemMeta>
+                        <span>{{bail.dateDebut| date:'longDate':'fr-FR'}}</span>
+                        <span *ngIf="bail.dateFin">&nbsp;-&nbsp;{{bail.dateFin| date:'longDate':'fr-FR'}}</span>
+                    </span>
+                </mat-list-item>
+                <mat-list-item>
+                    <mat-icon matListItemIcon>euro_symbol</mat-icon>
+                    <div matListItemTitle>Montant loyer</div>
+                    <span matListItemMeta>{{(bail.loyer)| currency:'EUR':'symbol':'1.0-0'}} + {{(bail.charges)| currency:'EUR':'symbol':'1.0-0'}}</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <mat-icon matListItemIcon>receipt_long</mat-icon>
+                    <div matListItemTitle>Date paiement</div>
+                    <span matListItemMeta>{{bailPeriodePaiements[bail.paiementPeriodicite]}} - {{bail.paiementDate| date:'d':'fr-FR' }} du mois</span>
+                </mat-list-item>
+                <mat-list-item *ngVar="documentService.getUnpaiedLoyer(bail) as unpaiedLoyer">
+                    <mat-icon matListItemIcon>monetization_on</mat-icon>
+                    <div matListItemTitle>Etat paiement</div>
+                    <span matListItemMeta *ngIf="unpaiedLoyer.length>0">{{unpaiedLoyer.length}} loyer(s) impayé(s) <mat-icon color="warn">error</mat-icon></span>
+                    <span matListItemMeta *ngIf="unpaiedLoyer.length==0">Aucun impayé <mat-icon color="primary">done</mat-icon></span>
+                </mat-list-item>
+                <ng-container *ngIf="!bail.dateFin">
+                    <mat-list-item *ngVar="documentService.getLoyerToUpdate(bail) as loyerToUpdate">
+                        <mat-icon matListItemIcon>currency_exchange</mat-icon>
+                        <div matListItemTitle>Mise à jour loyer</div>
+                        <span matListItemMeta *ngIf="loyerToUpdate && loyerToUpdate.toUpdate">Loyer à modifier (depuis {{loyerToUpdate.nbJours}} jours) <mat-icon color="warn">error</mat-icon></span>
+                        <span matListItemMeta *ngIf="loyerToUpdate && !loyerToUpdate.toUpdate">Loyer à jour <mat-icon color="primary">done</mat-icon></span>
+                        <span matListItemMeta *ngIf="!loyerToUpdate">Bail terminé <mat-icon disabled>hide_source</mat-icon></span>
+                    </mat-list-item>
+                </ng-container>
+                <mat-list-item *ngIf="bail.commentaire">
+                    <mat-icon matListItemIcon>feed</mat-icon>
+                    <div matListItemTitle>Commentaires</div>
+                    <span matListItemLine [innerHTML]="bail.commentaireHTML"></span>
+                </mat-list-item>
+            </mat-list>
+        </mat-card-content>
+        <mat-card-actions class="no-print">
+            <button mat-icon-button color="accent" routerLink="/fiche/bail/{{bail.id}}" ><mat-icon>visibility</mat-icon></button>
+            <button mat-icon-button color="accent" routerLink="/bail/{{bail.id}}" ><mat-icon>edit</mat-icon></button>
         </mat-card-actions>
     </mat-card>
 

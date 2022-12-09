@@ -2,15 +2,13 @@ import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angula
 import { Router, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { MatTableDataSource} from '@angular/material/table';
 import { MatDialog} from '@angular/material/dialog';
 
-import { Bien } from '../_modeles/bien';
+import { Bien, BIENTYPE } from '../_modeles/bien';
 import { Mouvement } from '../_modeles/mouvement';
 import { Bail } from '../_modeles/bail';
 import { BAILTERMEPAIEMENT as bailTermePaiements } from '../_modeles/bail';
@@ -20,7 +18,6 @@ import { UserService } from '../_services/user.service';
 import { AlertService } from '../_services/alert.service';
 import { DocumentService } from '../_services/document.service';
 import { ConfigurationService } from '../_services/configuration.service';
-import { MailComponent } from '../mail/mail.component';
 
 @Component({
   selector: 'app-bien-fiche',
@@ -31,6 +28,7 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
 
   //The current bien
   public bien: Bien = new Bien();
+  public bienType = BIENTYPE;
   //All bails for the current bien
   public bails: Bail[];
   //Conversion of types in text
@@ -120,29 +118,8 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
     this.location.back();
   }
 
-  export(){
-    //Create the PDF file with set properties
-    var ficheDoc = new jsPDF('p','pt', 'a4');
-
-    //Compute file name
-    const pdfFileName = "Bien_"+this.bien.nom+".pdf";
-
-    //COnvert HTML into canvas (general use because jsPDF is not powerfull enough to get CSS)
-    html2canvas(this.fiche.nativeElement, { scale: 3 }).then((canvas: any) => {
-      //Get converted HTML in the canvas
-      var imgData = canvas.toDataURL('image/png');              
-      //Add the canvas in the pdf
-      ficheDoc.addImage(imgData, 'JPEG', 40, 40, 500, 400, 'alias', 'FAST', 0);
-
-      //Get pdf as a blob
-      const blobPdf = ficheDoc.output('blob');
-      //Convert blob to file
-      const filePdf = new File([blobPdf], pdfFileName, { type: "application/pdf", });
-
-      //And download it
-      ficheDoc.save(pdfFileName);
-    });
-
+  public printFiche(){
+    setTimeout(()=>window.print(),1000);
   }
 
 }
