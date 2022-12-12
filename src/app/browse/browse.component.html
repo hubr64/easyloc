@@ -1,4 +1,18 @@
-<div class="global-box" *ngFor="let bien of documentService.document.biens; let i = index">
+<mat-toolbar color="primary" class="primary-darker sticky-toolbar no-print">
+    <mat-icon>apartment</mat-icon>
+    <span>Vue générale des biens gérés</span>
+    <span class="flex"></span>
+    <mat-button-toggle-group>
+        <mat-button-toggle value="nom" (click)="displayOrder='nom'" [checked]="displayOrder=='nom'">
+            <mat-icon>sort_by_alpha</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="dateAchat" (click)="displayOrder='dateAchat'" [checked]="displayOrder=='dateAchat'">
+            <mat-icon>calendar_month</mat-icon>
+        </mat-button-toggle>
+    </mat-button-toggle-group>
+</mat-toolbar>
+
+<div class="global-box" *ngFor="let bien of documentService.document.biens | orderBy:displayOrder; let i = index">
     <ng-container *ngVar="getBail(bien) as bail">
         <mat-card appearance="outlined" class="bailleur-card" *ngIf="visibility?visibility[i]:false" [ngStyle]="{'border-color': colors[i]}" (click)="toggle(i)">
             <mat-card-header>

@@ -23,7 +23,7 @@
             <mat-icon matPrefix>apartment</mat-icon> 
             <mat-select [formControl]="bienFilter">
                 <mat-option value="" selected>Tous</mat-option>
-                <mat-option *ngFor="let bien of documentService.document.biens" [value]="bien.id">
+                <mat-option *ngFor="let bien of documentService.document.biens | orderBy:'nom'" [value]="bien.id">
                     {{bien.nom}}
                 </mat-option>
             </mat-select>
@@ -33,7 +33,7 @@
             <mat-icon matPrefix>people</mat-icon> 
             <mat-select [formControl]="locataireFilter">
                 <mat-option value="" selected>Tous</mat-option>
-                <mat-option *ngFor="let locataire of documentService.document.locataires" [value]="locataire.id">
+                <mat-option *ngFor="let locataire of documentService.document.locataires | orderBy:'nom'" [value]="locataire.id">
                     {{locataire.nom}}
                 </mat-option>
             </mat-select>

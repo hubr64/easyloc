@@ -24,5 +24,6 @@ export const CONFIG: { [key: string]: any } = {
   'mouvementAutoCompleteOut': 'Taxe foncière;Assurance prêt immobilier;Assurance PNO;Provision sur charges;Intérêts d\'emprunt;Frais de dossier prêt immobilier;Travaux;Achat;Régularisation de charges',
   'nomModeleAnnoncePapier': 'Modèle Annonce Web',
   'nomModeleAnnonceWeb': 'Modèle Annonce Papier',
+  'ordreBien': 'nom',
 }
 

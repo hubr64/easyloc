@@ -49,6 +49,7 @@ export class ConfigurationService {
       'mouvementAutoCompleteOut': { advanced: false, title: 'Proposition textes de mouvements sortants (séparé par ";")', value: Configuration.CONFIG["mouvementAutoCompleteOut"], categorie: 'web_asset' },
       'nomModeleAnnoncePapier': { advanced: false, title: 'Nom du modèle par défaut pour une annonce de location en version papier', value: Configuration.CONFIG["nomModeleAnnoncePapier"], categorie: 'tune' },
       'nomModeleAnnonceWeb': { advanced: false, title: 'Nom du modèle par défaut pour une annonce de location en version Web', value: Configuration.CONFIG["nomModeleAnnonceWeb"], categorie: 'tune' },
+      'ordreBien': { advanced: false, title: 'Ordre d\'affichage des biens par défaut (nom|dateAchat)', value: Configuration.CONFIG["ordreBien"], categorie: 'web_asset' },
     };
 
     // Load local storage that replace the global initial storage
