@@ -17,7 +17,7 @@
                 <mat-form-field appearance="fill">
                     <mat-label>Locataire</mat-label>
                     <mat-select id="locataire" formControlName="locataire" required>
-                        <mat-option *ngFor="let locataire of documentService.document.locataires" [value]="locataire.id">
+                        <mat-option *ngFor="let locataire of documentService.document.locataires | orderBy:'nom'" [value]="locataire.id">
                             {{locataire.nom}}
                         </mat-option>
                     </mat-select>
@@ -28,7 +28,7 @@
                 <mat-form-field appearance="fill">
                     <mat-label>Bien loué</mat-label>
                     <mat-select id="bien" formControlName="bien" required>
-                        <mat-option *ngFor="let bien of documentService.document.biens" [value]="bien.id">
+                        <mat-option *ngFor="let bien of documentService.document.biens | orderBy:'nom'" [value]="bien.id">
                             {{bien.nom}}
                         </mat-option>
                     </mat-select>

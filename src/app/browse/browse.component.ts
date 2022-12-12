@@ -5,6 +5,7 @@ import { MatDialog} from '@angular/material/dialog';
 import { AlertService } from '../_services/alert.service';
 import { UserService } from '../_services/user.service';
 import { DocumentService } from '../_services/document.service';
+import { ConfigurationService } from '../_services/configuration.service';
 import { Bien, BIENTYPE} from '../_modeles/bien';
 import { Bail } from '../_modeles/bail';
 import { Locataire } from '../_modeles/locataire';
@@ -17,17 +18,20 @@ import { MailComponent } from '../mail/mail.component';
 })
 export class BrowseComponent implements OnInit {
 
-  public colors: string[] = ["#4285f4", "#ea4335", "#fbbc04", "#34a853", "#e37400", "#a142f4"];
+  public colors: string[] = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc'];
   public visibility : boolean[] = [];
   public bienType = BIENTYPE;
+  public displayOrder: string = "nom";
 
   constructor(
     public alertService: AlertService,
     public userService: UserService,
     public documentService: DocumentService,
+    public configurationService: ConfigurationService,
     public dialog: MatDialog) { }
 
   ngOnInit(): void {
+    this.displayOrder = this.configurationService.getValue('ordreBien');
   }
 
   public getBail(bien: Bien): Bail | null{
