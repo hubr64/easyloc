@@ -165,7 +165,7 @@ export class PieceListeComponent implements AfterViewInit  {
   masterToggle() {
     this.isAllSelected() ?
         this.selection.clear() :
-        this.dataSource.data.forEach(row => this.selection.select(row));
+        this.dataSource.filteredData.forEach(row => this.selection.select(row));
   }
 
   private createFilter(): (piece: Piece, filter: string) => boolean {
