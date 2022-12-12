@@ -38,7 +38,8 @@ import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatRadioModule} from '@angular/material/radio';
 import { MatStepperModule} from '@angular/material/stepper';
-import {MatExpansionModule} from '@angular/material/expansion';
+import { MatExpansionModule} from '@angular/material/expansion';
+import { MatButtonToggleModule} from '@angular/material/button-toggle';
 //Other libraries
 import { NgxEchartsModule } from 'ngx-echarts';
 //Services
@@ -90,6 +91,7 @@ import { BailNewComponent } from './bail-new/bail-new.component';
 import { FilterConfigurationPipe } from './_helpers/filter-configuration.pipe';
 import { DndDirective } from './_helpers/dnd.directive';
 import { VarDirective } from './_helpers/ng-var.directive';
+import { OrderByPipe } from './_helpers/orderby.pipe';
 
 registerLocaleData(localeFr);
 
@@ -107,6 +109,7 @@ const globalRippleConfig: RippleGlobalOptions = {
     FilterConfigurationPipe,
     DndDirective,
     VarDirective,
+    OrderByPipe,
     NavigationComponent,
     DashboardComponent,
     LocataireDetailsComponent,
@@ -180,6 +183,7 @@ const globalRippleConfig: RippleGlobalOptions = {
     MatRadioModule,
     MatStepperModule,
     MatExpansionModule,
+    MatButtonToggleModule,
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts'), 
     }),
