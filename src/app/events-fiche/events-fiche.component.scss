@@ -1,0 +1,18 @@
+mat-card-title mat-icon{
+    vertical-align: middle;
+}
+.avatar-letter{
+    font-size: 25px;
+    text-align: center;
+    font-weight: bold;
+    color: #FFF;
+    background: #4285f4;
+    line-height: 47px;
+}
+mat-card-actions {
+    position: absolute;
+    right: 0;
+    top: 5px;
+    margin:0;
+    padding:0;
+}

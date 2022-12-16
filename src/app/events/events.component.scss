@@ -1,0 +1,27 @@
+.mdc-list-item__end{
+    pointer-events:inherit!important;
+}
+#warning-empty{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 30px;
+    line-height: 40px;
+    text-align: center;
+    font-family: 'Unica One', cursive;
+}
+#warning-empty > mat-icon {
+    font-size: 50px;
+    flex: 1;
+    width: 100%;
+}
+.event-gravite{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    margin-bottom: 15px;
+}
+.event-gravite mat-icon{
+    color: white!important;
+}
