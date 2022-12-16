@@ -49,103 +49,21 @@
     <mat-grid-tile [rowspan]="(rowSpanWarn?rowSpanWarn:1)">
       <mat-card appearance="outlined" class="dashboard-card">
         <mat-card-header>
-            <div mat-card-avatar><mat-icon color="warn">error</mat-icon></div>
-            <mat-card-title>Attention !</mat-card-title>
-            <button mat-icon-button class="more-button" (click)="rowSpanWarn==1?(rowSpanWarn=2):(rowSpanWarn=1)">
-              <mat-icon *ngIf="rowSpanWarn==1">expand_more</mat-icon>
-              <mat-icon *ngIf="rowSpanWarn==2">expand_less</mat-icon>
-            </button>
+            <div mat-card-avatar><mat-icon color="warn">notifications</mat-icon></div>
+            <mat-card-title>Evènements</mat-card-title>
+            <span class="more-button">
+              <button mat-icon-button (click)="rowSpanWarn==1?(rowSpanWarn=2):(rowSpanWarn=1)">
+                <mat-icon *ngIf="rowSpanWarn==1">expand_more</mat-icon>
+                <mat-icon *ngIf="rowSpanWarn==2">expand_less</mat-icon>
+              </button>
+            </span>
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
-          <div id="warning-empty" *ngIf="warningCardEmpty()">
-            <mat-icon color="primary">sentiment_very_satisfied</mat-icon>
-            TOUT VA BIEN AUJOURD'HUI !
-          </div>
-          <mat-list>
-            <mat-list-item *ngFor="let unpaidLoyer of unpaidLoyers">
-                <mat-icon matListItemIcon matBadgeColor="warn" matBadge="!">euro_symbol</mat-icon>
-                <h3 matListItemTitle>Loyer impayé de {{unpaidLoyer.bail}}</h3>
-                <span matListItemLine>{{unpaidLoyer.date| date:'longDate':'fr-FR'}}</span>
-                <span matListItemMeta>
-                  <button title="Ajouter le paiement et acquitter" mat-icon-button (click)="acquitter(unpaidLoyer.bail)">
-                    <mat-icon color="warn">receipt_long</mat-icon>
-                  </button>
-                  <button title="Relancer le locataire" mat-icon-button (click)="relancer(unpaidLoyer)">
-                    <mat-icon color="warn">mail</mat-icon>
-                  </button>
-                </span>
-            </mat-list-item>
-          </mat-list>
-          <mat-list>
-            <mat-list-item *ngFor="let unrentBien of unrentBiens">
-              <mat-icon matListItemIcon matBadgeColor="warn" matBadge="!">apartment</mat-icon>
-              <h3 matListItemTitle>{{unrentBien.bien}} n'est pas loué</h3>
-              <span matListItemLine *ngIf="unrentBien.nbJours < 10000">{{unrentBien.nbJours}} jours sans location</span>
-              <span matListItemLine *ngIf="unrentBien.nbJours == 10000">Jamais loué</span>
-              <span matListItemMeta>
-                <button title="Voir le bien" mat-icon-button [routerLink]="'/fiche/bien/'+unrentBien.bien.id">
-                  <mat-icon color="warn">visibility</mat-icon>
-                </button>
-              </span>
-            </mat-list-item>
-          </mat-list>
-          <mat-list>
-            <mat-list-item *ngFor="let updateLoyerBail of updateLoyerBails">
-              <ng-container *ngIf="updateLoyerBail.toUpdate">
-                <mat-icon matListItemIcon matBadgeColor="warn" matBadge="!">assignment</mat-icon>
-                <h3 matListItemTitle>Loyer de {{updateLoyerBail.bail}} à réviser</h3>
-                <span matListItemLine>Le loyer aurait pu être modifié depuis {{updateLoyerBail.nbJours}} jours</span>
-                <span matListItemMeta>
-                  <button title="Voir le bail" mat-icon-button [routerLink]="'/fiche/bail/'+updateLoyerBail.bail.id">
-                    <mat-icon color="warn">visibility</mat-icon>
-                  </button>
-                </span>
-              </ng-container>
-            </mat-list-item>
-          </mat-list>
-          <mat-list>
-            <mat-list-item *ngFor="let mouvement of mouvementsWithoutQuittance">
-              <mat-icon matListItemIcon matBadgeColor="accent" matBadge="?">euro_symbol</mat-icon>
-              <h3 matListItemTitle>Entrée sans quittance</h3>
-              <span matListItemLine>{{mouvement.libelle}} ({{mouvement.montant| currency:'EUR':'symbol':'1.2-2'}})</span>
-              <span matListItemMeta>
-                <button title="Acquitter" mat-icon-button [routerLink]="'/quittance/'+mouvement.id">
-                  <mat-icon color="warn">receipt_long</mat-icon>
-                </button>
-              </span>
-            </mat-list-item>
-          </mat-list>
+          <app-events class="event-list"></app-events>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>
-    
-    <mat-grid-tile [colspan]="1" [rowspan]="(rowSpanPieces?rowSpanPieces:1)">
-      <mat-card appearance="outlined" class="dashboard-card">
-        <mat-card-header>
-          <div mat-card-avatar><mat-icon color="warn">sim_card_alert</mat-icon></div>
-          <mat-card-title>Pièces manquantes</mat-card-title>
-          <button mat-icon-button class="more-button" (click)="rowSpanPieces==1?(rowSpanPieces=2):(rowSpanPieces=1)">
-            <mat-icon *ngIf="rowSpanPieces==1">expand_more</mat-icon>
-            <mat-icon *ngIf="rowSpanPieces==2">expand_less</mat-icon>
-          </button>
-        </mat-card-header>
-        <mat-card-content>
-          <mat-list>
-              <mat-list-item *ngFor="let missingPiece of missingPieces">
-                  <mat-icon matListItemIcon svgIcon="{{typeIcon['svg.'+missingPiece.piecesContainer.className]}}">{{typeIcon[missingPiece.piecesContainer.className]}}</mat-icon>
-                  <h3 matListItemTitle>{{missingPiece.piecesContainer}}</h3>
-                  <span matListItemLine>{{getmissingPieceStr(missingPiece.piecesManquantes)}}</span>
-                  <span matListItemMeta>
-                    <button title="Modifier" mat-icon-button [routerLink]="'/'+missingPiece.piecesContainer.className.toLowerCase()+'/'+missingPiece.piecesContainer.id">
-                      <mat-icon>visibility</mat-icon>
-                  </button>
-                  <app-pieces-jointes-liste [container]="missingPiece.piecesContainer" badgeColor="warn"></app-pieces-jointes-liste>
-                </span>
-              </mat-list-item>
-          </mat-list>
-        </mat-card-content>
-      </mat-card>
-    </mat-grid-tile>
+
     <mat-grid-tile [colspan]="1" [rowspan]="1">
       <mat-card appearance="outlined" class="dashboard-card">
         <mat-card-header>

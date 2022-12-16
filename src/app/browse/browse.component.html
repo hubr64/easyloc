@@ -72,12 +72,10 @@
                         <div matListItemTitle>Total des entrées</div>
                         <span matListItemMeta>{{bienInOut.total.in| currency:'EUR':'symbol':'1.0-0'}}</span>
                     </mat-list-item>
-                    <mat-list-item *ngVar="documentService.getUnrentBien(bien) as unrentBien">
-                        <mat-icon matListItemIcon>person</mat-icon>
-                        <div matListItemTitle>Etat de location actuelle</div>
-                        <span matListItemMeta *ngIf="!unrentBien">Loué</span>
-                        <span matListItemMeta *ngIf="unrentBien && unrentBien.nbJours < 10000">Non loué depuis {{unrentBien.nbJours}} jours</span>
-                        <span matListItemMeta *ngIf="unrentBien && unrentBien.nbJours == 10000">Jamais loué</span>
+                    <mat-list-item>
+                        <mat-icon matListItemIcon>notifications</mat-icon>
+                        <div matListItemTitle>Evènements</div>
+                        <span matListItemMeta><app-events-liste [container]="bien"></app-events-liste></span>
                     </mat-list-item>
                     <mat-list-item *ngIf="bien.surface">
                         <mat-icon matListItemIcon>expand</mat-icon>
@@ -115,12 +113,10 @@
                         <div matListItemTitle>Téléphone</div>
                         <span matListItemMeta>{{bail.locataire.telephone}}</span>
                     </mat-list-item>
-                    <mat-list-item *ngVar="documentService.getUnpaiedLoyer(bail) as unpaiedLoyer">
-                        <mat-icon *ngIf="unpaiedLoyer.length>0" matListItemIcon color="warn">error</mat-icon>
-                        <mat-icon *ngIf="unpaiedLoyer.length==0" matListItemIcon color="accent">done</mat-icon>
-                        <div matListItemTitle>Statut de paiement</div>
-                        <span matListItemMeta *ngIf="unpaiedLoyer.length>0">{{unpaiedLoyer.length}} loyer(s) impayé(s)</span>
-                        <span matListItemMeta *ngIf="unpaiedLoyer.length==0">Aucun impayé</span>
+                    <mat-list-item>
+                        <mat-icon matListItemIcon>notifications</mat-icon>
+                        <div matListItemTitle>Evènements</div>
+                        <span matListItemMeta><app-events-liste [container]="bail"></app-events-liste></span>
                     </mat-list-item>
                     <mat-list-item>
                         <mat-icon matListItemIcon>euro_symbol</mat-icon>
