@@ -65,7 +65,7 @@ export class Mouvement {
   }
 
   toString(): string{
-    return this.libelle +" ("+ this.date.toLocaleDateString()+ ","+ this.montant+ "€)";
+    return this.libelle +" ("+ this.date.toLocaleDateString()+ ", "+ this.montant+ "€)";
   }
 
 }
