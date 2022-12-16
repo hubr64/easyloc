@@ -61,6 +61,11 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Bien loué</th>
             <td mat-cell *matCellDef="let row">{{getBail(row)?getBail(row)?.bien?.nom:'-'}}</td>
         </ng-container>
+                    
+        <ng-container matColumnDef="evenements" >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Evènements</th>
+            <td mat-cell *matCellDef="let row"><app-events-liste [container]="row"></app-events-liste></td>
+        </ng-container>
 
         <ng-container matColumnDef="pieces">
             <th mat-header-cell *matHeaderCellDef>Pièces</th>

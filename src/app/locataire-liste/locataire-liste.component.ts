@@ -31,7 +31,7 @@ export class LocataireListeComponent implements AfterViewInit {
   public dataSource: MatTableDataSource<Locataire>;
 
   // Columns displayed in the table. Columns IDs can be added, removed, or reordered.
-  public displayedColumns = ['select', 'nom', 'telephone', 'mail', 'bien', 'pieces', 'actions'];
+  public displayedColumns = ['select', 'nom', 'telephone', 'mail', 'bien', 'evenements', 'pieces', 'actions'];
   // String to get the search filter
   public searchFilter: string = '';
   //Multi selection management

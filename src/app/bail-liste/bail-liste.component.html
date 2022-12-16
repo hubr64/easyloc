@@ -99,14 +99,7 @@
                         
             <ng-container matColumnDef="loyer">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Loyer</th>
-                <td mat-cell *matCellDef="let row">
-                    {{row.loyer| currency:'EUR':'symbol':'1.2-2'}}
-                    <ng-container *ngVar="documentService.getLoyerToUpdate(row) as loyerToUpdate">
-                        <mat-icon title="Loyer modifiable" color="warn" *ngIf="loyerToUpdate && loyerToUpdate.toUpdate">restart_alt</mat-icon>
-                        <mat-icon title="Loyer à jour" color="primary" *ngIf="loyerToUpdate && !loyerToUpdate.toUpdate">check_circle</mat-icon>
-                        <mat-icon title="Loyer inactif" disabled *ngIf="!loyerToUpdate">radio_button_unchecked</mat-icon>
-                    </ng-container>
-                </td>
+                <td mat-cell *matCellDef="let row">{{row.loyer| currency:'EUR':'symbol':'1.2-2'}}</td>
                 <td mat-footer-cell *matFooterCellDef>{{getTotalLoyer() | currency:'EUR':'symbol':'1.2-2'}}</td>
             </ng-container>
                         
@@ -128,14 +121,9 @@
                 <td mat-footer-cell *matFooterCellDef>&nbsp;</td>
             </ng-container>
                         
-            <ng-container matColumnDef="impayes">
-                <th mat-header-cell *matHeaderCellDef>Impayés</th>
-                <td mat-cell *matCellDef="let row">
-                    <ng-container *ngVar="documentService.getUnpaiedLoyer(row) as unpaiedLoyer">
-                        <mat-icon color="warn" *ngIf="unpaiedLoyer.length>0" title="{{unpaiedLoyer.length}} loyer(s) impayé(s)">error</mat-icon>
-                        <mat-icon color="accent" *ngIf="unpaiedLoyer.length==0" title="Tous les loyers à jours">done</mat-icon>
-                    </ng-container>
-                </td>
+            <ng-container matColumnDef="events">
+                <th mat-header-cell *matHeaderCellDef>Evènements</th>
+                <td mat-cell *matCellDef="let row"><app-events-liste [container]="row"></app-events-liste></td>
                 <td mat-footer-cell *matFooterCellDef>&nbsp;</td>
             </ng-container>
     

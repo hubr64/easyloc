@@ -30,7 +30,7 @@ export class BailleurListeComponent implements AfterViewInit {
   public dataSource: MatTableDataSource<Bailleur>;
 
   // Columns displayed in the table. Columns IDs can be added, removed, or reordered.
-  public displayedColumns = ['select', 'nom', 'type', 'telephone', 'mail', 'pieces', 'actions'];
+  public displayedColumns = ['select', 'nom', 'type', 'telephone', 'mail', 'evenements', 'pieces', 'actions'];
   // String to get the search filter
   public searchFilter: string = '';
   //Multi selection management

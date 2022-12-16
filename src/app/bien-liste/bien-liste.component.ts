@@ -37,8 +37,8 @@ export class BienListeComponent implements AfterViewInit {
   public dataSource: MatTableDataSource<Bien>;
 
   // Columns displayed in the table. Columns IDs can be added, removed, or reordered.
-  public displayedColumns = ['select', 'nom', 'type', 'adresse', 'proprietaire', 'etat', 'syndic', 'dateAchat', 'surface', 'entrees', 'sorties', 'pieces', 'actions'];
-  public displayedColumnsEmbedded = ['nom', 'adresse', 'proprietaire', 'etat', 'surface'];
+  public displayedColumns = ['select', 'nom', 'type', 'adresse', 'proprietaire', 'syndic', 'dateAchat', 'surface', 'entrees', 'sorties', 'etat', 'pieces', 'actions'];
+  public displayedColumnsEmbedded = ['nom', 'adresse', 'proprietaire', 'surface', 'etat'];
 
   //Multi selection management
   public initialSelection = [];

@@ -41,8 +41,8 @@ export class BailListeComponent implements AfterViewInit {
   public dataSource: MatTableDataSource<Bail>;
 
   // Columns displayed in the table. Columns IDs can be added, removed, or reordered.
-  public displayedColumns = ['select', 'locataire', 'bien', 'dateDebut', 'dateFin', 'loyer', 'charges', 'total', 'paiement', 'impayes', 'pieces', 'actions'];
-  public displayedColumnsEmbedded = ['locataire', 'bien', 'dateDebut', 'dateFin', 'loyer', 'impayes'];
+  public displayedColumns = ['select', 'locataire', 'bien', 'dateDebut', 'dateFin', 'loyer', 'charges', 'total', 'paiement', 'events', 'pieces', 'actions'];
+  public displayedColumnsEmbedded = ['locataire', 'bien', 'dateDebut', 'dateFin', 'loyer', 'events'];
   //Multi selection management
   public initialSelection = [];
   public allowMultiSelect: boolean = true;
