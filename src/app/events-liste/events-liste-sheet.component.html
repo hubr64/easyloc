@@ -1,0 +1,5 @@
+<h3 *ngIf="data">
+  <mat-icon>notifications</mat-icon> 
+  Evènements - {{data.container}}
+</h3>
+<app-events [gravite]="0" [container]="data.container"></app-events>

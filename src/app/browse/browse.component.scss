@@ -28,10 +28,11 @@
     line-height: 40px;
 }
 .mdc-list-item--with-one-line{
-    height:44px!important;
+    height:48px!important;
 }
 .mdc-list-item__end{
     font-size: 1em;
+    pointer-events:inherit!important;
 }
 mat-card-actions {
     position: absolute;

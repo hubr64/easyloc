@@ -37,8 +37,8 @@ export class BienListeComponent implements AfterViewInit {
   public dataSource: MatTableDataSource<Bien>;
 
   // Columns displayed in the table. Columns IDs can be added, removed, or reordered.
-  public displayedColumns = ['select', 'nom', 'type', 'adresse', 'proprietaire', 'etat', 'syndic', 'dateAchat', 'surface', 'entrees', 'sorties', 'pieces', 'actions'];
-  public displayedColumnsEmbedded = ['nom', 'adresse', 'proprietaire', 'etat', 'surface'];
+  public displayedColumns = ['select', 'nom', 'type', 'adresse', 'dateAchat', 'surface', 'entrees', 'sorties', 'etat', 'pieces', 'actions'];
+  public displayedColumnsEmbedded = ['nom', 'adresse', 'surface', 'etat'];
 
   //Multi selection management
   public initialSelection = [];
@@ -210,6 +210,7 @@ export class BienListeComponent implements AfterViewInit {
           "Surface (m²)":bien.surface,
           "Nb Pièces":bien.nbPieces,
           "Parking":bien.parking,
+          "Assurance":bien.dateAssurance.toLocaleDateString(),
           "Commentaire":bien.commentaire
         });
       }

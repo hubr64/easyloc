@@ -1,0 +1,4 @@
+<button mat-icon-button title="Liste des évènements" (click)="openEvents()" [disabled]="events.length==0">
+    <mat-icon *ngIf="events.length>0" [color]="badgeColor">notifications</mat-icon>
+    <mat-icon title="Aucun évènement" *ngIf="events.length==0">notifications_off</mat-icon>
+</button>

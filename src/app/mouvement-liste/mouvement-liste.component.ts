@@ -9,7 +9,6 @@ import { MatTable } from '@angular/material/table';
 import { MatTableDataSource} from '@angular/material/table';
 import { MatDialog} from '@angular/material/dialog';
 
-import { UserService } from '../_services/user.service';
 import { AlertService } from '../_services/alert.service';
 import { DocumentService } from '../_services/document.service';
 import { ExportCsvService }      from '../_services/export-csv.service';

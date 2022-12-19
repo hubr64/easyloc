@@ -12,6 +12,7 @@ import { AlertService } from '../_services/alert.service';
 import { UserService } from '../_services/user.service';
 import { DriveService } from '../_services/drive.service';
 import { DocumentService } from '../_services/document.service';
+import { EventService } from '../_services/event.service';
 import { MailComponent } from '../mail/mail.component';
 import { User } from '../_modeles/user';
 
@@ -50,6 +51,7 @@ export class NavigationComponent {
     public userService: UserService,
     public documentService: DocumentService,
     public driveService: DriveService,
+    public eventService: EventService,
     public dialog: MatDialog) {
       this.currentUser = this.userService.getCurrentUser();
       this.isLoggedIn = this.userService.isUserSignedIn();

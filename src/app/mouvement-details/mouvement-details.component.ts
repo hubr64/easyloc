@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Observable} from 'rxjs';
 import { map, startWith} from 'rxjs/operators';
 
@@ -22,7 +22,6 @@ export class MouvementDetailsComponent implements OnInit {
   public libellesAutoFiltered: Observable<string[]>;
 
   constructor(
-    private formBuilder: FormBuilder,
     public documentService: DocumentService,
     public configurationService: ConfigurationService,
     @Inject(MAT_DIALOG_DATA) public data: any
@@ -36,7 +35,7 @@ export class MouvementDetailsComponent implements OnInit {
     this.mouvementForm = new FormGroup({
       'date': new FormControl('', [
         Validators.required
-      ]),
+      ],),
       'bien': new FormControl('', [
         Validators.required
       ]),

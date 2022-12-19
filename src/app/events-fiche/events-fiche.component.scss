@@ -1,12 +1,3 @@
-#fiche{
-    width:90%;
-    max-width:900px;
-    margin:0px auto 5px auto;
-}
-.card-box{
-    margin:15px 0;
-    border: 1px solid #DDD;
-}
 mat-card-title mat-icon{
     vertical-align: middle;
 }
@@ -18,20 +9,10 @@ mat-card-title mat-icon{
     background: #4285f4;
     line-height: 47px;
 }
-.mdc-list-item--with-one-line{
-    height:44px!important;
-}
-.mdc-list-item__end{
-    font-size: 1em;
-}
 mat-card-actions {
     position: absolute;
     right: 0;
     top: 5px;
     margin:0;
     padding:0;
-}
-app-events-fiche{
-    margin-bottom: 15px;
-    display: block;
 }

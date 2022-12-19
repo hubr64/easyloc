@@ -1,0 +1,29 @@
+<div id="warning-empty" *ngIf="noEvent()">
+  <mat-icon color="primary">sentiment_very_satisfied</mat-icon>
+  TOUT VA BIEN AUJOURD'HUI !
+</div>
+<mat-list>
+    <mat-list-item *ngFor="let event of events">
+      <mat-icon class="event-icon" matListItemIcon [matBadgeColor]="event.gravite==2?'warn':event.gravite==1?'accent':'primary'" [matBadge]="event.gravite==2?'!':event.gravite==1?'?':'i'">{{event.icone}}</mat-icon>
+      <h3 matListItemTitle>
+        <ng-container *ngIf="container">{{event.designation}}</ng-container>
+        <ng-container *ngIf="!container">{{event.object.toString()}}</ng-container>
+      </h3>
+      <span matListItemLine *ngIf="!container">{{event.designation}}</span>
+      <span matListItemMeta>
+        <ng-container *ngFor="let eventAction of event.actions">
+          <button *ngIf="eventAction.routerLink" [title]="eventAction.title" mat-icon-button [routerLink]="eventAction.routerLink">
+            <mat-icon [color]="event.gravite==2?'warn':event.gravite==1?'accent':'primary'">{{eventAction.icone}}</mat-icon>
+          </button>
+          <button *ngIf="eventAction.action" [title]="eventAction.title" mat-icon-button (click)="callEventAction(eventAction.action,event)">
+            <mat-icon [color]="event.gravite==2?'warn':event.gravite==1?'accent':'primary'">{{eventAction.icone}}</mat-icon>
+          </button>
+        </ng-container>
+      </span>
+  </mat-list-item>
+</mat-list>
+<div class="event-gravite">
+  <button mat-mini-fab color="primary" (click)="updateEvents(0)"><mat-icon>info</mat-icon></button>
+  <button mat-mini-fab color="accent"(click)="updateEvents(1)"><mat-icon>error</mat-icon></button>
+  <button mat-mini-fab color="warn" (click)="updateEvents(2)"><mat-icon>warning</mat-icon></button>
+</div>

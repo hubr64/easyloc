@@ -38,6 +38,11 @@
                     <span matListItemMeta>{{bien.proprietaire.nom}}</span>
                 </mat-list-item>
                 <mat-list-item>
+                    <mat-icon matListItemIcon>shield</mat-icon>
+                    <div matListItemTitle>Date effet assurance</div>
+                    <span matListItemMeta>{{bien.dateAssurance| date:'shortDate':'fr-FR'}}</span>
+                </mat-list-item>
+                <mat-list-item>
                     <mat-icon matListItemIcon>handyman</mat-icon>
                     <div matListItemTitle>Année construction</div>
                     <span matListItemMeta>{{bien.dateFabrication| date:'YYYY':'fr-FR'}}</span>
@@ -72,13 +77,6 @@
                     <div matListItemTitle>Syndic gestion</div>
                     <span matListItemMeta>{{bien.syndic}} <ng-container *ngIf="bien.syndicUrl">(<a href="{{bien.syndicUrl}}" target="_blank">{{bien.syndicUrl}}</a>)</ng-container></span>
                 </mat-list-item>
-                <mat-list-item *ngVar="documentService.getUnrentBien(bien) as unrentBien">
-                    <mat-icon matListItemIcon>person</mat-icon>
-                    <div matListItemTitle>Etat de location actuelle</div>
-                    <span matListItemMeta *ngIf="!unrentBien">Loué <mat-icon color="primary">done</mat-icon></span>
-                    <span matListItemMeta *ngIf="unrentBien && unrentBien.nbJours < 10000">Non loué depuis {{unrentBien.nbJours}} jours <mat-icon color="warn">warning</mat-icon></span>
-                    <span matListItemMeta *ngIf="unrentBien && unrentBien.nbJours == 10000">Jamais loué <mat-icon>pending</mat-icon></span>
-                </mat-list-item>
                 <mat-list-item *ngIf="bien.commentaire">
                     <mat-icon matListItemIcon>feed</mat-icon>
                     <div matListItemTitle>Commentaires</div>
@@ -87,6 +85,8 @@
             </mat-list>
         </mat-card-content>
     </mat-card>
+
+    <app-events-fiche [gravite]="0" [container]="bien"></app-events-fiche>
 
     <mat-card appearance="outlined" class="card-box">
         <mat-card-header>
@@ -165,20 +165,7 @@
                     <div matListItemTitle>Date paiement</div>
                     <span matListItemMeta>{{bailPeriodePaiements[bail.paiementPeriodicite]}} - {{bail.paiementDate| date:'d':'fr-FR' }} du mois</span>
                 </mat-list-item>
-                <mat-list-item *ngVar="documentService.getUnpaiedLoyer(bail) as unpaiedLoyer">
-                    <mat-icon matListItemIcon>monetization_on</mat-icon>
-                    <div matListItemTitle>Etat paiement</div>
-                    <span matListItemMeta *ngIf="unpaiedLoyer.length>0">{{unpaiedLoyer.length}} loyer(s) impayé(s) <mat-icon color="warn">error</mat-icon></span>
-                    <span matListItemMeta *ngIf="unpaiedLoyer.length==0">Aucun impayé <mat-icon color="primary">done</mat-icon></span>
-                </mat-list-item>
                 <ng-container *ngIf="!bail.dateFin">
-                    <mat-list-item *ngVar="documentService.getLoyerToUpdate(bail) as loyerToUpdate">
-                        <mat-icon matListItemIcon>currency_exchange</mat-icon>
-                        <div matListItemTitle>Mise à jour loyer</div>
-                        <span matListItemMeta *ngIf="loyerToUpdate && loyerToUpdate.toUpdate">Loyer à modifier (depuis {{loyerToUpdate.nbJours}} jours) <mat-icon color="warn">error</mat-icon></span>
-                        <span matListItemMeta *ngIf="loyerToUpdate && !loyerToUpdate.toUpdate">Loyer à jour <mat-icon color="primary">done</mat-icon></span>
-                        <span matListItemMeta *ngIf="!loyerToUpdate">Bail terminé <mat-icon disabled>hide_source</mat-icon></span>
-                    </mat-list-item>
                 </ng-container>
                 <mat-list-item *ngIf="bail.commentaire">
                     <mat-icon matListItemIcon>feed</mat-icon>
