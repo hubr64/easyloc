@@ -38,6 +38,11 @@
                     <span matListItemMeta>{{bien.proprietaire.nom}}</span>
                 </mat-list-item>
                 <mat-list-item>
+                    <mat-icon matListItemIcon>shield</mat-icon>
+                    <div matListItemTitle>Date effet assurance</div>
+                    <span matListItemMeta>{{bien.dateAssurance| date:'shortDate':'fr-FR'}}</span>
+                </mat-list-item>
+                <mat-list-item>
                     <mat-icon matListItemIcon>handyman</mat-icon>
                     <div matListItemTitle>Année construction</div>
                     <span matListItemMeta>{{bien.dateFabrication| date:'YYYY':'fr-FR'}}</span>

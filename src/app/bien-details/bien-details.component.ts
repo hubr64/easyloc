@@ -1,13 +1,12 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
-import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 import { Bien } from '../_modeles/bien';
 import { BIENTYPE as bienTypes } from '../_modeles/bien';
 import { AlertService } from '../_services/alert.service';
 import { DocumentService } from '../_services/document.service';
-import { DriveService } from '../_services/drive.service';
 
 @Component({
   selector: 'app-bien-details',
@@ -24,12 +23,9 @@ export class BienDetailsComponent implements OnInit {
   public bienTypes = bienTypes;
 
   constructor(
-    private router: Router,
-    private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private alertService: AlertService,
     public documentService: DocumentService,
-    private driveService: DriveService,
     private location: Location) { }
 
   ngOnInit(): void {
@@ -67,6 +63,9 @@ export class BienDetailsComponent implements OnInit {
         Validators.pattern('[0-9]*')
       ]),
       'parking': new FormControl(''),
+      'dateAssurance': new FormControl('', [
+        Validators.required
+      ]),
       'commentaire': new FormControl('')
     });
     this.getData();
@@ -85,6 +84,7 @@ export class BienDetailsComponent implements OnInit {
   get surface() { return this.bienForm.get('surface'); }
   get nbPieces() { return this.bienForm.get('nbPieces'); }
   get parking() { return this.bienForm.get('parking'); }
+  get dateAssurance() { return this.bienForm.get('dateAssurance'); }
   get commentaire() { return this.bienForm.get('commentaire'); }
 
   getData(): void {
@@ -113,6 +113,7 @@ export class BienDetailsComponent implements OnInit {
         surface: this.bien.surface,
         nbPieces: this.bien.nbPieces,
         parking: this.bien.parking,
+        dateAssurance: this.bien.dateAssurance,
         commentaire: this.bien.commentaire
       });
   
@@ -137,6 +138,7 @@ export class BienDetailsComponent implements OnInit {
           surface: 0,
           nbPieces: null,
           parking: '',
+          dateAssurance: '',
           commentaire: null
         });
     }

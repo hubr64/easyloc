@@ -66,6 +66,13 @@
                     <input matInput placeholder="Site web du syndic (http://...)" id="syndicUrl" formControlName="syndicUrl">
                     <mat-hint align="end">Site web du syndic de gestion de la copropriété</mat-hint>
                 </mat-form-field>
+                <mat-form-field appearance="fill">
+                    <mat-label>Date assurance</mat-label>
+                    <input matInput placeholder="Date d'assurance" id="dateAssurance" formControlName="dateAssurance" [matDatepicker]="picker3">
+                    <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+                    <mat-hint align="end">Date d'effet de l'assurance (à la souscription). Ne correspond pas à la date de paiement.</mat-hint>
+                    <mat-datepicker #picker3 startView="multi-year"></mat-datepicker>
+                </mat-form-field>
             </div>
             <h3><button mat-mini-fab color="accent"><mat-icon>cabin</mat-icon></button> Caractéristiques</h3>
             <div class="form-group">

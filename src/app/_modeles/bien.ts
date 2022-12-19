@@ -27,6 +27,7 @@ export class Bien {
   surface: number;
   nbPieces: number;
   parking: string;
+  dateAssurance: Date;
   commentaire: string;
   pieces: Piece[];
 
@@ -47,6 +48,7 @@ export class Bien {
     this.surface = 0;
     this.nbPieces = 0;
     this.parking = '';
+    this.dateAssurance = new Date();
     this.commentaire = '';
     this.pieces = [];
   }
@@ -56,6 +58,7 @@ export class Bien {
     //Build correct dates
     tmp.dateAchat = new Date(tmp.dateAchat);
     tmp.dateFabrication = new Date(tmp.dateFabrication);
+    tmp.dateAssurance = new Date(tmp.dateAssurance);
     //Convert to number
     tmp.prixAchat = parseFloat(tmp.prixAchat);
     tmp.surface = parseFloat(tmp.surface);
@@ -99,6 +102,7 @@ export class Bien {
       surface: this.surface,
       nbPieces: this.nbPieces,
       parking: this.parking,
+      dateAssurance: this.dateAssurance,
       commentaire: this.commentaire,
       pieces: [''],
     };
