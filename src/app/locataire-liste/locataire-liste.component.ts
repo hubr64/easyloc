@@ -216,4 +216,14 @@ export class LocataireListeComponent implements AfterViewInit {
     });
     return tmpBail;
   }
+
+  getBienLoue(locataire: Locataire): string{
+
+    var bail = this.getBail(locataire);
+    if(bail){
+      return bail.bien.nom;
+    }else{
+      return "-"
+    }
+  }
 }
