@@ -33,7 +33,7 @@ export class MouvementDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.mouvementForm = new FormGroup({
-      'date': new FormControl({value: '', disabled: true}, [
+      'date': new FormControl('', [
         Validators.required
       ],),
       'bien': new FormControl('', [
