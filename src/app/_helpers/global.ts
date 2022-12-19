@@ -25,5 +25,6 @@ export const CONFIG: { [key: string]: any } = {
   'nomModeleAnnoncePapier': 'Modèle Annonce Web',
   'nomModeleAnnonceWeb': 'Modèle Annonce Papier',
   'ordreBien': 'nom',
+  'datePaiementTaxe': '2022-10-01'
 }
 
