@@ -4,7 +4,7 @@
 </div>
 <mat-list>
     <mat-list-item *ngFor="let event of events">
-      <mat-icon matListItemIcon [matBadgeColor]="event.gravite==2?'warn':event.gravite==1?'accent':'primary'" [matBadge]="event.gravite>=1?'!':''">{{event.icone}}</mat-icon>
+      <mat-icon class="event-icon" matListItemIcon [matBadgeColor]="event.gravite==2?'warn':event.gravite==1?'accent':'primary'" [matBadge]="event.gravite==2?'!':event.gravite==1?'?':'i'">{{event.icone}}</mat-icon>
       <h3 matListItemTitle>
         <ng-container *ngIf="container">{{event.designation}}</ng-container>
         <ng-container *ngIf="!container">{{event.object.toString()}}</ng-container>

@@ -25,3 +25,7 @@
 .event-gravite mat-icon{
     color: white!important;
 }
+::ng-deep .event-icon .mat-badge-content{
+    color: white!important;
+    font-weight: 500;
+}

@@ -103,6 +103,14 @@ export class EventService {
             if(unrentBien){
                 this.bienEvents.push(unrentBien);
             }
+            var nonAssureBien = this.getBienNonAssure(bien);
+            if(nonAssureBien){
+                this.bienEvents.push(nonAssureBien);
+            }
+            var nonTaxBien = this.getBienTaxeNonpaye(bien);
+            if(nonTaxBien){
+                this.bienEvents.push(nonTaxBien);
+            }
         });
     }
 
@@ -197,7 +205,6 @@ export class EventService {
                 }
             }
         });
-
         return returnEvent;
     }
 
@@ -214,7 +221,6 @@ export class EventService {
                 }
             }
         });
-
         return returnEvent;
     }
     
@@ -290,11 +296,11 @@ export class EventService {
         if(!bailFound){
             var unrentEvent: Event = new Event();
             if(bailDeltaNbJour == 10000){
-                unrentEvent.designation = "Jamais loué";
+                unrentEvent.designation = "Le bien n'a jamais été loué";
                 unrentEvent.gravite = 2;
                 unrentEvent.icone = "apartment";
             }else{
-                unrentEvent.designation = "Non loué depuis "+bailDeltaNbJour+" jours";
+                unrentEvent.designation = "Le bien n'est pas loué depuis "+bailDeltaNbJour+" jours";
                 unrentEvent.gravite = 2;
                 unrentEvent.icone = "person";
             }
@@ -314,33 +320,205 @@ export class EventService {
 
           return unrentEvent;
         }
+        //If the bail is found it means that the bien is rent
+        //We do not create an info event has it is obvious in the MMI
         return undefined;
     }
 
     private getBienNonAssure(bien:Bien): Event|undefined {
+        
+        //Get current date
+        const currentDate = new Date();
+        //Text to look for in mouvement
+        const assuranceText: string = "assurance pno";
+        //Result of the analysis
+        var isNotAssure: boolean = true;
+        var mouvementAssure: Mouvement|undefined = undefined;
 
-        var nonAssureEvent: Event = new Event();
-        nonAssureEvent.designation = "L'assurance du bien n'est pas payée.";
-        nonAssureEvent.gravite = 2;
-        nonAssureEvent.icone = "shield_with_house";
-        nonAssureEvent.object = bien;
+        //We can only check bien with an assurance date defined
+        if(bien.dateAssurance){
 
-        var nonAssureEventAction1: EventAction = new EventAction();
-        nonAssureEventAction1.icone = "visibility";
-        nonAssureEventAction1.title = "Voir le bien";
-        nonAssureEventAction1.routerLink = '/fiche/bien/'+bien.id;
-        nonAssureEvent.actions.push(nonAssureEventAction1);
+            //First align assurance date to current year
+            var assuranceDateOfYear = new Date(bien.dateAssurance.getTime());
+            assuranceDateOfYear.setFullYear(currentDate.getFullYear());
+            // If aligned date is after now then we need to remove one more year
+            if(assuranceDateOfYear > currentDate){
+                assuranceDateOfYear.setFullYear(assuranceDateOfYear.getFullYear() - 1);
+            }
+            //Compute start and end date of the analyses
+            var startAnalysisAssuranceDate = new Date(assuranceDateOfYear.getTime());
+            startAnalysisAssuranceDate.setFullYear(startAnalysisAssuranceDate.getFullYear() - 1);
+            var endAnalysisAssuranceDate = assuranceDateOfYear;
 
-        var nonAssureEventAction2: EventAction = new EventAction();
-        nonAssureEventAction2.icone = "euro_symbol";
-        nonAssureEventAction2.title = "Ajouter le paiement";
-        nonAssureEventAction2.routerLink = '/mouvements';
-        nonAssureEvent.actions.push(nonAssureEventAction2);
+            //Browse all mouvements to look for assurance
+            this.documentService.document.mouvements.forEach((mouvement:Mouvement) => {
+                //We look only if we still didn't find the assurance
+                if(isNotAssure){
+                    //We are lokking for mouvement of the current bien only
+                    if(mouvement.bien == bien){
+                        //We look for mouvement with specific text and an out mouvement
+                        if(mouvement.libelle.toLowerCase().indexOf(assuranceText)!=-1 && mouvement.montant<0){
+                            //If the mouvement is a paiement between the computed date then it is the correct paiement
+                            if(mouvement.date > startAnalysisAssuranceDate && mouvement.date < endAnalysisAssuranceDate){
+                                isNotAssure = false;
+                                mouvementAssure = mouvement;
+                            }
+                        }
+                    }
+                }
+            });
+        }else{
+            //No assurance date defined : no possibility to look for assurance state
+            isNotAssure = false;
+        }
 
+        //The bien is not assured then add an event to alert
+        if(isNotAssure){
+            var nonAssureEvent: Event = new Event();
+            nonAssureEvent.designation = "L'assurance du bien n'est pas payée";
+            nonAssureEvent.gravite = 2;
+            nonAssureEvent.icone = "shield";
+            nonAssureEvent.object = bien;
+
+            //Add possible actions
+            var nonAssureEventAction1: EventAction = new EventAction();
+            nonAssureEventAction1.icone = "visibility";
+            nonAssureEventAction1.title = "Voir le bien";
+            nonAssureEventAction1.routerLink = '/fiche/bien/'+bien.id;
+            nonAssureEvent.actions.push(nonAssureEventAction1);
+            var nonAssureEventAction2: EventAction = new EventAction();
+            nonAssureEventAction2.icone = "euro_symbol";
+            nonAssureEventAction2.title = "Ajouter le paiement";
+            nonAssureEventAction2.routerLink = '/mouvements';
+            nonAssureEvent.actions.push(nonAssureEventAction2);
+
+            return nonAssureEvent;
+        }else{
+            // If the bien is assured and the mouvement is found then just inform
+            if(mouvementAssure != undefined){
+                var assureEvent: Event = new Event();
+                assureEvent.designation = "Le bien est assuré via "+ mouvementAssure;
+                assureEvent.gravite = 0;
+                assureEvent.icone = "shield";
+                assureEvent.object = bien;
+                return assureEvent;
+            }
+        }
+
+        //Impossible to define whether the bien is assured or not
         return undefined;
     }
 
     private getBienTaxeNonpaye(bien:Bien): Event|undefined {
+        //Get current date
+        const currentDate = new Date();
+        //Text to look for in mouvement
+        const taxeText: string = "taxe";
+        //Get in configuration the last possible paiement date for tax
+        var datePaiementTaxe = new Date(this.configurationService.getValue("datePaiementTaxe"));
+        //Result of the analysis
+        var isNotTaxed: number = 0; // 0 => non payé, 1 => payé, 2 => payé en retard
+        var mouvementTaxe: Mouvement|undefined = undefined;
+
+        //If a date is correctly configured
+        if(datePaiementTaxe){
+
+            //First align taxe date to current year
+            datePaiementTaxe.setFullYear(currentDate.getFullYear());
+
+            // If aligned date is after now then we need to remove one more year
+            if(datePaiementTaxe > currentDate){
+                datePaiementTaxe.setFullYear(datePaiementTaxe.getFullYear() - 1);
+            }
+            
+            //Compute start and end date of the analysis
+            var startAnalysisTaxDate = new Date(datePaiementTaxe.getTime());
+            startAnalysisTaxDate.setFullYear(startAnalysisTaxDate.getFullYear() - 1);
+            var endAnalysisTaxDate = datePaiementTaxe;
+            var endOfYear = new Date(currentDate.getFullYear(),11,31);
+
+            //Browse all mouvements to look for tax
+            this.documentService.document.mouvements.forEach((mouvement:Mouvement) => {
+                //We look only if we still didn't find the tax
+                if(isNotTaxed == 0){
+                    //We are looking for mouvement of the current bien only
+                    if(mouvement.bien == bien){
+                        //We look for mouvement with specific text and an out mouvement
+                        if(mouvement.libelle.toLowerCase().indexOf(taxeText)!=-1 && mouvement.montant<0){
+                            //If the mouvement is a paiement between the computed date then it is the correct paiement
+                            if(mouvement.date > startAnalysisTaxDate && mouvement.date < endAnalysisTaxDate){
+                                isNotTaxed = 1;
+                                mouvementTaxe = mouvement;
+                            }
+                        }
+                    }
+                }
+            });
+            //Can not find the mouvement inside the date, try to find after the end but still this year to find a late paiement
+            if(isNotTaxed == 0){
+                //Browse all mouvements to look for tax
+                this.documentService.document.mouvements.forEach((mouvement:Mouvement) => {
+                    //We look only if we still didn't find the tax
+                    if(isNotTaxed == 0){
+                        //We are looking for mouvement of the current bien only
+                        if(mouvement.bien == bien){
+                            //We look for mouvement with specific text and an out mouvement
+                            if(mouvement.libelle.toLowerCase().indexOf(taxeText)!=-1 && mouvement.montant<0){
+                                //If the mouvement is a paiement between the end date and now then it is the late paiement
+                                if(mouvement.date > endAnalysisTaxDate && currentDate < endOfYear){
+                                    isNotTaxed = 2;
+                                    mouvementTaxe = mouvement;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            //The tax paiement is late or not realised then add an event to alert
+            if(isNotTaxed==0 || isNotTaxed==2){
+    
+                //Global event definition
+                var nonTaxEvent: Event = new Event();
+                nonTaxEvent.icone = "account_balance";
+                nonTaxEvent.object = bien;
+                //Message is different according it is not paied or paied late
+                if(isNotTaxed==0){
+                    nonTaxEvent.designation = "La taxe foncière n'est pas payée";
+                    nonTaxEvent.gravite = 2;
+                }else{
+                    if(mouvementTaxe){
+                        nonTaxEvent.designation = "La taxe foncière a été payée en retard via "+ mouvementTaxe;
+                    }else{
+                        nonTaxEvent.designation = "La taxe foncière a été payée en retard";
+                    }
+                    nonTaxEvent.gravite = 1;
+                }
+                //Add possible actions
+                var nonTaxEventAction1: EventAction = new EventAction();
+                nonTaxEventAction1.icone = "visibility";
+                nonTaxEventAction1.title = "Voir le bien";
+                nonTaxEventAction1.routerLink = '/fiche/bien/'+bien.id;
+                nonTaxEvent.actions.push(nonTaxEventAction1);
+                var nonTaxEventAction2: EventAction = new EventAction();
+                nonTaxEventAction2.icone = "euro_symbol";
+                nonTaxEventAction2.title = "Ajouter le paiement";
+                nonTaxEventAction2.routerLink = '/mouvements';
+                nonTaxEvent.actions.push(nonTaxEventAction2);
+                return nonTaxEvent;
+            }else{
+                // If the tax has been paied for the bien and the mouvement is found then just inform
+                if(mouvementTaxe != undefined){
+                    var taxEvent: Event = new Event();
+                    taxEvent.designation = "La taxe foncière a été payée via "+ mouvementTaxe;
+                    taxEvent.gravite = 0;
+                    taxEvent.icone = "account_balance";
+                    taxEvent.object = bien;
+                    return taxEvent;
+                }
+            }
+        }
+        //Impossible to define whether the bien is assured or not
         return undefined;
     }
 
@@ -412,6 +590,16 @@ export class EventService {
             }
           }
         }
+
+        //If there is no event of unpaied loyer then add a zero gravity event to inform that everyhing is OK
+        if(unpaiedLoyers.length==0){
+            var paidEvent: Event = new Event();
+            paidEvent.designation = "Paiement des loyers à jour";
+            paidEvent.gravite = 0;
+            paidEvent.icone = "receipt_long";
+            paidEvent.object = bail;
+            unpaiedLoyers.push(paidEvent);
+        }
         
         return unpaiedLoyers;
     }
@@ -436,30 +624,23 @@ export class EventService {
           }
         }
     
-        //If the date is outdated
+        //If a bail has been found then can add an event
         if(bailFound){
             var updateEvent: Event = new Event();
+            //If the bail revision is outdated then add an 2-gravity event
             if(bailDeltaNbJour>dureeRevisionLoyer){
-                updateEvent.designation = "Loyer à modifier depuis " + bailDeltaNbJour + " jours";
+                updateEvent.designation = "Montant du loyer à modifier depuis " + bailDeltaNbJour + " jours";
                 updateEvent.gravite = 2;
-
-                //Add the actions possible for this event
+                //Add the actions possible
                 var action1: EventAction = new EventAction();
                 action1.icone = "edit";
                 action1.title = "Modifier le bail";
                 action1.routerLink = '/bail/'+bail.id;
                 updateEvent.actions.push(action1);
-
+            // The bail revision is compliant then inform that everything is OK
             }else{
-                updateEvent.designation = "Loyer à jour";
+                updateEvent.designation = "Montant du loyer récemment mis à jour";
                 updateEvent.gravite = 0;
-
-                //Add the actions possible for this event
-                var action2: EventAction = new EventAction();
-                action2.icone = "visibility";
-                action2.title = "Consulter le bail";
-                action2.routerLink = '/fiche/bail/'+bail.id;
-                updateEvent.actions.push(action2);
             }
             updateEvent.icone = "currency_exchange";
             updateEvent.object = bail;
