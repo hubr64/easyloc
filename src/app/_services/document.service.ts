@@ -38,6 +38,9 @@ export class DocumentService {
   // Variables used to track document synchronisation with server
   private autoSyncExecution: boolean = false;
   private autoSyncDuration: number = 1;
+  //Watchers
+  private watchSyncId: any;
+  private watchModifId: any;
 
   constructor(
     private ref: ApplicationRef,
@@ -66,6 +69,8 @@ export class DocumentService {
       console.log("DocumentService:constructor : "+ isCompliant);
       if(isCompliant){
         this.load();
+      }else{
+        this.closeDocument();
       }
     });
     // If the drive is compliant directly then load right now
@@ -101,14 +106,31 @@ export class DocumentService {
         this.docIsModified = false;
         // Launch modification tracking change function if first load only
         if(reloadVersion==-1){
-          setInterval(() => this.watchDocumentSync(), this.autoSyncDuration * 1000);
-          setInterval(() => this.watchDocumentModification(), this.autoSaveDuration * 1000);
+          this.watchSyncId = setInterval(() => this.watchDocumentSync(), this.autoSyncDuration * 1000);
+          this.watchModifId = setInterval(() => this.watchDocumentModification(), this.autoSaveDuration * 1000);
         }
       });
     }else{
       // If drive is not compliant we are not loading
       this.isLoading = false;
+      
     }
+  }
+
+  public closeDocument(){
+
+    console.log("DocumentService:closeDocument");
+    this.document = new EasylocData();
+
+    if(this.watchSyncId){
+      console.log("DocumentService:clearInterval:watchSyncId "+this.watchSyncId);
+      clearInterval(this.watchSyncId)
+    }
+    if(this.watchModifId){
+      console.log("DocumentService:clearInterval:watchModifId "+this.watchModifId);
+      clearInterval(this.watchModifId)
+    }
+
   }
 
   public saveDocumentFile(){
