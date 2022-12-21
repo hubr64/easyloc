@@ -30,7 +30,7 @@
 </div>
 
 <div class="result" *ngIf="computeEnded">
-    <table cellpadding="4" cellspacing="0">
+    <table cellpadding="4" cellspacing="0" *ngIf="mouvementClassifiedIn[selectedBien][this.selectedAnnee-1]; else elseBlock">
         <tr class="main-category">
             <td>Bien</td>
             <ng-container *ngIf="selectedBien=='total'">
@@ -244,5 +244,12 @@
             <td>4BA</td>
         </tr>
     </table>
+
+    <ng-template #elseBlock>
+        <div id="no-impot">
+            <mat-icon color="primary">sentiment_very_satisfied</mat-icon>
+            RIEN A DECLARER !
+        </div>
+    </ng-template>
 
 </div>

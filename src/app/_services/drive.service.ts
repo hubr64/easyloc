@@ -228,7 +228,7 @@ export class DriveService {
         
         //Header for the complete request
         let headers = new HttpHeaders()
-          .set("Authorization", 'Bearer ' + this.userService.gis_token)
+          .set("Authorization", 'Bearer ' + this.userService.gis_token.access_token)
           .set("Content-Type", 'multipart/related; boundary='+this.uploadBoundary);
         
         //Call the method to update the file
@@ -253,7 +253,7 @@ export class DriveService {
 
         //Create headers and add the authorisation token
         let headers = new HttpHeaders()
-            .set("Authorization", 'Bearer ' + this.userService.gis_token);
+            .set("Authorization", 'Bearer ' + this.userService.gis_token.access_token);
         // URL for dta upload
         const url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
 
@@ -264,7 +264,7 @@ export class DriveService {
         
         //Create headers and add the authorisation token
         let headers = new HttpHeaders()
-            .set("Authorization", 'Bearer ' + this.userService.gis_token);
+            .set("Authorization", 'Bearer ' + this.userService.gis_token.access_token);
 
         //URl to delete the file contains the file ID
         const url = 'https://www.googleapis.com/drive/v3/files/'+fileId;

@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ChangeDetectorRef } from '@angular/core';
 import { MAT_BOTTOM_SHEET_DATA} from '@angular/material/bottom-sheet';
 import { MatDialog} from '@angular/material/dialog';
 
@@ -32,7 +32,8 @@ export class PiecesJointesComponent {
     public driveService: DriveService,
     public documentService: DocumentService,
     public eventService: EventService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private cdr: ChangeDetectorRef
   ) { 
 
     if(data.piecesContainer.pieces){
@@ -43,10 +44,12 @@ export class PiecesJointesComponent {
         this.driveService.get(piece.id).then( 
           (response: any) => {
             this.urlPieces[piece.id] = response.result.webContentLink;
+            this.cdr.detectChanges();
           },
           (error:any) => {
             if(error.status==404){
               this.errorPieces[piece.id] = true;
+              this.cdr.detectChanges();
             }
             console.error("Impossible to get metadata for " + piece.nom);
           }

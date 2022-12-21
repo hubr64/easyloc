@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild, Inject, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { AfterViewInit, Component, ViewChild, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { FormControl } from '@angular/forms';
 

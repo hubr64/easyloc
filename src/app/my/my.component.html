@@ -11,11 +11,12 @@
   <button mat-menu-item routerLink="/configuration"><mat-icon>settings</mat-icon> Configuration</button>
   <button mat-menu-item [matMenuTriggerFor]="connexion"><mat-icon>cloud_queue</mat-icon> Connexion</button>
   <button mat-menu-item (click)="signOut()"><mat-icon>logout</mat-icon> Déconnexion</button>
+  <button mat-menu-item disabled><mat-icon>tag</mat-icon> Version 0.0.3</button>
 </mat-menu>
 <mat-menu #connexion="matMenu">
   <button mat-menu-item disabled><mat-icon>account_circle</mat-icon> {{currentUser.nom}}</button>
   <button mat-menu-item disabled><mat-icon>email</mat-icon> {{currentUser.mail}}</button>
-  <button mat-menu-item disabled><mat-icon>account_tree</mat-icon>Version : {{driveService.dataFileVersion}}</button>
+  <button mat-menu-item disabled><mat-icon>account_tree</mat-icon>Version Document : {{driveService.dataFileVersion}}</button>
   <button mat-menu-item disabled><mat-icon>login</mat-icon>Connexion : {{userService.dateConnection | date:'short':'fr-FR'}}</button>
   <button mat-menu-item disabled><mat-icon>logout</mat-icon>Expiration : {{userService.dateExpiration | date:'short':'fr-FR'}}</button>
 </mat-menu>

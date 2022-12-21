@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { Subject } from 'rxjs';
 import jwt_decode from 'jwt-decode';
 
+import { AlertService } from '../_services/alert.service';
 import { User } from '../_modeles/user';
 
 //declare const gapi: any;
@@ -12,7 +13,7 @@ declare const gapi: any;
 export class UserService {
 
     //Gis Clients 
-    private g_client_id: string = "474764062918-h31g2d341hajtdhipuggq6uagnfi10rl.apps.googleusercontent.com";
+    public g_client_id: string = "474764062918-h31g2d341hajtdhipuggq6uagnfi10rl.apps.googleusercontent.com";
     private gis_token_client: any;
     private gis_code_client: any;
     //Authentification token
@@ -28,7 +29,9 @@ export class UserService {
     public dateConnection: Date = new Date();
     public dateExpiration: Date = new Date();
 
-    constructor() {
+    constructor(
+        public alertService: AlertService
+    ) {
         //Init various variables
         this.currentUser = new User();
         this.isSignIn = false;
@@ -38,8 +41,12 @@ export class UserService {
         this.isSignInChange.next(false);
         this.isLoading = true;
 
-        //Load the google api for future OAUTH load
-        gapi.load('client', () => {this.initGapi(); });
+        try{
+            //Load the google api for future OAUTH load
+            gapi.load('client', () => {this.initGapi(); });
+        }catch(error:any){
+            this.alertService.error("Impossible de se connecter à Google pour charger les fonctions de l'API ! Veuillez réessayer ultérieurement.")
+        }
 
         //Handle the google anthentification callback (at global level) send by the google identification service
         // @ts-ignore
@@ -67,42 +74,47 @@ export class UserService {
 
         console.log("UserService:googleInitClient");
 
-        //Init the Google Token client with client id, drive and mail scope and scope only for the first time
-        this.gis_token_client = google.accounts.oauth2.initTokenClient({
-            client_id: this.g_client_id,
-            scope: 'https://www.googleapis.com/auth/drive \
-                    https://www.googleapis.com/auth/gmail.send',
-            prompt: '',
-            callback: (tokenResponse: any) => {
-                console.log("UserService:googleInitClient:initTokenClient:callback");
-                //Memorize the token for future use in the Google api  (bear token for instance)
-                this.gis_token = tokenResponse;
-                // Handle the initial sign-in state.
-                this.isSignInChange.next(true);
-                // Loading is finished
-                this.isLoading = false;
-                //Prepare to refresh the token (10s before expiration)
-                setTimeout(()=>this.refreshToken(),(this.gis_token.expires_in-10)*1000);
-            },
-            error_callback: (error: any) => {
-                console.dir("Impossible to init the google token client.")
-                console.error(error);
-            }
-          });
-          //Init the Google code client with client id, drive and mail scope and scope only for the first time
-        this.gis_code_client = google.accounts.oauth2.initCodeClient({
-            client_id: this.g_client_id,
-            scope: 'https://www.googleapis.com/auth/drive \
-                    https://www.googleapis.com/auth/gmail.send',
-            prompt: '',
-            callback: (codeResponse: any) => {
-                console.log("UserService:googleInitClient:initCodeClient:callback");
-            },
-            error_callback: (error: any) => {
-                console.dir("Impossible to init the google code client.")
-                console.error(error);
-            }
-          });
+        try{
+            //Init the Google Token client with client id, drive and mail scope and scope only for the first time
+            this.gis_token_client = google.accounts.oauth2.initTokenClient({
+                client_id: this.g_client_id,
+                scope: 'https://www.googleapis.com/auth/drive \
+                        https://www.googleapis.com/auth/gmail.send',
+                prompt: '',
+                callback: (tokenResponse: any) => {
+                    console.log("UserService:googleInitClient:initTokenClient:callback");
+                    //Memorize the token for future use in the Google api  (bear token for instance)
+                    this.gis_token = tokenResponse;
+                    // Handle the initial sign-in state.
+                    this.isSignInChange.next(true);
+                    // Loading is finished
+                    this.isLoading = false;
+                    //Prepare to refresh the token (10s before expiration)
+                    this.dateExpiration = new Date(this.gis_token.expires_in*1000);
+                    setTimeout(()=>this.refreshToken(),(this.gis_token.expires_in-10)*1000);
+                },
+                error_callback: (error: any) => {
+                    console.dir("Impossible to init the google token client.")
+                    console.error(error);
+                }
+            });
+            //Init the Google code client with client id, drive and mail scope and scope only for the first time
+            this.gis_code_client = google.accounts.oauth2.initCodeClient({
+                client_id: this.g_client_id,
+                scope: 'https://www.googleapis.com/auth/drive \
+                        https://www.googleapis.com/auth/gmail.send',
+                prompt: '',
+                callback: (codeResponse: any) => {
+                    console.log("UserService:googleInitClient:initCodeClient:callback");
+                },
+                error_callback: (error: any) => {
+                    console.dir("Impossible to init the google code client.")
+                    console.error(error);
+                }
+            });
+        }catch(error:any){
+            this.alertService.error("Impossible de se connecter à Google pour charger les fonctions d'authentification ! Veuillez réessayer ultérieurement.")
+        }
     }
 
     //Function to handle credential callback in the service
@@ -118,18 +130,30 @@ export class UserService {
             this.currentUser.mail = decodeCreds.email;
             this.currentUser.image = decodeCreds.picture;
             //Load the token to gain access to drive and mail now that user is identified
-            this.gis_token_client.requestAccessToken({prompt: ''});
+            if(this.gis_token_client){
+                this.gis_token_client.requestAccessToken({prompt: ''});
+            }else{
+                this.alertService.error("Impossible de se connecter à Google pour récupérer les codes d'authentification ! Veuillez réessayer ultérieurement.")
+            }
         }
     }
 
     public getAuthCode() {
-        // Request authorization code and obtain user consent
-        this.gis_code_client.requestCode();
+        if(this.gis_code_client){
+            // Request authorization code and obtain user consent
+            this.gis_code_client.requestCode();
+        }else{
+            this.alertService.error("Impossible de se connecter à Google pour récupérer les codes d'authentification ! Veuillez réessayer ultérieurement.")
+        }
     }
     
     public getToken(){
-        // Request access token and obtain user consent
-        this.gis_token_client.requestAccessToken({prompt: 'none'});
+        if(this.gis_token_client){
+            // Request access token and obtain user consent
+            this.gis_token_client.requestAccessToken({prompt: 'none'});
+        }else{
+            this.alertService.error("Impossible de se connecter à Google pour récupérer le jeton d'authentification ! Veuillez réessayer ultérieurement.")
+        }
     }
 
     public refreshToken(){

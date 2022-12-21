@@ -47,8 +47,10 @@
     <div *ngIf="(isLoading || !isLoggedIn || !isCompliant) && !isNonLoggedInRoute()" class="loading-message" matRipple [matRippleUnbounded]="true" [matRippleRadius]="250">
         <img src="assets/logo_sans_titre.png" alt="EasyLoc">
         <div>Easy<b>LOC</b></div>
-        <mat-progress-bar *ngIf="isLoading" color="primary" mode="indeterminate"></mat-progress-bar>
-        <div *ngIf="isLoading">Chargement en cours...</div>
+        <mat-progress-bar *ngIf="isLoading" color="primary" mode="indeterminate"></mat-progress-bar> 
+        <div *ngIf="userService.isLoading">Chargement des paramètres d'authentification...</div>
+        <div *ngIf="!userService.isLoading && driveService.isLoading">Chargement du drive...</div>
+        <div *ngIf="!driveService.isLoading && documentService.isLoading;">Chargement du fichier de définition...</div>
         <div *ngIf="!isLoading">pour vous simplifier la location...</div>
       </div>
     <div *ngIf="(!isLoading && isLoggedIn && isCompliant) || isNonLoggedInRoute()">

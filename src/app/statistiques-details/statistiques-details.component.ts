@@ -88,23 +88,25 @@ export class StatistiquesDetailsComponent implements OnInit {
 
     //First analyse all mouvements to get in and outs for each bien and for each year
     this.documentService.document.mouvements.forEach( (mouvement:Mouvement) => {
-
-      // If the object for this bien for this year still doesn't exist then create it
-      if(!this.bilanParAn[mouvement.bien.nom][mouvement.date.getFullYear()]){
-        this.bilanParAn[mouvement.bien.nom][mouvement.date.getFullYear()] = {in:0, out:0, gains: 0, gainsCumules:0, revenuMensuel:0, rentability:0, loyer:0, locationRate: 0};
-      }
-      // If the object for the total for this year still doesn't exist then create it
-      if(!this.bilanParAn["total"][mouvement.date.getFullYear()]){
-        this.bilanParAn["total"][mouvement.date.getFullYear()] = {in:0, out:0, gains: 0, gainsCumules:0, revenuMensuel:0, rentability:0, loyer:0, locationRate: 0};
-      }
-      //If this in an IN then add it to the in (in is positive)
-      if(mouvement.montant>0){
-        this.bilanParAn[mouvement.bien.nom][mouvement.date.getFullYear()].in += mouvement.montant;
-        this.bilanParAn["total"][mouvement.date.getFullYear()].in += mouvement.montant;
-      //If this in an OUT then add it to the out (out is negative)
-      }else{
-        this.bilanParAn[mouvement.bien.nom][mouvement.date.getFullYear()].out += mouvement.montant;
-        this.bilanParAn["total"][mouvement.date.getFullYear()].out += mouvement.montant;
+      //We just compute for now and passed mouvement but not for future year
+      if(mouvement.date.getFullYear() <= currentDate.getFullYear()){
+        // If the object for this bien for this year still doesn't exist then create it
+        if(!this.bilanParAn[mouvement.bien.nom][mouvement.date.getFullYear()]){
+          this.bilanParAn[mouvement.bien.nom][mouvement.date.getFullYear()] = {in:0, out:0, gains: 0, gainsCumules:0, revenuMensuel:0, rentability:0, loyer:0, locationRate: 0};
+        }
+        // If the object for the total for this year still doesn't exist then create it
+        if(!this.bilanParAn["total"][mouvement.date.getFullYear()]){
+          this.bilanParAn["total"][mouvement.date.getFullYear()] = {in:0, out:0, gains: 0, gainsCumules:0, revenuMensuel:0, rentability:0, loyer:0, locationRate: 0};
+        }
+        //If this in an IN then add it to the in (in is positive)
+        if(mouvement.montant>0){
+          this.bilanParAn[mouvement.bien.nom][mouvement.date.getFullYear()].in += mouvement.montant;
+          this.bilanParAn["total"][mouvement.date.getFullYear()].in += mouvement.montant;
+        //If this in an OUT then add it to the out (out is negative)
+        }else{
+          this.bilanParAn[mouvement.bien.nom][mouvement.date.getFullYear()].out += mouvement.montant;
+          this.bilanParAn["total"][mouvement.date.getFullYear()].out += mouvement.montant;
+        }
       }
     });
 
@@ -153,17 +155,26 @@ export class StatistiquesDetailsComponent implements OnInit {
       var prixAchatBiensAll: number = 0;
       //Loop through all biens to get their buy date
       this.documentService.document.biens.forEach( (bien:Bien) => {
-        //If the bien was bought the current com^puted year then add its cost to the cumulated cost
+        //If the bien was bought the current computed year then add its cost to the cumulated cost
         if(bien.dateAchat.getFullYear() <= parseInt(keyYear)){
-          prixAchatBiensAll += bien.prixAchat;
+          if(this.bilanParAn[bien.nom][keyYear] && this.bilanParAn[bien.nom][keyYear].rentability!=0){
+              prixAchatBiensAll += bien.prixAchat;
+          }
         }
       });
       //Now that we know the bien cumulated cost can compute the rentability
-      if(parseInt(keyYear) !== currentDate.getFullYear()){
+      //Full year when this is previous years
+      if(parseInt(keyYear) < currentDate.getFullYear()){
         this.bilanParAn["total"][keyYear].rentability = this.bilanParAn["total"][keyYear].gains / prixAchatBiensAll;
       }else{
-        //When this is the current year we extrapolate the year based on the elapsed month only (if don't do so, the curretn year will be underestimated)
-        this.bilanParAn["total"][keyYear].rentability = this.bilanParAn["total"][keyYear].gains * (12 / currentDate.getMonth()) / prixAchatBiensAll;
+        //When this is the current year we extrapolate the year based on the elapsed month only (if don't do so, the current year will be underestimated)
+        if(parseInt(keyYear) == currentDate.getFullYear()){
+          this.bilanParAn["total"][keyYear].rentability = this.bilanParAn["total"][keyYear].gains * (12 / currentDate.getMonth()) / prixAchatBiensAll;
+        //If this is next year we can not compute then force to zero
+        }else{
+          this.bilanParAn["total"][keyYear].rentability = 0;
+          
+        }
       }
     }
 
@@ -504,7 +515,7 @@ export class StatistiquesDetailsComponent implements OnInit {
             color: 'inherit',
             formatter: '{c} %'
           },
-          data: bienData.map(item => item?item.toFixed(2):'null')
+          data: bienData.map(item => item?item.toFixed(2):'-')
         });
       }
     }
