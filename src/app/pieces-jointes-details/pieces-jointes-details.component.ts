@@ -6,6 +6,7 @@ import { Piece } from '../_modeles/piece';
 import { PIECECODE } from '../_modeles/piece';
 import { AlertService } from '../_services/alert.service';
 import { DocumentService } from '../_services/document.service';
+import { EventService } from '../_services/event.service';
 import { UploadComponent } from '../upload/upload.component';
 import { PiecesChoixComponent } from '../pieces-choix/pieces-choix.component';
 
@@ -26,7 +27,7 @@ export class PiecesJointesDetailsComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private alertService: AlertService,
+    public eventService: EventService,
     public documentService: DocumentService) { }
 
   ngOnInit(): void {

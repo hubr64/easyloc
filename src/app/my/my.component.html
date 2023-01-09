@@ -1,15 +1,24 @@
-<button *ngIf="isLoggedIn; else elseBlock" mat-button [matMenuTriggerFor]="my"><div mat-card-avatar class="user-avatar" [style.background-image]="'url(' + currentUser.image + ')'" ></div></button>
+<button *ngIf="isLoggedIn; else elseBlock" mat-button [matMenuTriggerFor]="my">
+  <img class="user-avatar" src="{{currentUser.image}}" referrerpolicy="no-referrer">
+</button>
+<div id="g_id_onload"
+         data-client_id="474764062918-h31g2d341hajtdhipuggq6uagnfi10rl.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse"
+         data-cancel_on_tap_outside="true"
+         data-auto_select="true"></div>
+
 <mat-menu #my="matMenu" yPosition="above" [overlapTrigger]="false">
   <button mat-menu-item routerLink="/configuration"><mat-icon>settings</mat-icon> Configuration</button>
   <button mat-menu-item [matMenuTriggerFor]="connexion"><mat-icon>cloud_queue</mat-icon> Connexion</button>
   <button mat-menu-item (click)="signOut()"><mat-icon>logout</mat-icon> Déconnexion</button>
+  <button mat-menu-item disabled><mat-icon>tag</mat-icon> Version 0.0.3</button>
 </mat-menu>
 <mat-menu #connexion="matMenu">
   <button mat-menu-item disabled><mat-icon>account_circle</mat-icon> {{currentUser.nom}}</button>
   <button mat-menu-item disabled><mat-icon>email</mat-icon> {{currentUser.mail}}</button>
-  <button mat-menu-item disabled><mat-icon>account_tree</mat-icon>Version : {{driveService.dataFileVersion}}</button>
+  <button mat-menu-item disabled><mat-icon>account_tree</mat-icon>Version Document : {{driveService.dataFileVersion}}</button>
   <button mat-menu-item disabled><mat-icon>login</mat-icon>Connexion : {{userService.dateConnection | date:'short':'fr-FR'}}</button>
   <button mat-menu-item disabled><mat-icon>logout</mat-icon>Expiration : {{userService.dateExpiration | date:'short':'fr-FR'}}</button>
 </mat-menu>
 
-<ng-template #elseBlock><a mat-button (click)="signIn()" title="Se connecter"><mat-icon>login</mat-icon></a></ng-template>
+<ng-template #elseBlock><button mat-icon-button (click)="signIn()" title="Se connecter"><mat-icon>login</mat-icon></button></ng-template>

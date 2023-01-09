@@ -41,8 +41,8 @@ export class BailListeComponent implements AfterViewInit {
   public dataSource: MatTableDataSource<Bail>;
 
   // Columns displayed in the table. Columns IDs can be added, removed, or reordered.
-  public displayedColumns = ['select', 'locataire', 'bien', 'dateDebut', 'dateFin', 'loyer', 'charges', 'total', 'paiement', 'impayes', 'pieces', 'actions'];
-  public displayedColumnsEmbedded = ['locataire', 'bien', 'dateDebut', 'dateFin', 'loyer', 'impayes'];
+  public displayedColumns = ['select', 'locataire', 'bien', 'dateDebut', 'dateFin', 'loyer', 'charges', 'total', 'paiement', 'events', 'pieces', 'actions'];
+  public displayedColumnsEmbedded = ['locataire', 'bien', 'dateDebut', 'dateFin', 'loyer', 'events'];
   //Multi selection management
   public initialSelection = [];
   public allowMultiSelect: boolean = true;
@@ -137,7 +137,7 @@ export class BailListeComponent implements AfterViewInit {
   masterToggle() {
     this.isAllSelected() ?
         this.selection.clear() :
-        this.dataSource.data.forEach(row => this.selection.select(row));
+        this.dataSource.filteredData.forEach(row => this.selection.select(row));
   }
 
   private createFilter(): (bail: Bail, filter: string) => boolean {

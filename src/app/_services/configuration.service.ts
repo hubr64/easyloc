@@ -25,6 +25,7 @@ export class ConfigurationService {
       {'id':'web_asset', 'title':'Interface graphique'},
       {'id':'save','title':'Enregistrement'},
       {'id':'receipt_long','title':'Quittances'},
+      {'id':'notifications','title':'Evènements'},
     ];
     // Create configuration and init it from global configuration
     this.configurationItems = {
@@ -37,18 +38,20 @@ export class ConfigurationService {
       'quittanceFileNamePrefix': { advanced: false, title: 'Préfixe des fichiers de quittance', value: Configuration.CONFIG["quittanceFileNamePrefix"], categorie: 'receipt_long' },
       'quittanceMailSujet': { advanced: false, title: 'Sujet du mail envoyé avec les quittances', value: Configuration.CONFIG["quittanceMailSujet"], categorie: 'receipt_long' },
       'quittanceMailText': { advanced: false, title: 'Texte du mail envoyé avec les quittance (%% remplacé par la période)', value: Configuration.CONFIG["quittanceMailText"], categorie: 'receipt_long' },
-      'piecesObligatoiresBien': { advanced: false, title: 'Pièces obligatoires pour un bien', value: Configuration.CONFIG["piecesObligatoiresBien"], categorie: 'tune' },
-      'piecesObligatoiresLocataire': { advanced: false, title: 'Pièces obligatoires pour un locataire', value: Configuration.CONFIG["piecesObligatoiresLocataire"], categorie: 'tune' },
-      'piecesObligatoiresBailleur': { advanced: false, title: 'Pièces obligatoires pour un bailleur', value: Configuration.CONFIG["piecesObligatoiresBailleur"], categorie: 'tune' },
-      'piecesObligatoiresBail': { advanced: false, title: 'Pièces obligatoires pour un bail', value: Configuration.CONFIG["piecesObligatoiresBail"], categorie: 'tune' },
-      'bailUnpaiedLoyerNb': { advanced: false, title: 'Nombre de mois à analyser pour loyer impayé', value: Configuration.CONFIG["bailUnpaiedLoyerNb"], categorie: 'tune' },
-      'dureeRevisionLoyer': { advanced: false, title: 'Durée avant nouvelle révision de loyer (en jours)', value: Configuration.CONFIG["dureeRevisionLoyer"], categorie: 'tune' },
-      'nbCheckQuittance': { advanced: false, title: 'Nombre de mois à analyser pour paiement sans quittance', value: Configuration.CONFIG["nbCheckQuittance"], categorie: 'tune' },
+      'piecesObligatoiresBien': { advanced: false, title: 'Pièces obligatoires pour un bien', value: Configuration.CONFIG["piecesObligatoiresBien"], categorie: 'notifications' },
+      'piecesObligatoiresLocataire': { advanced: false, title: 'Pièces obligatoires pour un locataire', value: Configuration.CONFIG["piecesObligatoiresLocataire"], categorie: 'notifications' },
+      'piecesObligatoiresBailleur': { advanced: false, title: 'Pièces obligatoires pour un bailleur', value: Configuration.CONFIG["piecesObligatoiresBailleur"], categorie: 'notifications' },
+      'piecesObligatoiresBail': { advanced: false, title: 'Pièces obligatoires pour un bail', value: Configuration.CONFIG["piecesObligatoiresBail"], categorie: 'notifications' },
+      'bailUnpaiedLoyerNb': { advanced: false, title: 'Nombre de mois à analyser pour loyer impayé', value: Configuration.CONFIG["bailUnpaiedLoyerNb"], categorie: 'notifications' },
+      'dureeRevisionLoyer': { advanced: false, title: 'Durée avant nouvelle révision de loyer (en jours)', value: Configuration.CONFIG["dureeRevisionLoyer"], categorie: 'notifications' },
+      'nbCheckQuittance': { advanced: false, title: 'Nombre de mois à analyser pour paiement sans quittance', value: Configuration.CONFIG["nbCheckQuittance"], categorie: 'notifications' },
       'impotDeductionForfaitaire': { advanced: false, title: 'Taux de déduction forfaitaire des revenus imposables', value: Configuration.CONFIG["impotDeductionForfaitaire"], categorie: 'tune' },
       'mouvementAutoCompleteIn': { advanced: false, title: 'Proposition textes de mouvements entrants (séparé par ";")', value: Configuration.CONFIG["mouvementAutoCompleteIn"], categorie: 'web_asset' },
       'mouvementAutoCompleteOut': { advanced: false, title: 'Proposition textes de mouvements sortants (séparé par ";")', value: Configuration.CONFIG["mouvementAutoCompleteOut"], categorie: 'web_asset' },
       'nomModeleAnnoncePapier': { advanced: false, title: 'Nom du modèle par défaut pour une annonce de location en version papier', value: Configuration.CONFIG["nomModeleAnnoncePapier"], categorie: 'tune' },
       'nomModeleAnnonceWeb': { advanced: false, title: 'Nom du modèle par défaut pour une annonce de location en version Web', value: Configuration.CONFIG["nomModeleAnnonceWeb"], categorie: 'tune' },
+      'ordreBien': { advanced: false, title: 'Ordre d\'affichage des biens par défaut (nom|dateAchat)', value: Configuration.CONFIG["ordreBien"], categorie: 'web_asset' },
+      'datePaiementTaxe': { advanced: false, title: 'Date de paiement limite pour les taxes foncières', value: Configuration.CONFIG["datePaiementTaxe"], categorie: 'notifications' },
     };
 
     // Load local storage that replace the global initial storage

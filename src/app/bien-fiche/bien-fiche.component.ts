@@ -64,10 +64,7 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
 
     //Get data
     this.getData();
-  }
 
-  ngAfterViewInit(): void {
-    
     this.mouvements = [];
     for (var _i = 0; _i < this.documentService.document.mouvements.length; _i++) {
       // Find the requested one
@@ -78,6 +75,11 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
     
     // Configure table
     this.dataSource = new MatTableDataSource(this.mouvements);
+  }
+
+  ngAfterViewInit(): void {
+    
+
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
   }

@@ -1,8 +1,8 @@
 .mat-toolbar{
   z-index:2!important;
 }
-.sidenav-container {
-  height: 100%;
+mat-sidenav-content {
+  min-height: 600px;
 }
 @media print{    
   .sidenav-container{
@@ -10,9 +10,9 @@
   }
   mat-sidenav-content{
     margin-left:0px!important;
+    background: #FFF;
   }
 }
-
 .sidenav .mat-toolbar {
   background: inherit;
 }

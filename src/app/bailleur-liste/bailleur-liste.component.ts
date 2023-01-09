@@ -30,7 +30,7 @@ export class BailleurListeComponent implements AfterViewInit {
   public dataSource: MatTableDataSource<Bailleur>;
 
   // Columns displayed in the table. Columns IDs can be added, removed, or reordered.
-  public displayedColumns = ['select', 'nom', 'type', 'telephone', 'mail', 'pieces', 'actions'];
+  public displayedColumns = ['select', 'nom', 'type', 'telephone', 'mail', 'evenements', 'pieces', 'actions'];
   // String to get the search filter
   public searchFilter: string = '';
   //Multi selection management
@@ -78,7 +78,7 @@ export class BailleurListeComponent implements AfterViewInit {
   masterToggle() {
     this.isAllSelected() ?
         this.selection.clear() :
-        this.dataSource.data.forEach(row => this.selection.select(row));
+        this.dataSource.filteredData.forEach(row => this.selection.select(row));
   }
 
   applyFilter(event: any) {

@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialog, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Observable} from 'rxjs';
 import { map, startWith} from 'rxjs/operators';
 
@@ -22,21 +22,24 @@ export class MouvementDetailsComponent implements OnInit {
   public libellesAutoFiltered: Observable<string[]>;
 
   constructor(
-    private formBuilder: FormBuilder,
     public documentService: DocumentService,
     public configurationService: ConfigurationService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { 
+    //Get list of libelles for in or out mouvements
     const In = this.configurationService.getValue('mouvementAutoCompleteIn').split(";");
     const Out = this.configurationService.getValue('mouvementAutoCompleteOut').split(";");
+    //Concatenate both lists together
     this.libellesAuto = In.concat(Out); 
+    //Sort list alphabetically
+    this.libellesAuto = this.libellesAuto.sort();
   }
 
   ngOnInit(): void {
     this.mouvementForm = new FormGroup({
       'date': new FormControl('', [
         Validators.required
-      ]),
+      ],),
       'bien': new FormControl('', [
         Validators.required
       ]),
@@ -80,7 +83,7 @@ export class MouvementDetailsComponent implements OnInit {
         date: this.data.mouvement.date,
         bien: this.data.mouvement.bien.id,
         libelle: this.data.mouvement.libelle,
-        montant: this.data.mouvement.montant,
+        montant: parseFloat(this.data.mouvement.montant),
         tiers: this.data.mouvement.tiers,
         commentaires: this.data.mouvement.commentaires
       });

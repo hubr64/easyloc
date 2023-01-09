@@ -1,8 +1,9 @@
-import { Component, Inject } from '@angular/core';
-import { MatBottomSheetRef, MAT_BOTTOM_SHEET_DATA} from '@angular/material/bottom-sheet';
+import { Component, Inject, ChangeDetectorRef } from '@angular/core';
+import { MAT_BOTTOM_SHEET_DATA} from '@angular/material/bottom-sheet';
 import { MatDialog} from '@angular/material/dialog';
 
 import { DocumentService } from '../_services/document.service';
+import { EventService } from '../_services/event.service';
 import { DriveService } from '../_services/drive.service';
 import { Piece } from '../_modeles/piece';
 import { PIECECODE } from '../_modeles/piece';
@@ -28,10 +29,11 @@ export class PiecesJointesComponent {
 
   constructor(
     @Inject(MAT_BOTTOM_SHEET_DATA) public data: any,
-    private _bottomSheetRef: MatBottomSheetRef<PiecesJointesComponent>,
     public driveService: DriveService,
     public documentService: DocumentService,
-    public dialog: MatDialog
+    public eventService: EventService,
+    public dialog: MatDialog,
+    private cdr: ChangeDetectorRef
   ) { 
 
     if(data.piecesContainer.pieces){
@@ -42,10 +44,12 @@ export class PiecesJointesComponent {
         this.driveService.get(piece.id).then( 
           (response: any) => {
             this.urlPieces[piece.id] = response.result.webContentLink;
+            this.cdr.detectChanges();
           },
           (error:any) => {
             if(error.status==404){
               this.errorPieces[piece.id] = true;
+              this.cdr.detectChanges();
             }
             console.error("Impossible to get metadata for " + piece.nom);
           }
@@ -53,7 +57,7 @@ export class PiecesJointesComponent {
       });
     }
     //Get missed pieces for displaying them in the list
-    this.missedPieces = this.documentService.checkPiecesObligatoires(data.piecesContainer)
+    this.missedPieces = this.eventService.checkPiecesObligatoires(data.piecesContainer)
   }
 
   addPiece(){
@@ -82,7 +86,7 @@ export class PiecesJointesComponent {
             // Add it in the list
             this.pieces.push(tmpPiece);
             //Compute missing pieces once again
-            this.missedPieces = this.documentService.checkPiecesObligatoires(this.data.piecesContainer)
+            this.missedPieces = this.eventService.checkPiecesObligatoires(this.data.piecesContainer)
           });
         }
       }
@@ -108,7 +112,7 @@ export class PiecesJointesComponent {
             if (this.data.piecesContainer.pieces.indexOf(piece, 0) == -1) {
               this.data.piecesContainer.pieces.push(piece);
               //Compute missing pieces once again
-              this.missedPieces = this.documentService.checkPiecesObligatoires(this.data.piecesContainer)
+              this.missedPieces = this.eventService.checkPiecesObligatoires(this.data.piecesContainer)
             }
           });
         }
@@ -124,7 +128,7 @@ export class PiecesJointesComponent {
     if (indexPiece > -1) {
       this.data.piecesContainer.pieces.splice(indexPiece, 1);
       //Compute missing pieces once again
-      this.missedPieces = this.documentService.checkPiecesObligatoires(this.data.piecesContainer)
+      this.missedPieces = this.eventService.checkPiecesObligatoires(this.data.piecesContainer)
     }
   }
 

@@ -38,7 +38,8 @@ import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatAutocompleteModule} from '@angular/material/autocomplete';
 import { MatRadioModule} from '@angular/material/radio';
 import { MatStepperModule} from '@angular/material/stepper';
-import {MatExpansionModule} from '@angular/material/expansion';
+import { MatExpansionModule} from '@angular/material/expansion';
+import { MatButtonToggleModule} from '@angular/material/button-toggle';
 //Other libraries
 import { NgxEchartsModule } from 'ngx-echarts';
 //Services
@@ -46,6 +47,7 @@ import { AlertService } from './_services/alert.service';
 import { UserService } from './_services/user.service';
 import { DriveService } from './_services/drive.service';
 import { DocumentService } from './_services/document.service';
+import { EventService } from './_services/event.service';
 import { ConfigurationService } from './_services/configuration.service';
 import { ExportCsvService } from './_services/export-csv.service';
 // Standard Components
@@ -86,10 +88,14 @@ import { QuittancesComponent } from './quittances/quittances.component';
 import { StatistiquesDetailsComponent } from './statistiques-details/statistiques-details.component';
 import { StatistiquesImpotsComponent } from './statistiques-impots/statistiques-impots.component';
 import { BailNewComponent } from './bail-new/bail-new.component';
+import { EventsListeComponent, EventsListeComponentSheet } from './events-liste/events-liste.component';
+import { EventsComponent } from './events/events.component';
+import { EventsFicheComponent } from './events-fiche/events-fiche.component';
 // Helpers
 import { FilterConfigurationPipe } from './_helpers/filter-configuration.pipe';
 import { DndDirective } from './_helpers/dnd.directive';
 import { VarDirective } from './_helpers/ng-var.directive';
+import { OrderByPipe } from './_helpers/orderby.pipe';
 
 registerLocaleData(localeFr);
 
@@ -107,6 +113,7 @@ const globalRippleConfig: RippleGlobalOptions = {
     FilterConfigurationPipe,
     DndDirective,
     VarDirective,
+    OrderByPipe,
     NavigationComponent,
     DashboardComponent,
     LocataireDetailsComponent,
@@ -141,7 +148,11 @@ const globalRippleConfig: RippleGlobalOptions = {
     StatistiquesDetailsComponent,
     StatistiquesImpotsComponent,
     BailNewComponent,
-    PieceDetailsComponent
+    PieceDetailsComponent,
+    EventsListeComponent,
+    EventsListeComponentSheet,
+    EventsComponent,
+    EventsFicheComponent
   ],
   imports: [
     BrowserModule,
@@ -180,6 +191,7 @@ const globalRippleConfig: RippleGlobalOptions = {
     MatRadioModule,
     MatStepperModule,
     MatExpansionModule,
+    MatButtonToggleModule,
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts'), 
     }),
@@ -190,6 +202,7 @@ const globalRippleConfig: RippleGlobalOptions = {
     DocumentService,
     ConfigurationService,
     AlertService,
+    EventService,
     ExportCsvService,
     {provide: MAT_RIPPLE_GLOBAL_OPTIONS, useValue: globalRippleConfig},
     {provide: MAT_DATE_LOCALE, useValue: 'fr-FR'},

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild, Inject, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { AfterViewInit, Component, ViewChild, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { FormControl } from '@angular/forms';
 
@@ -165,7 +165,7 @@ export class PieceListeComponent implements AfterViewInit  {
   masterToggle() {
     this.isAllSelected() ?
         this.selection.clear() :
-        this.dataSource.data.forEach(row => this.selection.select(row));
+        this.dataSource.filteredData.forEach(row => this.selection.select(row));
   }
 
   private createFilter(): (piece: Piece, filter: string) => boolean {

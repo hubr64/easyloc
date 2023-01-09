@@ -3,6 +3,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { MatBottomSheet} from '@angular/material/bottom-sheet';
 
 import { DocumentService } from '../_services/document.service';
+import { EventService } from '../_services/event.service';
 import { PIECECODE } from '../_modeles/piece';
 import { PiecesJointesComponent } from '../pieces-jointes/pieces-jointes.component';
 
@@ -23,11 +24,12 @@ export class PiecesJointesListeComponent implements OnInit {
 
   constructor(
     public documentService: DocumentService,
+    public eventService: EventService,
     private _bottomSheet: MatBottomSheet) { }
 
   ngOnInit(): void {
     //Get missed pieces for changing color of the badge
-    this.missedPieces = this.documentService.checkPiecesObligatoires(this.container)
+    this.missedPieces = this.eventService.checkPiecesObligatoires(this.container)
   }
 
   openPieces(): void {
@@ -42,7 +44,7 @@ export class PiecesJointesListeComponent implements OnInit {
 
     bottomSheetRef.afterDismissed().subscribe(() => {
       //Compute missing pieces once again
-      this.missedPieces = this.documentService.checkPiecesObligatoires(this.container)
+      this.missedPieces = this.eventService.checkPiecesObligatoires(this.container)
     });
 
   }

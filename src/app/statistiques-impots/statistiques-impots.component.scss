@@ -20,11 +20,11 @@ table{
     margin: 0 auto;
 }
 table td{
-    width: 180px;
+    width: 150px;
     text-align:center;
 }
 table td:first-child{
-    width: 300px;
+    min-width: 300px;
     text-align:right;
 }
 table td:last-child{
@@ -70,11 +70,24 @@ td.details-category{
     font-weight: 500;
     font-size: 14px;
 }
-mat-radio-group{
-    margin: 0 10px;
-    font-weight: 100;
-    display: block;
+.mat-mdc-form-field {
+    width: 120px;
 }
-mat-radio-button{
-    margin: 10px;
+.regul ::ng-deep .mat-mdc-form-field-subscript-wrapper{
+    display: none;
+}
+#no-impot{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 30px;
+    line-height: 40px;
+    text-align: center;
+    font-family: 'Unica One', cursive;
+    margin-top: 15px;
+}
+#no-impot > mat-icon {
+    font-size: 50px;
+    flex: 1;
+    width: 100%;
 }

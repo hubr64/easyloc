@@ -4,10 +4,10 @@
     <form [formGroup]="mouvementForm">
         <mat-form-field appearance="fill">
             <mat-label>Date</mat-label>
-            <input matInput placeholder="Date" id="date" formControlName="date" [disabled]="true" [matDatepicker]="picker" required>
+            <input matInput placeholder="Date" id="date" formControlName="date" [matDatepicker]="picker" required [disabled]="true">
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-hint align="end">Date du mouvement</mat-hint>
-            <mat-datepicker #picker  disabled="false"></mat-datepicker>
+            <mat-datepicker #picker disabled="false"></mat-datepicker>
             <mat-error *ngIf="date?.errors?.required">La date est obligatoire.</mat-error>
         </mat-form-field>
         <mat-form-field appearance="fill">

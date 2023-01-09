@@ -76,34 +76,7 @@
         <ng-container matColumnDef="code">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
             <td mat-cell *matCellDef="let row" class="code-cell">
-                <ng-container [ngSwitch]="row.code">
-                    <mat-icon *ngSwitchCase="'LOC_CNI'" color="" title="LOC_CNI">badge</mat-icon>
-                    <mat-icon *ngSwitchCase="'LOC_PSP'" color="" title="LOC_PSP">badge</mat-icon>
-                    <mat-icon *ngSwitchCase="'BAIL_IMPT'" color="" title="BAIL_IMPT">account_balance</mat-icon>
-                    <mat-icon matListIcon svgIcon="bailleur" *ngSwitchCase="'BLR_STT'" color="" title="BLR_STT"></mat-icon>
-                    <mat-icon *ngSwitchCase="'BAIL_CTT'" color="" title="BAIL_CTT">business_center</mat-icon>
-                    <mat-icon *ngSwitchCase="'BAIL_SAL'" color="" title="BAIL_SAL">request_quote</mat-icon>
-                    <mat-icon *ngSwitchCase="'BAIL_CAUT'" color="" title="BAIL_CAUT">family_restroom</mat-icon>
-                    <mat-icon *ngSwitchCase="'BAIL_QUIT'" color="" title="BAIL_QUIT">receipt_long</mat-icon>
-                    <mat-icon *ngSwitchCase="'BAIL_CONT'" color="" title="BAIL_CONT">assignment</mat-icon>
-                    <mat-icon *ngSwitchCase="'BAIL_STV'" color="" title="BAIL_STV">check_box_outline_blank</mat-icon>
-                    <mat-icon *ngSwitchCase="'BAIL_STE'" color="" title="BAIL_STE">login</mat-icon>
-                    <mat-icon *ngSwitchCase="'BAIL_STS'" color="" title="BAIL_STS">logout</mat-icon>
-                    <mat-icon *ngSwitchCase="'BAIL_ASSU'" color="" title="BAIL_ASSU">admin_panel_settings</mat-icon>
-                    <mat-icon *ngSwitchCase="'DIVERS'" color="" title="DIVERS">description</mat-icon>
-                    <mat-icon *ngSwitchCase="'BIEN_TRAV'" color="" title="BIEN_TRAV">construction</mat-icon>
-                    <mat-icon *ngSwitchCase="'BIEN_DIAG'" color="" title="BIEN_DIAG">monitor_heart</mat-icon>
-                    <mat-icon *ngSwitchCase="'BIEN_PHOT'" color="" title="BIEN_PHOT">image</mat-icon>
-                    <mat-icon *ngSwitchCase="'BIEN_NOT'" color="" title="BIEN_NOT">gavel</mat-icon>
-                    <mat-icon *ngSwitchCase="'BIEN_ASSU'" color="" title="BIEN_ASSU">shield_with_house</mat-icon>
-                    <mat-icon *ngSwitchCase="'BIEN_REGL'" color="" title="BIEN_REGL">apartment</mat-icon>
-                    <mat-icon *ngSwitchCase="'BAIL_RVN'" color="" title="BAIL_RVN">money</mat-icon>
-                    <mat-icon *ngSwitchCase="'BAIL_JUSTIF'" color="" title="BAIL_JUSTIF">roofing</mat-icon>
-                    <mat-icon *ngSwitchCase="'BIEN_ANNO'" color="" title="BIEN_ANNO">newspaper</mat-icon>
-                    <ng-container *ngSwitchDefault>
-                        <mat-icon color="" title="Code inconnu">question_mark</mat-icon>
-                    </ng-container>
-                </ng-container>
+                <mat-icon title="{{row.code}}">{{row.codeIcone}}</mat-icon>
                 {{codes[row.code]}}
             </td>
         </ng-container>
