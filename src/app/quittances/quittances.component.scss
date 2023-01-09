@@ -1,16 +1,24 @@
 form, mat-card{
     width: 95%;
-    max-width: 700px;
     margin: 10px auto;
+}
+.form-group{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+}
+.form-group mat-form-field{
+    flex: 1 1 300px;
 }
 form button {
     align-items: center;
     margin:5px;
 }
-.mat-form-field, mat-checkbox {
+mat-checkbox {
     width: 100%;
     margin: 5px 10px 0 10px;
-    vertical-align: top;
 }
 .mat-list-item-disabled{
     font-style: italic;

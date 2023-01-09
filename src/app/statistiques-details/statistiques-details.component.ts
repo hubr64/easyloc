@@ -122,7 +122,7 @@ export class StatistiquesDetailsComponent implements OnInit {
           this.bilanParAn[keyBien][keyYear].revenuMensuel = this.bilanParAn[keyBien][keyYear].gains / 12;
         }else{
           //When this is the current year we compute only for the elapsed months only (not 12 months that will underevaluate the result...)
-          this.bilanParAn[keyBien][keyYear].revenuMensuel = this.bilanParAn[keyBien][keyYear].gains / currentDate.getMonth();
+          this.bilanParAn[keyBien][keyYear].revenuMensuel = this.bilanParAn[keyBien][keyYear].gains / (currentDate.getMonth()+1);
         }
         //The cumulated is the gain more the previsous computed gain (this is OK as the key are looped by number thus by incresing year)
         this.bilanParAn[keyBien][keyYear].gainsCumules = this.bilanParAn[keyBien][keyYear].in + this.bilanParAn[keyBien][keyYear].out + gainsCumules;
@@ -142,7 +142,7 @@ export class StatistiquesDetailsComponent implements OnInit {
               this.bilanParAn[bien.nom][keyYear].rentability = this.bilanParAn[bien.nom][keyYear].gains / bien.prixAchat;
             }else{
               //When this is the current year we extrapolate the year based on the elapsed month only (if don't do so, the curretn year will be underestimated)
-              this.bilanParAn[bien.nom][keyYear].rentability = this.bilanParAn[bien.nom][keyYear].gains * (12 / currentDate.getMonth()) / bien.prixAchat; 
+              this.bilanParAn[bien.nom][keyYear].rentability = this.bilanParAn[bien.nom][keyYear].gains * (12 / (currentDate.getMonth()+1)) / bien.prixAchat; 
             }
           }
         }
@@ -169,7 +169,7 @@ export class StatistiquesDetailsComponent implements OnInit {
       }else{
         //When this is the current year we extrapolate the year based on the elapsed month only (if don't do so, the current year will be underestimated)
         if(parseInt(keyYear) == currentDate.getFullYear()){
-          this.bilanParAn["total"][keyYear].rentability = this.bilanParAn["total"][keyYear].gains * (12 / currentDate.getMonth()) / prixAchatBiensAll;
+          this.bilanParAn["total"][keyYear].rentability = this.bilanParAn["total"][keyYear].gains * (12 / (currentDate.getMonth()+1)) / prixAchatBiensAll;
         //If this is next year we can not compute then force to zero
         }else{
           this.bilanParAn["total"][keyYear].rentability = 0;

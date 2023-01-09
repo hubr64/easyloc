@@ -56,4 +56,37 @@ export class Piece {
     toString(): string{
       return this.nom +" ("+ this.code+ ")";
     }
+
+    public get codeIcone() {
+
+        var icone: string = "";
+
+        switch(this.code) {
+            case 'LOC_CNI'     : { icone = 'badge'; break; } 
+            case 'LOC_PSP'     : { icone = 'badge'; break; }
+            case 'BAIL_IMPT'   : { icone = 'account_balance'; break; }
+            case 'BLR_STT'     : { icone = 'workspace_premium'; break; }
+            case 'BAIL_CTT'    : { icone = 'business_center'; break; }
+            case 'BAIL_SAL'    : { icone = 'request_quote'; break; }
+            case 'BAIL_CAUT'   : { icone = 'family_restroom'; break; }
+            case 'BAIL_QUIT'   : { icone = 'receipt_long'; break; }
+            case 'BAIL_CONT'   : { icone = 'assignment'; break; }
+            case 'BAIL_STV'    : { icone = 'check_box_outline_blank'; break; }
+            case 'BAIL_STE'    : { icone = 'login'; break; }
+            case 'BAIL_STS'    : { icone = 'logout'; break; }
+            case 'BAIL_ASSU'   : { icone = 'admin_panel_settings'; break; }
+            case 'DIVERS'      : { icone = 'description'; break; }
+            case 'BIEN_TRAV'   : { icone = 'construction'; break; }
+            case 'BIEN_DIAG'   : { icone = 'monitor_heart'; break; }
+            case 'BIEN_PHOT'   : { icone = 'image'; break; }
+            case 'BIEN_NOT'    : { icone = 'gavel'; break; }
+            case 'BIEN_ASSU'   : { icone = 'shield'; break; }
+            case 'BIEN_REGL'   : { icone = 'apartment'; break; }
+            case 'BAIL_RVN'    : { icone = 'money'; break; }
+            case 'BAIL_JUSTIF' : { icone = 'roofing'; break; }
+            case 'BIEN_ANNO'   : { icone = 'newspaper'; break; }
+            default: { icone = 'question_mark'; break; }
+        }
+        return icone;
+    }
 }

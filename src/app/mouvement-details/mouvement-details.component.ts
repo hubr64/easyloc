@@ -26,9 +26,13 @@ export class MouvementDetailsComponent implements OnInit {
     public configurationService: ConfigurationService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { 
+    //Get list of libelles for in or out mouvements
     const In = this.configurationService.getValue('mouvementAutoCompleteIn').split(";");
     const Out = this.configurationService.getValue('mouvementAutoCompleteOut').split(";");
+    //Concatenate both lists together
     this.libellesAuto = In.concat(Out); 
+    //Sort list alphabetically
+    this.libellesAuto = this.libellesAuto.sort();
   }
 
   ngOnInit(): void {
@@ -79,7 +83,7 @@ export class MouvementDetailsComponent implements OnInit {
         date: this.data.mouvement.date,
         bien: this.data.mouvement.bien.id,
         libelle: this.data.mouvement.libelle,
-        montant: this.data.mouvement.montant,
+        montant: parseFloat(this.data.mouvement.montant),
         tiers: this.data.mouvement.tiers,
         commentaires: this.data.mouvement.commentaires
       });

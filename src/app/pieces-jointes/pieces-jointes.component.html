@@ -5,19 +5,19 @@
         <span matListItemMeta><mat-icon color='primary'>play_arrow</mat-icon></span>
     </button>
     <button mat-list-item *ngIf="data.canAdd" (click)="addPieceExisting()">
-        <mat-icon matListItemIcon color="primary">find_in_page</mat-icon>
-        <span matListItemTitle>Annexer pièce jointe</span>
+        <mat-icon matListItemIcon color="primary">add_link</mat-icon>
+        <span matListItemTitle>Associer pièce jointe</span>
         <span matListItemMeta><mat-icon color='primary'>play_arrow</mat-icon></span>
     </button>
     <mat-divider></mat-divider>
-    <button mat-list-item *ngFor="let piece of pieces" >
-        <mat-icon matListItemIcon>insert_drive_file</mat-icon>
-        <h3 matListItemTitle>{{piece.nom}}</h3>
+    <button mat-list-item *ngFor="let piece of pieces">
+        <mat-icon matListItemIcon>{{piece.codeIcone}}</mat-icon>
+        <h3 matListItemTitle>{{piece.description}}</h3>
         <span matListItemLine>{{pieceCode[piece.code]}}</span>
-        <span matListItemLine>{{piece.description}}</span>
+        <span matListItemLine>{{piece.nom}}</span>
         <span matListItemMeta>
             <a *ngIf="urlPieces[piece.id]" mat-icon-button color="primary" title="Télécharger" [href]="urlPieces[piece.id]" target="_blank"><mat-icon>cloud_download</mat-icon></a>
-            <a (click)="deletePiece(piece, $event)" title="Dissocier"><mat-icon *ngIf="data.canRemove" color="warn">remove_circle</mat-icon></a>
+            <a (click)="deletePiece(piece, $event)" title="Dissocier"><mat-icon *ngIf="data.canRemove" color="warn">link_off</mat-icon></a>
         </span>
     </button>
     <button mat-list-item *ngIf="pieces.length == 0" [disabled]="true">

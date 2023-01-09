@@ -139,6 +139,8 @@ export class DocumentService {
       (response: any) => {
         if(response && response.result && response.result.version && this.driveService.dataFileVersion == response.result.version){
           this.docIsLoadedChange.next(false);
+          //Prevent sync to be executed otherwise save and sync may interfer
+          this.autoSyncExecution = true;
           console.dir("File is the last version. Save can be executed");
           //Document is converted in a JSON string
           const documentJson = JSON.stringify(this.document.toJSON());
@@ -154,7 +156,15 @@ export class DocumentService {
                 (response: any) => {
                   if(response && response.result && response.result.version){
                     this.driveService.dataFileVersion = response.result.version;
+                    //Autosync can now be executed again
+                    this.autoSyncExecution = false;
                   }
+                },
+                (error:any) => {
+                  console.error('New version can not be loaded after save : ');
+                  console.dir(error);
+                  //Autosync can now be executed again
+                  this.autoSyncExecution = false;
                 }
               );
             },
@@ -162,6 +172,8 @@ export class DocumentService {
               this.alertService.error("Impossible de sauvegarder le document. Veuillez vérifier votre connexion.");
               console.error('Modification not saved : ');
               console.dir(error);
+              //Autosync can now be executed again
+              this.autoSyncExecution = false;
             });
         }else{
           //Problem of version : version on server is more recent then ask user what to do

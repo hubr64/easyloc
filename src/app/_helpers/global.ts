@@ -21,7 +21,7 @@ export const CONFIG: { [key: string]: any } = {
   'nbCheckQuittance': 12,
   'impotDeductionForfaitaire': 0.3,
   'mouvementAutoCompleteIn': 'Loyer;Régularisation de charges;Remboursement',
-  'mouvementAutoCompleteOut': 'Taxe foncière;Assurance prêt immobilier;Assurance PNO;Provision sur charges;Intérêts d\'emprunt;Frais de dossier prêt immobilier;Travaux;Achat;Régularisation de charges',
+  'mouvementAutoCompleteOut': 'Taxe foncière;Assurance prêt immobilier;Assurance PNO;Provision sur charges;Intérêts d\'emprunt;Frais de dossier prêt immobilier;Travaux;Achat;Régularisation de charges;Frais de garantie',
   'nomModeleAnnoncePapier': 'Modèle Annonce Web',
   'nomModeleAnnonceWeb': 'Modèle Annonce Papier',
   'ordreBien': 'nom',

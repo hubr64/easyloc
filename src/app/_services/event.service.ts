@@ -549,12 +549,18 @@ export class EventService {
                 offsetMonth = 1;
                 comparePeriod = new Date(currentDate.getFullYear(), currentDate.getMonth() - (offsetMonth+i), bail.paiementDate.getDate());
               }
+
               //By default nothing is found
               var monthFound = false;
+
+              //If the compare period is before the begining of the bail then it is considered as paid
+              if(comparePeriod < bail.dateDebut){
+                monthFound = true;
+              }
     
               //Look in all pieces to look for the quittance of the compare period
               bail.pieces.forEach((piece:Piece) => {
-                //JUst consider pieces that are bail
+                //Just consider pieces that are quittances
                 if(piece.code == 'BAIL_QUIT'){
                   const quittanceDate = piece.description.substr(-7,7);
                   const compareDate = comparePeriod.getFullYear()+"-"+(comparePeriod.getMonth()+1<10?'0':'') + (comparePeriod.getMonth()+1);

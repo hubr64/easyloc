@@ -292,6 +292,9 @@ export class StatistiquesImpotsComponent implements OnInit {
     if(txt.toLowerCase().includes("intérêts")){
       returnStr = "250";
     }
+    if(txt.toLowerCase().includes("frais")){
+      returnStr = "250";
+    }
     return returnStr;
   }
 

@@ -131,9 +131,11 @@ export class UserService {
             this.currentUser.image = decodeCreds.picture;
             //Load the token to gain access to drive and mail now that user is identified
             if(this.gis_token_client){
+                console.log("UserService:handleCredentials : Client is loaded then request access token.");
                 this.gis_token_client.requestAccessToken({prompt: ''});
             }else{
-                this.alertService.error("Impossible de se connecter à Google pour récupérer les codes d'authentification ! Veuillez réessayer ultérieurement.")
+                console.log("UserService:handleCredentials : Wait 5 more seconds as the client is still not loaded.");
+                setTimeout(() => this.handleCredentials(response), 1000);
             }
         }
     }

@@ -6,31 +6,33 @@
 </mat-toolbar>
 
 <form [formGroup]="quittanceForm" (ngSubmit)="generate()">
-    <mat-form-field appearance="fill">
-        <mat-label>Bail</mat-label>
-        <mat-select id="bail" formControlName="bail" required>
-            <mat-option *ngFor="let bail of documentService.document.bails" [value]="bail.id">
-                {{bail.toString()}}
-            </mat-option>
-        </mat-select>
-        <mat-icon *ngIf="quittanceForm.value.bail" matSuffix color="accent" [routerLink]="'/fiche/bail/'+quittanceForm.value.bail">visibility</mat-icon>
-        <mat-hint align="end">Bail concerné (par défaut, bail en cours. A changer si nécessaire)</mat-hint>
-        <mat-error *ngIf="bail?.errors?.required">Le bail est obligatoire.</mat-error>
-    </mat-form-field>
-    <mat-form-field appearance="fill">
-        <mat-label>Localisation</mat-label>
-        <input matInput placeholder="Votre localisation" id="localisation" formControlName="localisation" required>
-        <mat-hint align="end">Localisation pour la génération</mat-hint>
-        <mat-error *ngIf="localisation?.errors?.required">La localisation est obligatoire.</mat-error>
-    </mat-form-field>
-    <mat-form-field appearance="fill">
-        <mat-label>Mois</mat-label>
-        <input matInput placeholder="Mois concerné par le paiement" id="mois" formControlName="mois" required [matDatepicker]="picker" readonly>
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-hint align="end">Choix du mois concerné par le paiement</mat-hint>
-        <mat-error *ngIf="mois?.errors?.required">Le mois est obligatoire.</mat-error>
-        <mat-datepicker #picker startView="multi-year" (monthSelected)="closeDatePicker($event, picker)"></mat-datepicker>
-    </mat-form-field>
+    <div class="form-group">
+        <mat-form-field appearance="fill">
+            <mat-label>Bail</mat-label>
+            <mat-select id="bail" formControlName="bail" required>
+                <mat-option *ngFor="let bail of documentService.document.bails" [value]="bail.id">
+                    {{bail.toString()}}
+                </mat-option>
+            </mat-select>
+            <mat-icon *ngIf="quittanceForm.value.bail" matSuffix color="accent" [routerLink]="'/fiche/bail/'+quittanceForm.value.bail">visibility</mat-icon>
+            <mat-hint align="end">Bail concerné (par défaut, bail en cours. A changer si nécessaire)</mat-hint>
+            <mat-error *ngIf="bail?.errors?.required">Le bail est obligatoire.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Localisation</mat-label>
+            <input matInput placeholder="Votre localisation" id="localisation" formControlName="localisation" required>
+            <mat-hint align="end">Localisation pour la génération</mat-hint>
+            <mat-error *ngIf="localisation?.errors?.required">La localisation est obligatoire.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Mois</mat-label>
+            <input matInput placeholder="Mois concerné par le paiement" id="mois" formControlName="mois" required [matDatepicker]="picker" readonly>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-hint align="end">Choix du mois concerné par le paiement</mat-hint>
+            <mat-error *ngIf="mois?.errors?.required">Le mois est obligatoire.</mat-error>
+            <mat-datepicker #picker startView="multi-year" (monthSelected)="closeDatePicker($event, picker)"></mat-datepicker>
+        </mat-form-field>
+    </div>
     <mat-checkbox id="drive" formControlName="drive">Déposer dans le drive</mat-checkbox>            
     <mat-checkbox id="mail" formControlName="mail">Envoyer directement par mail</mat-checkbox>            
     <div class="form-button">
@@ -42,40 +44,40 @@
     <mat-card-content>
         <mat-list>
             <mat-list-item>
-                <mat-icon matListIcon *ngIf="stepGenerate<=1">query_builder</mat-icon>
-                <mat-icon matListIcon *ngIf="stepGenerate==2" color="accent">done</mat-icon>
-                <mat-icon matListIcon *ngIf="stepGenerate==3" color="warn">warning</mat-icon>
-                <p matLine>Génération du document au format PDF.</p>
-                <p matLine *ngIf="stepGenerate==1"><mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar></p>
-                <p matLine *ngIf="stepGenerate==2"><mat-progress-bar color="accent" mode="determinate" [value]="100"></mat-progress-bar></p>
-                <p matLine *ngIf="stepGenerate==3"><mat-progress-bar color="warn" mode="determinate" [value]="100"></mat-progress-bar></p>
+                <mat-icon matListItemIcon *ngIf="stepGenerate<=1">query_builder</mat-icon>
+                <mat-icon matListItemIcon *ngIf="stepGenerate==2" color="accent">done</mat-icon>
+                <mat-icon matListItemIcon *ngIf="stepGenerate==3" color="warn">warning</mat-icon>
+                <p matListItemTitle>Génération du document au format PDF.</p>
+                <p matListItemLine *ngIf="stepGenerate==1"><mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar></p>
+                <p matListItemLine *ngIf="stepGenerate==2"><mat-progress-bar color="accent" mode="determinate" [value]="100"></mat-progress-bar></p>
+                <p matListItemLine *ngIf="stepGenerate==3"><mat-progress-bar color="warn" mode="determinate" [value]="100"></mat-progress-bar></p>
             </mat-list-item>
             <mat-list-item [disabled]="stepTransfer==-1">
-                <mat-icon matListIcon *ngIf="stepTransfer<=1">query_builder</mat-icon>
-                <mat-icon matListIcon *ngIf="stepTransfer==2" color="accent">done</mat-icon>
-                <mat-icon matListIcon *ngIf="stepTransfer==3" color="warn">warning</mat-icon>
-                <p matLine>Envoi du fichier sur le cloud.</p>
-                <p matLine *ngIf="stepTransfer==1"><mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar></p>
-                <p matLine *ngIf="stepTransfer==2"><mat-progress-bar color="accent" mode="determinate" [value]="100"></mat-progress-bar></p>
-                <p matLine *ngIf="stepTransfer==3"><mat-progress-bar color="warn" mode="determinate" [value]="100"></mat-progress-bar></p>
+                <mat-icon matListItemIcon *ngIf="stepTransfer<=1">query_builder</mat-icon>
+                <mat-icon matListItemIcon *ngIf="stepTransfer==2" color="accent">done</mat-icon>
+                <mat-icon matListItemIcon *ngIf="stepTransfer==3" color="warn">warning</mat-icon>
+                <p matListItemTitle>Envoi du fichier sur le cloud.</p>
+                <p matListItemLine *ngIf="stepTransfer==1"><mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar></p>
+                <p matListItemLine *ngIf="stepTransfer==2"><mat-progress-bar color="accent" mode="determinate" [value]="100"></mat-progress-bar></p>
+                <p matListItemLine *ngIf="stepTransfer==3"><mat-progress-bar color="warn" mode="determinate" [value]="100"></mat-progress-bar></p>
             </mat-list-item>
             <mat-list-item [disabled]="stepTransfer==-1">
-                <mat-icon matListIcon *ngIf="stepJoint<=1">query_builder</mat-icon>
-                <mat-icon matListIcon *ngIf="stepJoint==2" color="accent">done</mat-icon>
-                <mat-icon matListIcon *ngIf="stepJoint==3" color="warn">warning</mat-icon>
-                <p matLine>Mise en pièce jointe du bail.</p>
-                <p matLine *ngIf="stepJoint==1"><mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar></p>
-                <p matLine *ngIf="stepJoint==2"><mat-progress-bar color="accent" mode="determinate" [value]="100"></mat-progress-bar></p>
-                <p matLine *ngIf="stepJoint==3"><mat-progress-bar color="warn" mode="determinate" [value]="100"></mat-progress-bar></p>
+                <mat-icon matListItemIcon *ngIf="stepJoint<=1">query_builder</mat-icon>
+                <mat-icon matListItemIcon *ngIf="stepJoint==2" color="accent">done</mat-icon>
+                <mat-icon matListItemIcon *ngIf="stepJoint==3" color="warn">warning</mat-icon>
+                <p matListItemTitle>Mise en pièce jointe du bail.</p>
+                <p matListItemLine *ngIf="stepJoint==1"><mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar></p>
+                <p matListItemLine *ngIf="stepJoint==2"><mat-progress-bar color="accent" mode="determinate" [value]="100"></mat-progress-bar></p>
+                <p matListItemLine *ngIf="stepJoint==3"><mat-progress-bar color="warn" mode="determinate" [value]="100"></mat-progress-bar></p>
             </mat-list-item>
             <mat-list-item [disabled]="stepMail==-1">
-                <mat-icon matListIcon *ngIf="stepMail<=1">query_builder</mat-icon>
-                <mat-icon matListIcon *ngIf="stepMail==2" color="accent">done</mat-icon>
-                <mat-icon matListIcon *ngIf="stepMail==3" color="warn">warning</mat-icon>
-                <p matLine>Envoi du fichier par mail {{selectedBail?.locataire?.mail}} {{selectedBail?.bien?.proprietaire?.mail}}.</p>
-                <p matLine *ngIf="stepMail==1"><mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar></p>
-                <p matLine *ngIf="stepMail==2"><mat-progress-bar color="accent" mode="determinate" [value]="100"></mat-progress-bar></p>
-                <p matLine *ngIf="stepMail==3"><mat-progress-bar color="warn" mode="determinate" [value]="100"></mat-progress-bar></p>
+                <mat-icon matListItemIcon *ngIf="stepMail<=1">query_builder</mat-icon>
+                <mat-icon matListItemIcon *ngIf="stepMail==2" color="accent">done</mat-icon>
+                <mat-icon matListItemIcon *ngIf="stepMail==3" color="warn">warning</mat-icon>
+                <p matListItemTitle>Envoi du fichier par mail {{selectedBail?.locataire?.mail}} {{selectedBail?.bien?.proprietaire?.mail}}.</p>
+                <p matListItemLine *ngIf="stepMail==1"><mat-progress-bar color="accent" mode="indeterminate"></mat-progress-bar></p>
+                <p matListItemLine *ngIf="stepMail==2"><mat-progress-bar color="accent" mode="determinate" [value]="100"></mat-progress-bar></p>
+                <p matListItemLine *ngIf="stepMail==3"><mat-progress-bar color="warn" mode="determinate" [value]="100"></mat-progress-bar></p>
             </mat-list-item>
         </mat-list>
     </mat-card-content>
