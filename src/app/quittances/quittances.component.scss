@@ -1,3 +1,17 @@
+.avatar-letter{
+    font-size: 25px;
+    text-align: center;
+    font-weight: bold;
+    color: #FFF;
+    background: #4285f4;
+    line-height: 47px;
+}
+.mdc-list-item__end{
+    font-size: 1em;
+}
+mat-card-actions{
+    flex-direction: row-reverse!important;
+}
 form, mat-card{
     width: 95%;
     margin: 10px auto;
@@ -36,7 +50,7 @@ mat-checkbox {
     background: #AAA;
     font-weight: bold;
     font-size:1.3em;
-    margin: 40px 0;
+    margin: 40px 0 30px 0;
     text-align:center;
     padding: 5px;
     border: 1px solid #000;
@@ -53,9 +67,16 @@ mat-checkbox {
 #quittance > .subtitle > div:first-child {
     background: #AAA;
     font-weight: bold;
+    height: 25px;
+    text-transform: uppercase;
+    line-height: 1.6;
 }
 #quittance > .subtitle > div:last-child {
     font-size:0.8em;
+    vertical-align: middle;
+    display: table-cell;
+    height: 100px;
+    padding: 3px;
 }
 #quittance > .texte{
     margin-top: 20px;

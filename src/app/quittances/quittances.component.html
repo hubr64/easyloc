@@ -5,6 +5,39 @@
     <span class="flex"></span>
 </mat-toolbar>
 
+<mat-card appearance="outlined">
+    <mat-card-header>
+        <div mat-card-avatar class="avatar-letter"><mat-icon>euro</mat-icon></div>
+        <mat-card-title>Mouvements</mat-card-title>
+        <mat-card-subtitle>Liste des mouvements acquittés</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+        <mat-list>
+            <mat-list-item>
+              <mat-icon matListItemIcon color="primary">euro</mat-icon>
+              <span matListItemTitle>{{mouvement.libelle}}</span>
+              <span matListItemLine>{{mouvement.tiers}} - {{mouvement.date | date:'shortDate':'fr-FR' }}</span>
+              <span matListItemMeta>{{mouvement.montant  | currency:'EUR':'symbol':'1.2-2'}}</span>
+            </mat-list-item>
+            <mat-list-item *ngFor="let otherMouvement of otherMouvements">
+                <mat-icon matListItemIcon color="accent">euro</mat-icon>
+                <span matListItemTitle>{{otherMouvement.libelle}}</span>
+                <span matListItemLine>{{otherMouvement.tiers}} - {{otherMouvement.date | date:'shortDate':'fr-FR' }}</span>
+                <span matListItemMeta>{{otherMouvement.montant  | currency:'EUR':'symbol':'1.2-2'}}</span>
+              </mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item *ngIf="otherMouvements.length > 0">
+            <mat-icon matListItemIcon color="accent">functions</mat-icon>
+            <span matListItemTitle>TOTAL</span>
+            <span matListItemMeta>{{getTotalMouvements()  | currency:'EUR':'symbol':'1.2-2'}}</span>
+          </mat-list-item>
+        </mat-list>
+    </mat-card-content>
+    <mat-card-actions>
+        <button mat-flat-button color="primary" type="button" (click)="addMouvementSecondaire()" ><mat-icon>add</mat-icon>Ajouter</button>
+    </mat-card-actions>
+</mat-card>
+
 <form [formGroup]="quittanceForm" (ngSubmit)="generate()">
     <div class="form-group">
         <mat-form-field appearance="fill">
@@ -99,20 +132,30 @@
     <div class="texte">
         Fait à <b>{{quittanceForm.value.localisation}}</b>, le <b>{{generationDate | date:'shortDate':'fr-FR'}}</b>
     </div>
-    <div class="texte">
+    <div class="texte" *ngIf="otherMouvements.length==0">
         Je soussigné <b>{{selectedBail.bien.proprietaire.nom}}</b>, propriétaire du logement désigné ci-dessus, déclare avoir reçu de 
         <b>{{selectedBail.locataire.nom}}</b>, la somme de <b>{{mouvement.montant}} €uros</b>, au titre du paiement du loyer, charges et accessoires pour la 
         période de location du mois de <b>{{bailPeriodeShort}}</b> et lui en donne quittance, sous réserve de tous mes droits.
     </div>
-    <div class="texte">
-        <u>Détails du règlement :</u>
+    <div class="texte" *ngIf="otherMouvements.length>0">
+        Je soussigné <b>{{selectedBail.bien.proprietaire.nom}}</b>, propriétaire du logement désigné ci-dessus, déclare avoir reçu l'ensemble des virements suivants 
+        au titre du paiement du loyer, charges et accessoires pour la période de location du mois de <b>{{bailPeriodeShort}}</b> et donne quittance à
+        <b>{{selectedBail.locataire.nom}}</b>, sous réserve de tous mes droits.
+
         <ul>
-            <li>Loyer nu : <b>{{quittanceLoyer}} €</b></li>
-            <li>Provisions de charges : <b>{{quittanceCharges}} €</b></li>
-            <li>Montant total du terme : <b>{{quittanceLoyer + quittanceCharges}} €</b></li>
-            <li>Paiement reçu : <b>{{mouvement.montant}} €</b></li>
-            <li>Solde à payer : <b>{{quittanceLoyer + quittanceCharges - mouvement.montant}} €</b></li>
-            <li>Reçu le : <b>{{mouvement.date | date:'fullDate':'fr-FR'}}</b></li>
+            <li>{{mouvement.tiers}} : {{mouvement.montant}} € <small>(reçu le {{mouvement.date | date:'fullDate':'fr-FR'}})</small></li>
+            <li *ngFor="let otherMouvement of otherMouvements">{{otherMouvement.tiers}} : {{otherMouvement.montant}} € <small>(reçu le {{otherMouvement.date | date:'fullDate':'fr-FR'}})</small></li>
+        </ul>
+    </div>
+    <div class="texte">
+        <u>Détails des montants :</u>
+        <ul>
+            <li>Loyer nu : <b>{{quittanceLoyer | currency:'EUR':'symbol':'1.2-2'}}</b></li>
+            <li>Provisions de charges : <b>{{quittanceCharges | currency:'EUR':'symbol':'1.2-2'}}</b></li>
+            <li>Montant total du terme : <b>{{(quittanceLoyer + quittanceCharges)| currency:'EUR':'symbol':'1.2-2'}}</b></li>
+            <li>Paiement total reçu : <b>{{getTotalMouvements() | currency:'EUR':'symbol':'1.2-2'}}</b></li>
+            <li>Solde à payer : <b>{{ (quittanceLoyer + quittanceCharges - getTotalMouvements()) | currency:'EUR':'symbol':'1.2-2' }}</b></li>
+            <li *ngIf="otherMouvements.length==0">Reçu le : <b>{{mouvement.date | date:'fullDate':'fr-FR'}}</b></li>
         </ul>
     </div>
     <div class="texte">
