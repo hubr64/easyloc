@@ -1,11 +1,12 @@
 import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { MatDialog} from '@angular/material/dialog';
 import { Location } from '@angular/common';
 
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import {DateAdapter, NativeDateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from '@angular/material/core';
+import {DateAdapter, NativeDateAdapter, MAT_DATE_LOCALE} from '@angular/material/core';
 
 import { Bail } from '../_modeles/bail';
 import { Piece } from '../_modeles/piece';
@@ -15,6 +16,7 @@ import { MailService } from '../_services/mail.service';
 import { DocumentService } from '../_services/document.service';
 import { AlertService } from '../_services/alert.service';
 import { ConfigurationService } from '../_services/configuration.service';
+import { MouvementPickDialogComponent } from '../mouvement-pick-dialog/mouvement-pick-dialog.component';
 
 //French month names (easyer to define them rather then import complex JS lib as moment)
 const MOIS_FR: string[] = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
@@ -44,16 +46,18 @@ export class QuittancesComponent implements OnInit {
   public quittanceForm: FormGroup;
   //The HTML element that contains element to display in PDF
   @ViewChild('quittance') quittance: ElementRef;
-  //PDF page size
-  private quittanceFileNamePrefix: string = 'quittance_';
+  //Various quittance information
   private quittanceMailSujet: string = '';
   private quittanceMailText: string = '';
   private quittanceLocalisation: string = '';
   //Quittance file
   public quittanceDoc: any;
   public pdfFileName: string = "";
-  //Current locataire, bailleur and bien
+  //Main mouvement that will contain the quittance
   public mouvement: Mouvement;
+  //Secondary quittances display inside
+  public otherMouvements: Mouvement[];
+  //Current locataire, bailleur and bien
   public selectedBail: Bail | null;
   public bailPeriodeShort : string;
   public bailPeriodeLong : string;
@@ -70,20 +74,20 @@ export class QuittancesComponent implements OnInit {
 
   constructor(
     private cdRef: ChangeDetectorRef,
-    private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     public mailService: MailService,
     public driveService: DriveService,
     public documentService: DocumentService,
     public alertService: AlertService,
     public configurationService: ConfigurationService,
-    private _elementRef : ElementRef,
-    private location: Location) { 
+    private location: Location,
+    public dialog: MatDialog) { 
       //Get configuration for quittance generation
-      this.quittanceFileNamePrefix = this.configurationService.getValue('quittanceFileNamePrefix');
       this.quittanceMailSujet = this.configurationService.getValue('quittanceMailSujet');
       this.quittanceMailText = this.configurationService.getValue('quittanceMailText');
       this.quittanceLocalisation = this.configurationService.getValue('quittanceLocalisation');
+      //By default no other mouvements
+      this.otherMouvements = [];
   }
 
   ngOnInit(): void {
@@ -170,6 +174,45 @@ export class QuittancesComponent implements OnInit {
     }
   }
 
+  addMouvementSecondaire(){
+    //Display a dialog to add a piece
+    const dialogRef = this.dialog.open(MouvementPickDialogComponent, {
+      data: {
+        multiple: true,
+        defaultBien: this.mouvement.bien
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result:any) => {
+      //If user has choosed a mouvement
+      if(result){
+        // If one or more
+        if(result.length>0){
+          //For each file selected
+          result.forEach((mouvement:Mouvement) => {
+            // Add the new piece in the list of pieces only if it doesn't exist
+            if (this.otherMouvements.indexOf(mouvement, 0) == -1 && this.mouvement != mouvement) {
+              this.otherMouvements.push(mouvement);
+            }
+          });
+        }
+      }
+    });
+  }
+
+  getTotalMouvements(): number{
+
+    var total: number = 0;
+    //First add amount of the main mouvement
+    total += this.mouvement.montant;
+    //Then add amount of eahc secondary mouvements
+    this.otherMouvements.forEach((otherMouvement:Mouvement) => {
+      total += otherMouvement.montant;
+    });
+    //Return final result
+    return total;
+  }
+
   closeDatePicker(eventData: any, dp?:any) {
     // get month and year from eventData and close datepicker, thus not allowing user to select date
     dp.close();
@@ -248,8 +291,6 @@ export class QuittancesComponent implements OnInit {
     const tmpSelectedMonth = new Date(this.quittanceForm.value.mois);
 
     //Compute file name
-    //const fileDate = this.generationDate.getFullYear() + "-" + (this.generationDate.getMonth()+1<10?'0':'') + (this.generationDate.getMonth()+1) + "-" + (this.generationDate.getDate()<10?'0':'') + this.generationDate.getDate();
-    //this.pdfFileName = this.quittanceFileNamePrefix + fileDate + "-" + (this.selectedBail?this.selectedBail.bien.nom:'') + ".pdf";
     this.pdfFileName = (this.selectedBail?this.selectedBail.locataire.nom.replace(/\s/g, ""):'') + "_" +
       (this.selectedBail?this.selectedBail.bien.nom.replace(/\s/g, ""):'') + "_" +
       'Quittance' + "_" +
@@ -309,7 +350,7 @@ export class QuittancesComponent implements OnInit {
           });
         }
 
-        //If user wants, send it direclty bay mail
+        //If user wants, send it directlty bay mail
         if(this.stepMail == 1){
           if(this.selectedBail){
             //Get mail destination
