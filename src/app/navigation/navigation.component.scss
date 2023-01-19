@@ -2,7 +2,7 @@
   z-index:2!important;
 }
 mat-sidenav-content {
-  min-height: 600px;
+  min-height: 650px;
 }
 @media print{    
   .sidenav-container{
@@ -10,7 +10,6 @@ mat-sidenav-content {
   }
   mat-sidenav-content{
     margin-left:0px!important;
-    background: #FFF;
   }
 }
 .sidenav .mat-toolbar {

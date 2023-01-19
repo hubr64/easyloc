@@ -6,6 +6,9 @@ body {
     font-family: "Raleway"!important; 
     background-color: #fafafa;
 }
+body.dark-theme {
+    background-color: #303030;
+}
 @media print{    
     body {
         background-color: #fff;
