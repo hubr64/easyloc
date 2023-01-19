@@ -345,10 +345,12 @@ export class EventService {
             if(assuranceDateOfYear > currentDate){
                 assuranceDateOfYear.setFullYear(assuranceDateOfYear.getFullYear() - 1);
             }
-            //Compute start and end date of the analyses
+            //Compute start of the analysis (at least one year before the due date)
             var startAnalysisAssuranceDate = new Date(assuranceDateOfYear.getTime());
             startAnalysisAssuranceDate.setFullYear(startAnalysisAssuranceDate.getFullYear() - 1);
+            //Compute end date of the analysis (at least one month after the due date)
             var endAnalysisAssuranceDate = assuranceDateOfYear;
+            endAnalysisAssuranceDate.setMonth(endAnalysisAssuranceDate.getMonth() + 1);
 
             //Browse all mouvements to look for assurance
             this.documentService.document.mouvements.forEach((mouvement:Mouvement) => {
