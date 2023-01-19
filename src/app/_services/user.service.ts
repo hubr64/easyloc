@@ -15,7 +15,6 @@ export class UserService {
     //Gis Clients 
     public g_client_id: string = "474764062918-h31g2d341hajtdhipuggq6uagnfi10rl.apps.googleusercontent.com";
     private gis_token_client: any;
-    private gis_code_client: any;
     //Authentification token
     public gis_token: any;
     // The current gapi user connected
@@ -98,20 +97,6 @@ export class UserService {
                     console.error(error);
                 }
             });
-            //Init the Google code client with client id, drive and mail scope and scope only for the first time
-            this.gis_code_client = google.accounts.oauth2.initCodeClient({
-                client_id: this.g_client_id,
-                scope: 'https://www.googleapis.com/auth/drive \
-                        https://www.googleapis.com/auth/gmail.send',
-                prompt: '',
-                callback: (codeResponse: any) => {
-                    console.log("UserService:googleInitClient:initCodeClient:callback");
-                },
-                error_callback: (error: any) => {
-                    console.dir("Impossible to init the google code client.")
-                    console.error(error);
-                }
-            });
         }catch(error:any){
             this.alertService.error("Impossible de se connecter à Google pour charger les fonctions d'authentification ! Veuillez réessayer ultérieurement.")
         }
@@ -137,24 +122,6 @@ export class UserService {
                 console.log("UserService:handleCredentials : Wait 5 more seconds as the client is still not loaded.");
                 setTimeout(() => this.handleCredentials(response), 1000);
             }
-        }
-    }
-
-    public getAuthCode() {
-        if(this.gis_code_client){
-            // Request authorization code and obtain user consent
-            this.gis_code_client.requestCode();
-        }else{
-            this.alertService.error("Impossible de se connecter à Google pour récupérer les codes d'authentification ! Veuillez réessayer ultérieurement.")
-        }
-    }
-    
-    public getToken(){
-        if(this.gis_token_client){
-            // Request access token and obtain user consent
-            this.gis_token_client.requestAccessToken({prompt: 'none'});
-        }else{
-            this.alertService.error("Impossible de se connecter à Google pour récupérer le jeton d'authentification ! Veuillez réessayer ultérieurement.")
         }
     }
 
