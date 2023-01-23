@@ -169,6 +169,7 @@ export class CompteurListeComponent {
       if(result){
         compteur.id = result.id;
         compteur.designation = result.designation;
+        compteur.commentaires = result.commentaires;
         this.documentService.document.biens.forEach((docBien:Bien) => {
           if(docBien.id == result.bien){
             compteur.bien = docBien;
