@@ -7,7 +7,7 @@ export class AlertService {
 
     public message: string = "";
     public type: string = "";
-    private horizontalPosition: MatSnackBarHorizontalPosition = 'end';
+    private horizontalPosition: MatSnackBarHorizontalPosition = 'center';
     private verticalPosition: MatSnackBarVerticalPosition = 'bottom';
     private messageDuration: number = 3;
 
@@ -36,7 +36,7 @@ export class AlertService {
             horizontalPosition: this.horizontalPosition,
             verticalPosition: this.verticalPosition,
             panelClass: 'error-alert',
-            duration: this.messageDuration * 1000
+            duration: this.messageDuration * 2 * 1000
           });
     }
 

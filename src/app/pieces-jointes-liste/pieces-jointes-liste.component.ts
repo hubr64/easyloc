@@ -29,7 +29,14 @@ export class PiecesJointesListeComponent implements OnInit {
 
   ngOnInit(): void {
     //Get missed pieces for changing color of the badge
-    this.missedPieces = this.eventService.checkPiecesObligatoires(this.container)
+    this.missedPieces = this.eventService.checkPiecesObligatoires(this.container);
+
+    //If document is reloaded then get data again
+    this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
+      if(isLoaded){
+        this.missedPieces = this.eventService.checkPiecesObligatoires(this.container);
+      }
+    });
   }
 
   openPieces(): void {

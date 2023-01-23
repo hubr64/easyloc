@@ -45,6 +45,7 @@ export class ConfigurationService {
       'bailUnpaiedLoyerNb': { advanced: false, title: 'Nombre de mois à analyser pour loyer impayé', value: Configuration.CONFIG["bailUnpaiedLoyerNb"], categorie: 'notifications' },
       'dureeRevisionLoyer': { advanced: false, title: 'Durée avant nouvelle révision de loyer (en jours)', value: Configuration.CONFIG["dureeRevisionLoyer"], categorie: 'notifications' },
       'nbCheckQuittance': { advanced: false, title: 'Nombre de mois à analyser pour paiement sans quittance', value: Configuration.CONFIG["nbCheckQuittance"], categorie: 'notifications' },
+      'margePaiementAssurance': { advanced: false, title: 'Marge de paiement assurance vs date échéance (en mois)', value: Configuration.CONFIG["margePaiementAssurance"], categorie: 'notifications' },
       'impotDeductionForfaitaire': { advanced: false, title: 'Taux de déduction forfaitaire des revenus imposables', value: Configuration.CONFIG["impotDeductionForfaitaire"], categorie: 'tune' },
       'mouvementAutoCompleteIn': { advanced: false, title: 'Proposition textes de mouvements entrants (séparé par ";")', value: Configuration.CONFIG["mouvementAutoCompleteIn"], categorie: 'web_asset' },
       'mouvementAutoCompleteOut': { advanced: false, title: 'Proposition textes de mouvements sortants (séparé par ";")', value: Configuration.CONFIG["mouvementAutoCompleteOut"], categorie: 'web_asset' },

@@ -19,6 +19,7 @@ export const CONFIG: { [key: string]: any } = {
   'bailUnpaiedLoyerNb': 3,
   'dureeRevisionLoyer': 365,
   'nbCheckQuittance': 12,
+  'margePaiementAssurance': 1,
   'impotDeductionForfaitaire': 0.3,
   'mouvementAutoCompleteIn': 'Loyer;Régularisation de charges;Remboursement',
   'mouvementAutoCompleteOut': 'Taxe foncière;Assurance prêt immobilier;Assurance PNO;Provision sur charges;Intérêts d\'emprunt;Frais de dossier prêt immobilier;Travaux;Achat;Régularisation de charges;Frais de garantie',

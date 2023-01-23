@@ -12,8 +12,6 @@ import { Bailleur, BailleurType } from '../_modeles/bailleur';
 import { Bien } from '../_modeles/bien';
 import { Piece } from '../_modeles/piece';
 import { Bail } from '../_modeles/bail';
-import { Mouvement } from '../_modeles/mouvement';
-import { BailleurListeComponent } from '../bailleur-liste/bailleur-liste.component';
 import { DialogReloadComponent } from '../dialog-reload/dialog-reload.component';
 
 declare const gapi: any;
@@ -82,9 +80,10 @@ export class DocumentService {
   public load(reloadVersion: number = -1){
 
     if(reloadVersion!=-1){
-      //console.dir(this.document);
-      //First indicate that the document has to be loaded
+      //First indicate that the document has to be loaded again
       this.docIsLoadedChange.next(false);
+      //Display an alert message
+      this.alertService.success("Rechargement du document en cours...")
     }
     //Indicate that we load
     this.isLoading = true;
@@ -98,9 +97,7 @@ export class DocumentService {
         if(reloadVersion!=-1){
           this.driveService.dataFileVersion = reloadVersion;
         }
-        console.log("Document version "+this.driveService.dataFileVersion+" is loaded");
-        this.isLoading = false;
-        this.docIsLoadedChange.next(true);
+        
         //Memorize the document for modification tracking change
         this.oldDocument = JSON.stringify(this.document.toJSON());
         this.docIsModified = false;
@@ -108,12 +105,19 @@ export class DocumentService {
         if(reloadVersion==-1){
           this.watchSyncId = setInterval(() => this.watchDocumentSync(), this.autoSyncDuration * 1000);
           this.watchModifId = setInterval(() => this.watchDocumentModification(), this.autoSaveDuration * 1000);
+        }else{
+          //Display an alert message
+          this.alertService.success("Rechargement du document terminé...")
         }
+
+        //Everything is now loaded
+        console.log("Document version "+this.driveService.dataFileVersion+" is loaded");
+        this.isLoading = false;
+        this.docIsLoadedChange.next(true);
       });
     }else{
       // If drive is not compliant we are not loading
       this.isLoading = false;
-      
     }
   }
 
@@ -416,6 +420,13 @@ export class DocumentService {
         }
       }
     }
+    for (var _i = 0; _i < this.document.compteurs.length; _i++) {
+      for (var _j = 0; _j < this.document.compteurs[_i].valeurs.length; _j++) {
+        if (this.document.compteurs[_i].valeurs[_j].preuve == piece) {
+          this.document.compteurs[_i].valeurs[_j].preuve = null;
+        }
+      }
+    }
   }
 
   public getPieceUsage(piece: Piece){
@@ -439,6 +450,18 @@ export class DocumentService {
       if(this.document.bails[_i].pieces.indexOf(piece, 0) > -1){
         pieceUsers.push(this.document.bails[_i]);
       }
+    }
+    for (var _i = 0; _i < this.document.mouvements.length; _i++) {
+      if (this.document.mouvements[_i].quittance == piece) {
+        pieceUsers.push(this.document.mouvements[_i]);
+      }
+    }
+    for (var _i = 0; _i < this.document.compteurs.length; _i++) {
+      for (var _j = 0; _j < this.document.compteurs[_i].valeurs.length; _j++) {
+        if (this.document.compteurs[_i].valeurs[_j].preuve == piece) {
+          pieceUsers.push(this.document.compteurs[_i]);
+        }
+      } 
     }
     return pieceUsers;
   }

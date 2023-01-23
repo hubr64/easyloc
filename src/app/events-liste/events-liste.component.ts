@@ -50,7 +50,7 @@ export class EventsListeComponent implements OnInit {
   }
 
   public openEvents(): void {
-    //Open the list of pieces in a bottom sheet
+    //Open the list of events in a bottom sheet
     this._bottomSheet.open(EventsListeComponentSheet, {
       data: {
         container: this.container

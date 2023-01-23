@@ -46,6 +46,13 @@ export class PieceDetailsComponent implements OnInit {
     });
 
     this.getData();
+
+    //If document is reloaded then get data again
+    this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
+      if(isLoaded){
+          this.getData();
+      }
+    });
   }
 
   get id() { return this.pieceForm.get('id'); }

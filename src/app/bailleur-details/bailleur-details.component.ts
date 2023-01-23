@@ -61,6 +61,13 @@ export class BailleurDetailsComponent implements OnInit {
       'commentaire': new FormControl('')
     });
     this.getData();
+
+    //If document is reloaded then get data again
+    this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
+      if(isLoaded){
+          this.getData();
+      }
+    });
   }
 
   get nom() { return this.bailleurForm.get('nom'); }

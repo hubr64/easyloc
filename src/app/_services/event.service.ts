@@ -334,6 +334,8 @@ export class EventService {
         //Result of the analysis
         var isNotAssure: boolean = true;
         var mouvementAssure: Mouvement|undefined = undefined;
+        //First get in configuration the marge to pay assurance
+        var margePaiementAssurance = parseInt(this.configurationService.getValue("margePaiementAssurance"));
 
         //We can only check bien with an assurance date defined
         if(bien.dateAssurance){
@@ -350,7 +352,7 @@ export class EventService {
             startAnalysisAssuranceDate.setFullYear(startAnalysisAssuranceDate.getFullYear() - 1);
             //Compute end date of the analysis (at least one month after the due date)
             var endAnalysisAssuranceDate = assuranceDateOfYear;
-            endAnalysisAssuranceDate.setMonth(endAnalysisAssuranceDate.getMonth() + 1);
+            endAnalysisAssuranceDate.setMonth(endAnalysisAssuranceDate.getMonth() + margePaiementAssurance);
 
             //Browse all mouvements to look for assurance
             this.documentService.document.mouvements.forEach((mouvement:Mouvement) => {

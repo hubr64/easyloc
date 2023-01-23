@@ -44,6 +44,18 @@ export class PiecesJointesFicheComponent implements OnInit {
 
   ngOnInit(): void {
 
+    //Compute list of pieces
+    this.getData();
+
+    //If document is reloaded then get data again and recompute list of pieces
+    this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
+      if(isLoaded){
+          this.getData();
+      }
+    });
+  }
+
+  public getData(){
     this.mandatoryPieces = [];
     this.specificPieces = [];
     this.otherPieces = [];

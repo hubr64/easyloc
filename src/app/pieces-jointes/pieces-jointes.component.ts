@@ -17,6 +17,9 @@ import { PiecesChoixComponent } from '../pieces-choix/pieces-choix.component';
 })
 export class PiecesJointesComponent {
 
+  //Injected data 
+  private injectedData: any;
+  //List of pieced to display
   public pieces: Piece[] = [];
   //COnversion of pieces codes into strings
   public pieceCode = PIECECODE;
@@ -35,10 +38,22 @@ export class PiecesJointesComponent {
     public dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) { 
+    //Memorize injected data
+    this.injectedData = data;
+    //Get displayed data
+    this.getData();
+    //If document is reloaded then get data again
+    this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
+      if(isLoaded){
+        this.getData();
+      }
+    });
+  }
 
-    if(data.piecesContainer.pieces){
+  public getData(){
+    if(this.injectedData.piecesContainer.pieces){
       //Get pieces locally
-      this.pieces = data.piecesContainer.pieces;
+      this.pieces = this.injectedData.piecesContainer.pieces;
       // For each piece found try to get the link
       this.pieces.forEach((piece:Piece) => {
         this.driveService.get(piece.id).then( 
@@ -57,7 +72,7 @@ export class PiecesJointesComponent {
       });
     }
     //Get missed pieces for displaying them in the list
-    this.missedPieces = this.eventService.checkPiecesObligatoires(data.piecesContainer)
+    this.missedPieces = this.eventService.checkPiecesObligatoires(this.injectedData.piecesContainer)
   }
 
   addPiece(){

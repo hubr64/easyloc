@@ -65,23 +65,18 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
     //Get data
     this.getData();
 
-    this.mouvements = [];
-    for (var _i = 0; _i < this.documentService.document.mouvements.length; _i++) {
-      // Find the requested one
-      if(this.documentService.document.mouvements[_i].bien.id == this.bien.id){
-        this.mouvements.push(this.documentService.document.mouvements[_i]);
+    //If document is reloaded then get data again and recompute list of mouvements
+    this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
+      if(isLoaded){
+          this.getData();
+          this.getMouvements();
       }
-    }
-    
-    // Configure table
-    this.dataSource = new MatTableDataSource(this.mouvements);
+    });
   }
 
   ngAfterViewInit(): void {
-    
-
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    //Get mouvements for this bien
+    this.getMouvements();
   }
 
   getData(): void {
@@ -114,6 +109,20 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
       this.goBack();
       this.alertService.error('Aucun bien demandé !');
     }
+  }
+
+  public getMouvements(){
+    this.mouvements = [];
+    for (var _i = 0; _i < this.documentService.document.mouvements.length; _i++) {
+      // Find the requested one
+      if(this.documentService.document.mouvements[_i].bien.id == this.bien.id){
+        this.mouvements.push(this.documentService.document.mouvements[_i]);
+      }
+    }
+    // Configure table
+    this.dataSource = new MatTableDataSource(this.mouvements);
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
   }
 
   public goBack(): void {

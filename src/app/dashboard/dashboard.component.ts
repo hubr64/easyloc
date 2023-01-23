@@ -32,10 +32,6 @@ export class DashboardComponent {
   //Whether the list of pissing pieces or warning is big or small (small by default)
   public rowSpanWarn = 2;
   public rowSpanStats = 2;
-  //List of events
-  /*
-  public eventGravite: number = 2;
-  */
 
   constructor(
     public alertService: AlertService,
@@ -43,9 +39,7 @@ export class DashboardComponent {
     public documentService: DocumentService,
     public userService: UserService,
     public dialog: MatDialog) {
-
   }
-
 
   addMouvement(): void {
     //Display a confirmation dialog

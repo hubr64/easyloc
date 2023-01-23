@@ -10,16 +10,12 @@ import { TYPEICON } from '../_modeles/easyloc.data';
 })
 export class PieceUsersComponent {
 
-  public urlUser: {[key: string]: string} = {};
   public userTypeIcon = TYPEICON;
 
   constructor(
     @Inject(MAT_BOTTOM_SHEET_DATA) public data: any,
     private _bottomSheetRef: MatBottomSheetRef<PieceUsersComponent>,
     private router: Router) { 
-      data.users.forEach((pieceUser: any) => {
-        this.urlUser[pieceUser.id] = "/"+pieceUser.className.toLowerCase( )+"/"+pieceUser.id;
-      });
     }
 
     detachUser(user:any, event: any){
