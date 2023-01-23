@@ -9,7 +9,7 @@
 <mat-tab-group mat-stretch-tabs mat-align-tabs="start">
     <mat-tab>
         <ng-template mat-tab-label>
-            <mat-icon class="tab-label-icon">info</mat-icon> Détails
+            <mat-icon class="tab-label-icon">info</mat-icon><span class="tab-label-text">Détails</span>
         </ng-template>
         <form [formGroup]="bienForm" (ngSubmit)="save()">
             <h3><button mat-mini-fab color="accent"><mat-icon>info</mat-icon></button> Généralités</h3>
@@ -129,25 +129,31 @@
     </mat-tab>
     <mat-tab [disabled]="!bien">
         <ng-template mat-tab-label>
-            <mat-icon class="tab-label-icon">book</mat-icon> Pièces jointes
+            <mat-icon class="tab-label-icon">book</mat-icon><span class="tab-label-text">Pièces jointes</span>
         </ng-template>
         <app-pieces-jointes-details *ngIf="bien" [container]="bien"></app-pieces-jointes-details>
     </mat-tab>
     <mat-tab [disabled]="!bien">
-            <ng-template mat-tab-label>
-                <mat-icon class="tab-label-icon">query_stats</mat-icon> Statistiques
-            </ng-template>
-            <app-statistiques-details *ngIf="bien" [defaultBien]="bien"></app-statistiques-details>
-        </mat-tab>
+        <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">query_stats</mat-icon><span class="tab-label-text">Statistiques</span>
+        </ng-template>
+        <app-statistiques-details *ngIf="bien" [defaultBien]="bien"></app-statistiques-details>
+    </mat-tab>
     <mat-tab [disabled]="!bien">
         <ng-template mat-tab-label>
-            <mat-icon class="tab-label-icon">euro_symbol</mat-icon> Mouvements
+            <mat-icon class="tab-label-icon">euro_symbol</mat-icon><span class="tab-label-text">Mouvements</span>
         </ng-template>
         <app-mouvement-liste *ngIf="bien" [embedded]="true" [defaultBien]="bien"></app-mouvement-liste>
     </mat-tab>
     <mat-tab [disabled]="!bien">
         <ng-template mat-tab-label>
-            <mat-icon class="tab-label-icon">account_balance</mat-icon> Impôts
+            <mat-icon class="tab-label-icon">pin</mat-icon><span class="tab-label-text">Compteurs</span>
+        </ng-template>
+        <app-compteur-liste *ngIf="bien" [embedded]="true" [defaultBien]="bien"></app-compteur-liste>
+    </mat-tab>
+    <mat-tab [disabled]="!bien">
+        <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">account_balance</mat-icon><span class="tab-label-text">Impôts</span>
         </ng-template>
         <app-statistiques-impots *ngIf="bien" [defaultBien]="bien"></app-statistiques-impots>
     </mat-tab>
