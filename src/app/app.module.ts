@@ -92,6 +92,8 @@ import { EventsListeComponent, EventsListeComponentSheet } from './events-liste/
 import { EventsComponent } from './events/events.component';
 import { EventsFicheComponent } from './events-fiche/events-fiche.component';
 import { MouvementPickDialogComponent } from './mouvement-pick-dialog/mouvement-pick-dialog.component';
+import { CompteurListeComponent } from './compteur-liste/compteur-liste.component';
+import { CompteurDetailsComponent } from './compteur-details/compteur-details.component';
 // Helpers
 import { FilterConfigurationPipe } from './_helpers/filter-configuration.pipe';
 import { DndDirective } from './_helpers/dnd.directive';
@@ -154,7 +156,9 @@ const globalRippleConfig: RippleGlobalOptions = {
     EventsListeComponentSheet,
     EventsComponent,
     EventsFicheComponent,
-    MouvementPickDialogComponent
+    MouvementPickDialogComponent,
+    CompteurListeComponent,
+    CompteurDetailsComponent
   ],
   imports: [
     BrowserModule,

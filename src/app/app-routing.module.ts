@@ -22,6 +22,7 @@ import { QuittancesComponent } from './quittances/quittances.component';
 import { ConditionsComponent } from './conditions/conditions.component';
 import { StatistiquesDetailsComponent } from './statistiques-details/statistiques-details.component';
 import { StatistiquesImpotsComponent } from './statistiques-impots/statistiques-impots.component';
+import { CompteurListeComponent } from './compteur-liste/compteur-liste.component';
 
 const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
@@ -42,6 +43,7 @@ const routes: Routes = [
   { path: 'mouvements', component: MouvementListeComponent },
   { path: 'quittance/:_mouvementid', component: QuittancesComponent },
   { path: 'pieces', component: PieceListeComponent },
+  { path: 'compteurs', component: CompteurListeComponent },
   { path: 'conditions',  component: ConditionsComponent },
   { path: 'statistiques',  component: StatistiquesDetailsComponent },
   { path: 'impots',  component: StatistiquesImpotsComponent },
