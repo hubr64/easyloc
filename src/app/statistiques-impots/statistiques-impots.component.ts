@@ -85,7 +85,6 @@ export class StatistiquesImpotsComponent implements OnInit {
   public bienTotal: BienTotal;
 
   constructor(
-    private alertService: AlertService,
     public documentService: DocumentService,
     public configurationService: ConfigurationService,
     private location: Location
@@ -109,9 +108,16 @@ export class StatistiquesImpotsComponent implements OnInit {
     }else{
       this.selectedBien = "total";
     }
+
+    //If document is reloaded then reset back to be sure that everything will be recompute
+    this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
+      if(isLoaded){
+        this.reset();
+      }
+    });
   }
 
-  //Fonction to come back to glbal configuration generation
+  //Fonction to come back to global configuration generation
   reset(){
     this.computeEnded = false;
   }

@@ -17,7 +17,6 @@ import { Bien } from '../_modeles/bien';
 import { BIENTYPE as bienTypes } from '../_modeles/bien';
 import { Bailleur } from '../_modeles/bailleur';
 import { DialogDeleteConfirmComponent } from '../dialog-delete-confirm/dialog-delete-confirm.component';
-import { MailComponent } from '../mail/mail.component';
 
 @Component({
   selector: 'app-bien-liste',

@@ -17,7 +17,7 @@ import { PiecesChoixComponent } from '../pieces-choix/pieces-choix.component';
 })
 export class PiecesJointesDetailsComponent implements OnInit {
 
-  // COmponent input and output
+  // Component input and output
   @Input() container: any;
   public pieces: Piece[] = [];
   //COnversion of pieces codes into strings
@@ -32,6 +32,13 @@ export class PiecesJointesDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.pieces = this.container.pieces;
+
+    //If document is reloaded then get data again and recompute list of mouvements
+    this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
+      if(isLoaded){
+        this.pieces = this.container.pieces;
+      }
+    });
   }
 
   addPieces(){

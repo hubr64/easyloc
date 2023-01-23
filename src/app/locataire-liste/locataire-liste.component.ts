@@ -210,7 +210,7 @@ export class LocataireListeComponent implements AfterViewInit {
   getBail(locataire: Locataire): Bail | undefined{
     var tmpBail;
     this.documentService.document.bails.forEach((bail:Bail) => {
-      if(bail.locataire == locataire){
+      if(bail.locataire.id == locataire.id){
         tmpBail = bail;
       }
     });
@@ -218,7 +218,6 @@ export class LocataireListeComponent implements AfterViewInit {
   }
 
   getBienLoue(locataire: Locataire): string{
-
     var bail = this.getBail(locataire);
     if(bail){
       return bail.bien.nom;

@@ -86,8 +86,6 @@ export class QuittancesComponent implements OnInit {
       this.quittanceMailSujet = this.configurationService.getValue('quittanceMailSujet');
       this.quittanceMailText = this.configurationService.getValue('quittanceMailText');
       this.quittanceLocalisation = this.configurationService.getValue('quittanceLocalisation');
-      //By default no other mouvements
-      this.otherMouvements = [];
   }
 
   ngOnInit(): void {
@@ -105,6 +103,13 @@ export class QuittancesComponent implements OnInit {
       'mail': new FormControl(true)
     });
     this.getData();
+
+    // Subscribe in case the document was reloaded
+    this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
+      if(isLoaded){
+        this.getData();
+      }
+    });
   }
   get bail() { return this.quittanceForm.get('bail'); }
   get localisation() { return this.quittanceForm.get('localisation'); }
@@ -113,6 +118,8 @@ export class QuittancesComponent implements OnInit {
   get mail() { return this.quittanceForm.get('mail'); }
 
   getData(): void {
+    //By default no other mouvements
+    this.otherMouvements = [];
     //Get parameter id to check if it's new or existing
     const reqMouvementId = this.route.snapshot.paramMap.get('_mouvementid');
     //If an existing one is edited
@@ -130,7 +137,7 @@ export class QuittancesComponent implements OnInit {
       //A mouvement has been found try now to get the current bail
       if(this.mouvement){
 
-        ////By default quittance is for themonth corresponding to the mouvement day
+        //By default quittance is for the month corresponding to the mouvement day
         this.quittanceForm.patchValue({mois: this.mouvement.date});
 
         //A bien is correctly defined in the mouvement
@@ -221,7 +228,7 @@ export class QuittancesComponent implements OnInit {
   }
 
   public generate(){
-    //Reinit slected bail 
+    //Reinit selected bail 
     this.selectedBail = null;
     //Get bail from form
     const tmpBail = this.quittanceForm.value.bail;
@@ -235,7 +242,7 @@ export class QuittancesComponent implements OnInit {
     if(this.selectedBail){
       //Reinitialize the quittance file
       this.quittanceDoc = null;
-      //COnfigure steps and action to do
+      //Configure steps and action to do
       this.stepGenerate = 0;
       this.stepTransfer = 0;
       this.stepJoint = 0;

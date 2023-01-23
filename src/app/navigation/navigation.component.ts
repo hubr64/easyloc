@@ -94,7 +94,7 @@ export class NavigationComponent {
         if(this.isLoading){
           //Check if still loading
           this.isLoading = this.userService.isLoading || this.driveService.isLoading || this.documentService.isLoading;
-          //Loading is finsihed then can qui interval
+          //Loading is finished then can quit interval
           if(!this.isLoading){
             this.sub.unsubscribe();
           }

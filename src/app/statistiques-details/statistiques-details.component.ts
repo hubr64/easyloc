@@ -71,6 +71,22 @@ export class StatistiquesDetailsComponent implements OnInit {
 
   ngOnInit(): void {
 
+    this.getData();
+
+    //If document is reloaded then reset back to be sure that everything will be recompute
+    this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
+      if(isLoaded){
+        this.getData();
+      }
+    });
+  }
+
+  public getData(){
+
+    //FIrst init everything
+    this.bilanParAn = {};
+    this.bilan = {};
+
     //Get the current date to have an ended date
     var currentDate = new Date();
 
@@ -213,7 +229,7 @@ export class StatistiquesDetailsComponent implements OnInit {
     }
 
     
-    //Lok for each bien
+    //Look for each bien
     this.documentService.document.biens.forEach( (bien:Bien) => {
       //If the bien is exploited
       if(this.bilanParAn[bien.nom]){

@@ -62,26 +62,19 @@ export class BailFicheComponent implements OnInit, AfterViewInit {
     this.piecesObligatoires = this.configurationService.getValue("piecesObligatoiresBail");
     //Get data
     this.getData();
+    //If document is reloaded then get data again and recompute mouvements
+    this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
+      if(isLoaded){
+          this.getData();
+          this.getMouvements();
+      }
+    });
   }
 
   ngAfterViewInit(): void {
     
-    this.mouvements = [];
-    for (var _i = 0; _i < this.documentService.document.mouvements.length; _i++) {
-      // Find the requested one
-      if(this.documentService.document.mouvements[_i].bien.id == this.bail.bien.id && 
-        this.documentService.document.mouvements[_i].quittance &&
-        this.documentService.document.mouvements[_i].date > this.bail.dateDebut &&
-        (!this.bail.dateFin || this.documentService.document.mouvements[_i].date < this.bail.dateFin)
-      ){
-        this.mouvements.push(this.documentService.document.mouvements[_i]);
-      }
-    }
-    
-    // Configure table
-    this.dataSource = new MatTableDataSource(this.mouvements);
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    //Get specific mouvements related to that bail (mouvement for the bien, with quittance and during the bail)
+    this.getMouvements();
   }
 
   getData(): void {
@@ -110,6 +103,25 @@ export class BailFicheComponent implements OnInit, AfterViewInit {
 
   public goBack(): void {
     this.location.back();
+  }
+
+  public getMouvements(){
+    this.mouvements = [];
+    for (var _i = 0; _i < this.documentService.document.mouvements.length; _i++) {
+      // Find the requested one
+      if(this.documentService.document.mouvements[_i].bien.id == this.bail.bien.id && 
+        this.documentService.document.mouvements[_i].quittance &&
+        this.documentService.document.mouvements[_i].date > this.bail.dateDebut &&
+        (!this.bail.dateFin || this.documentService.document.mouvements[_i].date < this.bail.dateFin)
+      ){
+        this.mouvements.push(this.documentService.document.mouvements[_i]);
+      }
+    }
+    
+    // Configure table
+    this.dataSource = new MatTableDataSource(this.mouvements);
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
   }
 
   public contact(mail:string){
