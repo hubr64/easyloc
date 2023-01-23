@@ -1,0 +1,43 @@
+<h2 mat-dialog-title *ngIf="data.compteur"><mat-icon>edit_square</mat-icon> Modification d'un compteur</h2>
+<h2 mat-dialog-title *ngIf="!data.compteur"><mat-icon>add</mat-icon> Ajout d'un compteur</h2>
+<mat-dialog-content>
+    <form [formGroup]="compteurForm">
+        <mat-form-field appearance="fill">
+            <mat-label>Bien</mat-label>
+            <mat-select id="bien" formControlName="bien" required>
+                <mat-option *ngFor="let bien of documentService.document.biens" [value]="bien.id">
+                    {{bien.nom}}
+                </mat-option>
+            </mat-select>
+            <mat-icon *ngIf="compteurForm.value.bien" matSuffix color="accent" [routerLink]="'/fiche/bien/'+compteurForm.value.bien">visibility</mat-icon>
+            <mat-hint align="end">Bien concerné par le compteur</mat-hint>
+            <mat-error *ngIf="bien?.errors?.required">Le bien est obligatoire.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Référence</mat-label>
+            <input matInput placeholder="Référence compteur" id="id" formControlName="id" required>
+            <mat-hint align="end">Texte libre décrivant la référence unique du compteur</mat-hint>
+            <mat-error *ngIf="id?.errors?.required">La référence est obligatoire.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Désignation</mat-label>
+            <input matInput placeholder="Désignation" id="designation" formControlName="designation" [matAutocomplete]="auto" required>
+            <mat-hint align="end">Désignation standardisée</mat-hint>
+            <mat-error *ngIf="designation?.errors?.required">La désignation est obligatoire.</mat-error>
+        </mat-form-field>
+        <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let designationAuto of designationsAutoFiltered | async" [value]="designationAuto">
+                {{designationAuto}}
+            </mat-option>
+        </mat-autocomplete>
+        <mat-form-field appearance="fill">
+            <mat-label>Commentaires</mat-label>
+            <input matInput placeholder="Commentaires libres" id="commentaires" formControlName="commentaires" >
+            <mat-hint align="end">Compléments de détails</mat-hint>
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button color="primary" mat-flat-button [mat-dialog-close]="compteurForm.value" [disabled]="!compteurForm.valid">Enregistrer</button>
+    <button color="warn" mat-flat-button [mat-dialog-close]="false">Annuler</button>
+</mat-dialog-actions>

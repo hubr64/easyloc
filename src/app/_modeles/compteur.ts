@@ -50,12 +50,14 @@ export class Compteur {
     id: string;
     designation: string;
     bien: Bien;
+    commentaires: string;
     valeurs : CompteurValue[];
 
     constructor() {
         this.className = 'Compteur';
         this.id = '';
         this.designation = '';
+        this.commentaires = '';
         this.valeurs = [];
     }
 
@@ -74,7 +76,9 @@ export class Compteur {
         if(input.valeurs){
             tmp.valeurs = [];
             for (const key of Object.keys(input.valeurs)) {
-                tmp.valeurs.push(CompteurValue.fromJSON(input.valeurs[key], docPieces));
+                if(input.valeurs[key] && input.valeurs[key]!= "" && input.valeurs[key]!= ""){
+                    tmp.valeurs.push(CompteurValue.fromJSON(input.valeurs[key], docPieces));
+                }
             }
         }
         return tmp;
@@ -85,7 +89,8 @@ export class Compteur {
             id: this.id,
             designation: this.designation,
             bien: this.bien ? this.bien.id: '',
-            valeurs: [''],
+            commentaires: this.commentaires,
+            valeurs: ['']
         };
         this.valeurs.forEach((valeur: CompteurValue) => {
             serialize.valeurs.push(valeur.toJSON());

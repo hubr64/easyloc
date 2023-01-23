@@ -23,6 +23,7 @@ export const CONFIG: { [key: string]: any } = {
   'impotDeductionForfaitaire': 0.3,
   'mouvementAutoCompleteIn': 'Loyer;Régularisation de charges;Remboursement',
   'mouvementAutoCompleteOut': 'Taxe foncière;Assurance prêt immobilier;Assurance PNO;Provision sur charges;Intérêts d\'emprunt;Frais de dossier prêt immobilier;Travaux;Achat;Régularisation de charges;Frais de garantie',
+  'compteurAutoComplete': 'Electricité;Gaz;Eau;Télécom',
   'nomModeleAnnoncePapier': 'Modèle Annonce Web',
   'nomModeleAnnonceWeb': 'Modèle Annonce Papier',
   'ordreBien': 'nom',
