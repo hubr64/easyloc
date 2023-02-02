@@ -1,0 +1,49 @@
+<h2 mat-dialog-title><mat-icon>pin</mat-icon> Liste des relevés</h2>
+<mat-dialog-content>
+    <div *ngIf="this.compteur && this.compteur.valeurs.length>0; else elseBlock">
+        <table mat-table [dataSource]="dataSource" matSort matSortActive="dateReleve" matSortDirection="desc">
+            <ng-container matColumnDef="dateReleve">
+                <th mat-header-cell *matHeaderCellDef>Date</th>
+                <td mat-cell *matCellDef="let row">{{row.dateReleve | date:'shortDate':'fr-FR'}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="valeur">
+                <th mat-header-cell *matHeaderCellDef>Valeur</th>
+                <td mat-cell *matCellDef="let row">{{row.valeur}} {{compteur.unite}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="preuve">
+                <th mat-header-cell *matHeaderCellDef >Preuve</th>
+                <td mat-cell *matCellDef="let row">
+                    <span *ngIf="row.preuve; else elseBlock">{{row.preuve.nom}}</span>
+                    <ng-template #elseBlock>-</ng-template>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let row">
+                    <button mat-icon-button [matMenuTriggerFor]="menuItem">
+                        <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menuItem="matMenu" yPosition="below" [overlapTrigger]="false">
+                        <button mat-menu-item title="Editer" (click)="edit(row)"><mat-icon color="primary">edit</mat-icon> Editer</button>
+                        <button mat-menu-item title="Supprimer" (click)="delete(row)"><mat-icon color="warn">delete</mat-icon> Supprimer</button>
+                    </mat-menu>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr class="mat-row" *matNoDataRow>
+                <td class="centered-cell mat-cell empty-cell" [attr.colspan]="displayedColumns.length"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun résultat à afficher</td>
+            </tr>
+        </table>
+        <div *ngIf="this.compteur.valeurs.length>1" echarts [options]="chartOptions" [loading]="true" class="main-chart"></div>
+    </div>
+    <ng-template #elseBlock><div class="empty-cell centered-cell"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun index à afficher : ajouter un nouveau relevé !</div></ng-template>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button color="accent" mat-flat-button (click)="addValeur()">Ajouter un relevé</button>
+    <button color="primary" mat-flat-button [mat-dialog-close]="false">Fermer</button>
+</mat-dialog-actions>

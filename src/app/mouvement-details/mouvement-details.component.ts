@@ -62,6 +62,13 @@ export class MouvementDetailsComponent implements OnInit {
     );
 
     this.getData();
+
+    // Subscribe in case the document was reloaded
+    this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
+      if(isLoaded){
+        this.getData();
+      }
+    });
   }
 
   private _filter(value: string): string[] {
@@ -99,9 +106,6 @@ export class MouvementDetailsComponent implements OnInit {
         commentaires: null
       });
     }
-  }
-
-  public checkForm(){
   }
 
   public isMouvementForLoyer(): number {

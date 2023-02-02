@@ -31,7 +31,6 @@ export class Bien {
   commentaire: string;
   pieces: Piece[];
 
-
   constructor() {
     this.className = 'Bien';
     this.id = '';

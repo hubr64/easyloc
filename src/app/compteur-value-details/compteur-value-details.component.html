@@ -1,0 +1,48 @@
+<h2 mat-dialog-title *ngIf="data.compteurValue"><mat-icon>edit_square</mat-icon> Modification d'un relevé</h2>
+<h2 mat-dialog-title *ngIf="!data.compteurValue"><mat-icon>add</mat-icon> Nouveau relevé</h2>
+<mat-dialog-content>
+    <form [formGroup]="compteurValueForm">
+        <mat-form-field appearance="fill" *ngIf="this.chooseCompteur">
+            <mat-label>Compteur</mat-label>
+            <mat-select id="compteur" formControlName="compteur" [required]="this.chooseCompteur?true:false">
+                <mat-option *ngFor="let compteur of documentService.document.compteurs" [value]="compteur.id">
+                    {{compteur.bien.nom}} - {{compteur.designation}}
+                </mat-option>
+            </mat-select>
+            <mat-hint align="end">Compteur concerné par le relevé</mat-hint>
+            <mat-error *ngIf="compteur?.errors?.required">Le compteur est obligatoire.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Date</mat-label>
+            <input matInput placeholder="Date" id="dateReleve" formControlName="dateReleve" [matDatepicker]="picker" required [disabled]="true">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-hint align="end">Date du relevé</mat-hint>
+            <mat-datepicker #picker disabled="false"></mat-datepicker>
+            <mat-error *ngIf="dateReleve?.errors?.required">La date de relevé est obligatoire.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Valeur</mat-label>
+            <input matInput placeholder="Valeur index" id="valeur" formControlName="valeur" required>
+            <mat-hint align="end">Texte libre contenant la nouvelle valeur de l'index</mat-hint>
+            <mat-error *ngIf="valeur?.errors?.required">La référence est obligatoire.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Preuve</mat-label>
+            <input matInput placeholder="Preuve" id="preuve" formControlName="preuve" hidden>
+            <input *ngIf="selectedPreuve" matInput placeholder="Preuve" id="preuveName" formControlName="preuveName">
+            <button mat-icon-button (click)="choosePreuve()" matSuffix>
+                <mat-icon>add_link</mat-icon>
+            </button>
+            <mat-hint align="end">Preuve de l'index (photo, ...)</mat-hint>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+            <mat-label>Commentaires</mat-label>
+            <input matInput placeholder="Commentaires libres" id="commentaires" formControlName="commentaires" >
+            <mat-hint align="end">Compléments de détails</mat-hint>
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button color="primary" mat-flat-button [mat-dialog-close]="compteurValueForm.value" [disabled]="!compteurValueForm.valid">Enregistrer</button>
+    <button color="warn" mat-flat-button [mat-dialog-close]="false">Annuler</button>
+</mat-dialog-actions>

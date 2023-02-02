@@ -4,6 +4,7 @@ import { Bien } from './bien';
 import { Bail } from './bail';
 import { Piece } from './piece';
 import { Mouvement } from './mouvement';
+import { Compteur } from './compteur';
 
 export const TYPEICON: {[key: string]: string} = {
   "Locataire": 'people',
@@ -11,7 +12,8 @@ export const TYPEICON: {[key: string]: string} = {
   "Bien": 'apartment',
   "Bail": 'assignment',
   "Quittance": 'receipt_long',
-  "Mouvement": 'euro_symbol'
+  "Mouvement": 'euro_symbol',
+  "Compteur": 'pin'
 };
 
 export class EasylocData {
@@ -26,6 +28,7 @@ export class EasylocData {
   biens: Bien[];
   bails: Bail[];
   pieces: Piece[];
+  compteurs: Compteur[];
   mouvements: Mouvement[];
 
   constructor() {
@@ -39,6 +42,7 @@ export class EasylocData {
     this.biens = [];
     this.bails = [];
     this.pieces = [];
+    this.compteurs = [];
     this.mouvements = [];
   }
 
@@ -72,6 +76,13 @@ export class EasylocData {
       tmp.biens = [];
       for (const key of Object.keys(input.biens)) {
         tmp.biens.push(Bien.fromJSON(input.biens[key], tmp.bailleurs, tmp.pieces));
+      }
+    }
+    //Load compteurs after biens
+    if(input.compteurs){
+      tmp.compteurs = [];
+      for (const key of Object.keys(input.compteurs)) {
+        tmp.compteurs.push(Compteur.fromJSON(input.compteurs[key], tmp.pieces, tmp.biens));
       }
     }
     //Load baux nearly last as need bien, locataire and pieces
@@ -108,7 +119,8 @@ export class EasylocData {
       biens: [''],
       bails: [''],
       mouvements: [''],
-      pieces: ['']
+      pieces: [''],
+      compteurs: ['']
     };
 
     let serializeLocataires : any[] = [];
@@ -140,6 +152,12 @@ export class EasylocData {
       serializeMouvements.push(mouvement.toJSON());
     });
     serialize.mouvements = serializeMouvements;
+
+    let serializeCompteurs : any[] = [];
+    this.compteurs.forEach((compteur: Compteur) => {
+      serializeCompteurs.push(compteur.toJSON());
+    });
+    serialize.compteurs = serializeCompteurs;
 
     let serializePieces : any[] = [];
     this.pieces.forEach((piece: Piece) => {
