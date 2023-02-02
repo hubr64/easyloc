@@ -94,11 +94,13 @@ import { EventsFicheComponent } from './events-fiche/events-fiche.component';
 import { MouvementPickDialogComponent } from './mouvement-pick-dialog/mouvement-pick-dialog.component';
 import { CompteurListeComponent } from './compteur-liste/compteur-liste.component';
 import { CompteurDetailsComponent } from './compteur-details/compteur-details.component';
+import { CompteurValueDetailsComponent } from './compteur-value-details/compteur-value-details.component';
 // Helpers
 import { FilterConfigurationPipe } from './_helpers/filter-configuration.pipe';
 import { DndDirective } from './_helpers/dnd.directive';
 import { VarDirective } from './_helpers/ng-var.directive';
 import { OrderByPipe } from './_helpers/orderby.pipe';
+import { CompteurValueFicheComponent } from './compteur-value-fiche/compteur-value-fiche.component';
 
 registerLocaleData(localeFr);
 
@@ -158,7 +160,9 @@ const globalRippleConfig: RippleGlobalOptions = {
     EventsFicheComponent,
     MouvementPickDialogComponent,
     CompteurListeComponent,
-    CompteurDetailsComponent
+    CompteurDetailsComponent,
+    CompteurValueDetailsComponent,
+    CompteurValueFicheComponent
   ],
   imports: [
     BrowserModule,
