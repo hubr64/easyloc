@@ -1,5 +1,4 @@
 import { AfterViewInit, Component, ViewChild, Inject, Input, Output, EventEmitter } from '@angular/core';
-import { Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { FormControl } from '@angular/forms';
 
@@ -8,6 +7,7 @@ import { MatSort, Sort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { MatTableDataSource} from '@angular/material/table';
 import { MatDialog} from '@angular/material/dialog';
+import { animate, state, style, transition, trigger } from '@angular/animations';
 
 import { AlertService } from '../_services/alert.service';
 import { DocumentService } from '../_services/document.service';
@@ -16,13 +16,22 @@ import { Compteur, CompteurValue } from '../_modeles/compteur';
 import { Bien } from '../_modeles/bien';
 import { DialogDeleteConfirmComponent } from '../dialog-delete-confirm/dialog-delete-confirm.component';
 import { CompteurDetailsComponent } from '../compteur-details/compteur-details.component';
+import { CompteurValueDetailsComponent } from '../compteur-value-details/compteur-value-details.component';
+import { CompteurValueFicheComponent } from '../compteur-value-fiche/compteur-value-fiche.component';
 
 @Component({
   selector: 'app-compteur-liste',
   templateUrl: './compteur-liste.component.html',
-  styleUrls: ['./compteur-liste.component.scss']
+  styleUrls: ['./compteur-liste.component.scss'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({height: '0px', minHeight: '0'})),
+      state('expanded', style({height: '*'})),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ]
 })
-export class CompteurListeComponent {
+export class CompteurListeComponent implements AfterViewInit{
 
   // COmponent input and output
   @Input() embedded: boolean = false;
@@ -34,10 +43,11 @@ export class CompteurListeComponent {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table!: MatTable<Compteur>;
   public dataSource: MatTableDataSource<Compteur>;
+  public expandedElement: Compteur | null = null;
 
   // Columns displayed in the table. Columns IDs can be added, removed, or reordered.
   public displayedColumns = ['select', 'bien', 'designation', 'derniereValeur', 'nbValeur', 'actions'];
-  public displayedColumnsEmbedded = ['select', 'designation', 'derniereValeur', 'nbValeur', 'actions'];
+  public displayedColumnsEmbedded = ['designation', 'derniereValeur', 'nbValeur','visualisation'];
   //Multi selection management
   public initialSelection = [];
   public allowMultiSelect: boolean = true;
@@ -54,7 +64,6 @@ export class CompteurListeComponent {
     public alertService: AlertService,
     public documentService: DocumentService,
     private exportCsvService: ExportCsvService,
-    private router: Router,
     public dialog: MatDialog
   ) {}
 
@@ -169,6 +178,7 @@ export class CompteurListeComponent {
       if(result){
         compteur.id = result.id;
         compteur.designation = result.designation;
+        compteur.unite = result.unite;
         compteur.commentaires = result.commentaires;
         this.documentService.document.biens.forEach((docBien:Bien) => {
           if(docBien.id == result.bien){
@@ -254,31 +264,36 @@ export class CompteurListeComponent {
   }
 
   public addValeur(compteur: Compteur){
-    /*
-    //Display a confirmation dialog
+    //Display a selection dialog
     const dialogRef = this.dialog.open(CompteurValueDetailsComponent, {
       data: {
-        compteur: compteur
-      },
+        chooseCompteur: false
+      }
     });
-
+    //Manage dialog result
     dialogRef.afterClosed().subscribe((result:any) => {
       //If user confirm add
       if(result){
         //Add in the global definition
         let tmpNew: CompteurValue = CompteurValue.fromJSON(result, this.documentService.document.pieces);
         compteur.valeurs.push(tmpNew);
-        //TODO : gérer la pièce
         this.alertService.success('La nouvelle valeur de compteur est maintenant ajoutée.');
         // Update data source
         this.getData();
-      // If user finally change his mind
-
       // If user finally change his mind
       }else{
         this.alertService.error("L'ajout d'une valeur a été annulée...");
       }
     });
-    */
+  }
+
+  public displayValeurs(compteur: Compteur){
+    //Display a selection dialog
+    const dialogRef = this.dialog.open(CompteurValueFicheComponent, {
+      autoFocus: false,
+      data: {
+        compteur: compteur
+      }
+    });
   }
 }
