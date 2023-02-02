@@ -7,11 +7,13 @@ export class CompteurValue {
     dateReleve: Date;
     valeur: any;
     preuve: Piece | null;
+    commentaires: string;
   
     constructor() {
       this.className = 'CompteurValue';
       this.dateReleve = new Date();
       this.preuve = null;
+      this.commentaires = '';
     }
 
     static fromJSON(input: any, docPieces: Piece[] = []): CompteurValue {
@@ -35,12 +37,13 @@ export class CompteurValue {
             dateReleve: this.dateReleve,
             valeur: this.valeur,
             preuve: this.preuve ? this.preuve.id : '',
+            commentaires: this.commentaires
         };
         return serialize;
     }
   
     toString(): string{
-      return this.valeur + "(" + this.dateReleve.toLocaleDateString() + ")";
+      return this.valeur + " (" + this.dateReleve.toLocaleDateString() + ")";
     }
   
   }
@@ -49,6 +52,7 @@ export class Compteur {
     className: string;
     id: string;
     designation: string;
+    unite: string;
     bien: Bien;
     commentaires: string;
     valeurs : CompteurValue[];
@@ -57,6 +61,7 @@ export class Compteur {
         this.className = 'Compteur';
         this.id = '';
         this.designation = '';
+        this.unite = '';
         this.commentaires = '';
         this.valeurs = [];
     }
@@ -88,6 +93,7 @@ export class Compteur {
         let serialize = {
             id: this.id,
             designation: this.designation,
+            unite: this.unite,
             bien: this.bien ? this.bien.id: '',
             commentaires: this.commentaires,
             valeurs: ['']
@@ -99,7 +105,7 @@ export class Compteur {
     }
 
     toString(): string{
-        return this.designation + "(" + this.id + ")";
+        return this.designation + " (" + this.id + ")";
     }
 
     public get derniereValeur(): CompteurValue|null {

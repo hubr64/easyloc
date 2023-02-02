@@ -42,6 +42,7 @@ export class CompteurDetailsComponent implements OnInit{
       'designation': new FormControl('', [
         Validators.required
       ]),
+      'unite': new FormControl(''),
       'commentaires': new FormControl('')
     });
 
@@ -68,6 +69,7 @@ export class CompteurDetailsComponent implements OnInit{
   get bien() { return this.compteurForm.get('bien'); }
   get id() { return this.compteurForm.get('id'); }
   get designation() { return this.compteurForm.get('designation'); }
+  get unite() { return this.compteurForm.get('unite'); }
   get commentaires() { return this.compteurForm.get('commentaires'); }
 
   getData(): void {
@@ -77,6 +79,7 @@ export class CompteurDetailsComponent implements OnInit{
         bien: this.data.compteur.bien.id,
         id: this.data.compteur.id,
         designation: this.data.compteur.designation,
+        unite: this.data.compteur.unite,
         commentaires: this.data.compteur.commentaires
       });
 
@@ -86,11 +89,9 @@ export class CompteurDetailsComponent implements OnInit{
         bien: '',
         id: '',
         designation: '',
+        unite: '',
         commentaires: null
       });
     }
-  }
-
-  public checkForm(){
   }
 }
