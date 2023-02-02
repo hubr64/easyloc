@@ -108,9 +108,6 @@ export class MouvementDetailsComponent implements OnInit {
     }
   }
 
-  public checkForm(){
-  }
-
   public isMouvementForLoyer(): number {
 
     //An eeventual active bail to compare
