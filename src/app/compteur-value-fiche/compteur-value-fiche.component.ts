@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, Inject, ViewChild } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 
 import { EChartsOption, SeriesOption } from 'echarts';
 import { MatTable } from '@angular/material/table';
@@ -8,6 +8,7 @@ import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { AlertService } from '../_services/alert.service';
 import { DocumentService } from '../_services/document.service';
+import { ConfigurationService } from '../_services/configuration.service';
 import { Compteur, CompteurValue } from '../_modeles/compteur';
 import { Piece } from '../_modeles/piece';
 import { DialogDeleteConfirmComponent } from '../dialog-delete-confirm/dialog-delete-confirm.component';
@@ -18,7 +19,7 @@ import { CompteurValueDetailsComponent } from '../compteur-value-details/compteu
   templateUrl: './compteur-value-fiche.component.html',
   styleUrls: ['./compteur-value-fiche.component.scss']
 })
-export class CompteurValueFicheComponent implements AfterViewInit {
+export class CompteurValueFicheComponent implements OnInit {
 
   public compteur: Compteur;
 
@@ -35,11 +36,12 @@ export class CompteurValueFicheComponent implements AfterViewInit {
   constructor(
     public alertService: AlertService,
     public documentService: DocumentService,
+    public configurationService: ConfigurationService,
     public dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {}
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
 
     this.compteur = this.data.compteur;
 
@@ -93,7 +95,7 @@ export class CompteurValueFicheComponent implements AfterViewInit {
       //Convert values to display them in the chart
       var valeursData: any[] = [];
       compteurValues.forEach((valeur: CompteurValue) => {
-        valeursData.push([valeur.dateReleve.toISOString(), valeur.valeur]);
+        valeursData.push([valeur.dateReleve.toISOString(), Math.round(valeur.valeur)]);
       });
       
       //Compute year consumption
@@ -131,7 +133,7 @@ export class CompteurValueFicheComponent implements AfterViewInit {
         if(beforeValue && afterValue){
           var a = (afterValue.valeur - beforeValue.valeur)/(afterValue.dateReleve.getTime() - beforeValue.dateReleve.getTime());
           var b = beforeValue.valeur-a*beforeValue.dateReleve.getTime();
-          interpolatedValue = Math.round(a * lastYearDate.getTime() + b);
+          interpolatedValue = a * lastYearDate.getTime() + b;
         }else{
           //If we don't found anything before and if the value after is not the current value then we use the after value (simplification)
           if(!beforeValue && afterValue && afterValue.valeur!=valeur.valeur){
@@ -141,7 +143,7 @@ export class CompteurValueFicheComponent implements AfterViewInit {
             interpolatedValue = 0;
           } 
         }
-        valeursDataForYear.push([valeur.dateReleve.toISOString(), valeur.valeur-interpolatedValue]);
+        valeursDataForYear.push([valeur.dateReleve.toISOString(), Math.round(valeur.valeur-interpolatedValue)]);
       });
 
       seriesData.push({
