@@ -105,6 +105,8 @@
                     <mat-icon>more_vert</mat-icon>
                 </button>
                 <mat-menu #menuItem="matMenu" yPosition="below" [overlapTrigger]="false">
+                    <button mat-menu-item title="Envoyer" (click)="mail(row)"><mat-icon color="primary">email</mat-icon> Envoyer</button>
+                    <mat-divider></mat-divider>
                     <button mat-menu-item title="Editer" (click)="edit(row)"><mat-icon color="primary">edit</mat-icon> Editer</button>
                     <button mat-menu-item title="Supprimer" (click)="delete(row)"><mat-icon color="warn">delete</mat-icon> Supprimer</button>
                 </mat-menu>
