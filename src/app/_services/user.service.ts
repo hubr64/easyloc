@@ -15,6 +15,7 @@ export class UserService {
     //Gis Clients 
     public g_client_id: string = "474764062918-h31g2d341hajtdhipuggq6uagnfi10rl.apps.googleusercontent.com";
     private gis_token_client: any;
+    public g_cookie_id: string = "easyloc-cookie-id";
     //Authentification token
     public gis_token: any;
     // The current gapi user connected
@@ -53,6 +54,20 @@ export class UserService {
             //Function just call the service function
             this.handleCredentials(response);
         }
+
+        //Check if we have a cookie that store authentification information (prevent new authentification request)
+        let cookies: any = document.cookie;
+        cookies = cookies.split("; ")
+        cookies.forEach((cookie:string) => {
+            let cookieDef = cookie.split("=");
+            if(cookieDef[0] == this.g_cookie_id){
+                console.log("UserService:constructor : A cookie exists, do not request access just refresh token")
+                //Store credential
+                this.storeCredential(cookieDef[1]);
+                //And then refresh credential to ask for a new access
+                this.refreshToken();
+            }
+        });
     }
 
     //Init the Google API part that cover drive and mail but no more authentification
@@ -89,8 +104,9 @@ export class UserService {
                     // Loading is finished
                     this.isLoading = false;
                     //Prepare to refresh the token (10s before expiration)
-                    this.dateExpiration = new Date(this.gis_token.expires_in*1000);
-                    setTimeout(()=>this.refreshToken(),(this.gis_token.expires_in-10)*1000);
+                    this.dateExpiration = new Date();
+                    this.dateExpiration.setSeconds(this.dateExpiration.getSeconds() + this.gis_token.expires_in*1000);
+                    setTimeout(()=>this.refreshToken(),(this.gis_token.expires_in-10)*1000);   
                 },
                 error_callback: (error: any) => {
                     console.dir("Impossible to init the google token client.")
@@ -106,14 +122,10 @@ export class UserService {
     private handleCredentials(response:any){
         //A response is send via the GIS callback with credential
         if(response && response.credential){
-            //Decode the JWT credentiel to get more informaiton on the user
-            var decodeCreds: any = jwt_decode(response.credential);
-            //From credential get all usefull information
-            this.dateConnection = new Date(decodeCreds.iat*1000);
-            this.dateExpiration = new Date(decodeCreds.exp*1000);
-            this.currentUser.nom = decodeCreds.family_name + " " + decodeCreds.given_name;
-            this.currentUser.mail = decodeCreds.email;
-            this.currentUser.image = decodeCreds.picture;
+            //Decode and store the JWT credential to get more information on the user
+            this.storeCredential(response.credential);
+            //Store credential in a cookie to prevent unusefull authentification request
+            document.cookie = this.g_cookie_id + "="+response.credential+"; expires="+ this.dateExpiration.toUTCString();
             //Load the token to gain access to drive and mail now that user is identified
             if(this.gis_token_client){
                 console.log("UserService:handleCredentials : Client is loaded then request access token.");
@@ -125,10 +137,25 @@ export class UserService {
         }
     }
 
+    public storeCredential(credential: any){
+        //Decode the JWT credentiel to get more informaiton on the user
+        var decodeCreds: any = jwt_decode(credential);
+        //From credential get all usefull information
+        this.dateConnection = new Date(decodeCreds.iat*1000);
+        this.dateExpiration = new Date(decodeCreds.exp*1000);
+        this.currentUser.nom = decodeCreds.family_name + " " + decodeCreds.given_name;
+        this.currentUser.mail = decodeCreds.email;
+        this.currentUser.image = decodeCreds.picture;
+    }
+
     public refreshToken(){
-        console.dir("UserService:refreshToken:Token will expire soon...");
         //Refresh is just a token request but without prompt (pop up display and hide)
-        this.gis_token_client.requestAccessToken({prompt: 'none'});
+        if(this.gis_token_client){
+            console.dir("UserService:refreshToken:Token needs to be refreshed...");
+            this.gis_token_client.requestAccessToken({prompt: 'none'});
+        }else{
+            setTimeout(() => this.refreshToken(), 1000);
+        }
     }
 
     public signOut() {
@@ -146,6 +173,8 @@ export class UserService {
             this.gis_token = '';
             //Warn everybody that now we are no more logged in
             this.isSignInChange.next(false);
+            //Remove cookie 
+            document.cookie = this.g_cookie_id+"= ; expires = Thu, 01 Jan 1970 00:00:00 GMT";
         }
     }
 
