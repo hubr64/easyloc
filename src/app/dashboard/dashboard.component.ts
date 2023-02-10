@@ -70,9 +70,10 @@ export class DashboardComponent {
     this.dialog.open(MailComponent, {
       data: {
         destinataires: '',
-        emetteur: '',
+        emetteur: this.userService.currentUser.mail,
         sujet: "",
-        contenu: "\r\n\r\nCordialement.\r\n"+this.userService.currentUser.nom
+        contenu: "\r\n\r\nCordialement.\r\n"+this.userService.currentUser.nom,
+        pieces: []
       },
     });
   }
