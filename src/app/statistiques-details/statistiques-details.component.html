@@ -12,35 +12,35 @@
                 <mat-panel-title>Rentabilité globale</mat-panel-title>
                 <mat-panel-description>Rentabilité générale par année sur l'ensemble des biens détenus<mat-icon>stacked_line_chart</mat-icon></mat-panel-description>
             </mat-expansion-panel-header>
-            <div echarts [options]="chartOptionGlobaRentability" [loading]="true" class="main-chart mat-elevation-z1"></div>
+            <div echarts [options]="chartOptionGlobaRentability" [loading]="true" class="main-chart mat-elevation-z1" [theme]="configurationService.isDarkMode()?'dark':''"></div>
         </mat-expansion-panel>
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>Rentabilité ventilée par bien</mat-panel-title>
                 <mat-panel-description>Rentabilité par bien par année<mat-icon>query_stats</mat-icon></mat-panel-description>
             </mat-expansion-panel-header>
-            <div echarts [options]="chartOptionBienRentability" [loading]="true" class="main-chart mat-elevation-z1"></div>
+            <div echarts [options]="chartOptionBienRentability" [loading]="true" class="main-chart mat-elevation-z1" [theme]="configurationService.isDarkMode()?'dark':''"></div>
         </mat-expansion-panel>
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>Gains</mat-panel-title>
                 <mat-panel-description>Gains nets et cumulés par année<mat-icon>savings</mat-icon></mat-panel-description>
             </mat-expansion-panel-header>
-            <div echarts [options]="chartOptionGains" [loading]="true" class="main-chart mat-elevation-z1"></div>
+            <div echarts [options]="chartOptionGains" [loading]="true" class="main-chart mat-elevation-z1" [theme]="configurationService.isDarkMode()?'dark':''"></div>
         </mat-expansion-panel>
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>Evolution des loyers</mat-panel-title>
                 <mat-panel-description>Evolution moyenne des loyers par année<mat-icon>apartment</mat-icon></mat-panel-description>
             </mat-expansion-panel-header>
-            <div echarts [options]="chartOptionLoyers" [loading]="true" class="main-chart mat-elevation-z1"></div>
+            <div echarts [options]="chartOptionLoyers" [loading]="true" class="main-chart mat-elevation-z1" [theme]="configurationService.isDarkMode()?'dark':''"></div>
         </mat-expansion-panel>
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>Taux de location</mat-panel-title>
                 <mat-panel-description>Taux de location par bien et moyenné par année<mat-icon>key</mat-icon></mat-panel-description>
             </mat-expansion-panel-header>
-            <div echarts [options]="chartOptionTaux" [loading]="true" class="main-chart mat-elevation-z1"></div>
+            <div echarts [options]="chartOptionTaux" [loading]="true" class="main-chart mat-elevation-z1" [theme]="configurationService.isDarkMode()?'dark':''"></div>
         </mat-expansion-panel>
     </mat-accordion>
 </div>
@@ -48,10 +48,10 @@
 <ng-container *ngVar="(defaultBien?defaultBien.nom:'total') as elementToDisplay">
     <div class="main-container" [ngClass]="{'compact-stat': defaultBien?false:true}" *ngIf="simple &&  this.bilan[elementToDisplay]">
         <h3><mat-icon>savings</mat-icon>Entrées/Sorties {{currentYear}}</h3>
-        <div *ngIf="!defaultBien" #chartSimple echarts [options]="chartOptionSimple" [loading]="true" class="simple-chart"></div>
-        <div *ngIf="defaultBien" #chartSimple echarts [options]="chartOptionSimpleBien" [loading]="true" class="simple-chart"></div>
+        <div *ngIf="!defaultBien" #chartSimple echarts [options]="chartOptionSimple" [loading]="true" class="simple-chart" [theme]="configurationService.isDarkMode()?'dark':''"></div>
+        <div *ngIf="defaultBien" #chartSimple echarts [options]="chartOptionSimpleBien" [loading]="true" class="simple-chart" [theme]="configurationService.isDarkMode()?'dark':''"></div>
         <h3 *ngIf="defaultBien"><mat-icon>query_stats</mat-icon>Evolution du loyer</h3>
-        <div *ngIf="defaultBien" echarts [options]="chartOptionSimpleLoyers" [loading]="true" class="simple-chart"></div>
+        <div *ngIf="defaultBien" echarts [options]="chartOptionSimpleLoyers" [loading]="true" class="simple-chart" [theme]="configurationService.isDarkMode()?'dark':''"></div>
         <h3><mat-icon>euro</mat-icon>Généralités <span class="generalites-current-year">{{currentYear}}</span></h3>
         <mat-list>
             <mat-list-item><mat-icon class="stat-icon" color="primary">north_east</mat-icon><span class="stat-title">Entrées</span><span>{{this.bilan[elementToDisplay].in | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].in | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>

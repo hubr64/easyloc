@@ -39,7 +39,7 @@
                 <td class="centered-cell mat-cell empty-cell" [attr.colspan]="displayedColumns.length"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun résultat à afficher</td>
             </tr>
         </table>
-        <div *ngIf="this.compteur.valeurs.length>1" echarts [options]="chartOptions" [loading]="true" class="main-chart"></div>
+        <div *ngIf="this.compteur.valeurs.length>1" echarts [options]="chartOptions" [loading]="true" class="main-chart" [theme]="configurationService.isDarkMode()?'dark':''"></div>
     </div>
     <ng-template #elseBlock><div class="empty-cell centered-cell"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun index à afficher : ajouter un nouveau relevé !</div></ng-template>
 </mat-dialog-content>
