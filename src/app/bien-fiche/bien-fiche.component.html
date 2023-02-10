@@ -10,6 +10,14 @@
         <button mat-menu-item [routerLink]="'/bien/'+bien.id"><mat-icon>edit</mat-icon> Modifier</button>
         <button mat-menu-item [routerLink]="'/bien/new'"><mat-icon>add</mat-icon> Nouveau</button>
         <button mat-menu-item (click)="printFiche()"><mat-icon>print</mat-icon> Imprimer</button>
+        <button mat-menu-item [matMenuTriggerFor]="sousMenuListe"><mat-icon>visibility</mat-icon> Affichage</button>
+    </mat-menu>
+    <mat-menu #sousMenuListe="matMenu" xPosition="before" [overlapTrigger]="false">
+        <button mat-menu-item (click)="toggleVisibily($event, 'eventsVisibility')"><mat-icon *ngIf="eventsVisibility">check_box</mat-icon><mat-icon *ngIf="!eventsVisibility">check_box_outline_blank</mat-icon><mat-icon>notifications</mat-icon> Evènements</button>
+        <button mat-menu-item (click)="toggleVisibily($event, 'mouvementsVisibility')"><mat-icon *ngIf="mouvementsVisibility">check_box</mat-icon><mat-icon *ngIf="!mouvementsVisibility">check_box_outline_blank</mat-icon><mat-icon>euro</mat-icon> Mouvements</button>
+        <button mat-menu-item (click)="toggleVisibily($event, 'compteursVisibility')"><mat-icon *ngIf="compteursVisibility">check_box</mat-icon><mat-icon *ngIf="!compteursVisibility">check_box_outline_blank</mat-icon><mat-icon>pin</mat-icon> Compteurs</button>
+        <button mat-menu-item (click)="toggleVisibily($event, 'bailsVisibility')"><mat-icon *ngIf="bailsVisibility">check_box</mat-icon><mat-icon *ngIf="!bailsVisibility">check_box_outline_blank</mat-icon><mat-icon>assignment</mat-icon> Baux</button>
+        <button mat-menu-item (click)="toggleVisibily($event, 'piecesVisibility')"><mat-icon *ngIf="piecesVisibility">check_box</mat-icon><mat-icon *ngIf="!piecesVisibility">check_box_outline_blank</mat-icon><mat-icon>book</mat-icon> Pièces</button>
     </mat-menu>
 </mat-toolbar>
 
@@ -86,9 +94,9 @@
         </mat-card-content>
     </mat-card>
 
-    <app-events-fiche [gravite]="0" [container]="bien"></app-events-fiche>
+    <app-events-fiche [gravite]="0" [container]="bien" *ngIf="eventsVisibility"></app-events-fiche>
 
-    <mat-card appearance="outlined" class="card-box">
+    <mat-card appearance="outlined" class="card-box" *ngIf="mouvementsVisibility">
         <mat-card-header>
             <div mat-card-avatar class="avatar-letter"><mat-icon>euro_symbol</mat-icon></div>
             <mat-card-title>Mouvements</mat-card-title>
@@ -139,7 +147,7 @@
         </mat-card-actions>
     </mat-card>
 
-    <mat-card appearance="outlined" class="card-box">
+    <mat-card appearance="outlined" class="card-box" *ngIf="compteursVisibility">
         <mat-card-header>
             <div mat-card-avatar class="avatar-letter"><mat-icon>pin</mat-icon></div>
             <mat-card-title>Compteurs</mat-card-title>
@@ -153,48 +161,50 @@
         </mat-card-actions>
     </mat-card>
 
-    <mat-card appearance="outlined" class="card-box" *ngFor="let bail of bails">
-        <mat-card-header>
-            <div mat-card-avatar class="avatar-letter" [ngClass]="{'old': bail.dateFin}"><mat-icon>assignment</mat-icon></div>
-            <mat-card-title><mat-icon>apartment</mat-icon>{{bail.bien.nom}}<mat-icon>multiple_stop</mat-icon>{{bail.locataire.nom}}<mat-icon>people</mat-icon></mat-card-title>
-            <mat-card-subtitle>Bail de location <ng-container *ngIf="bail.dateFin">in</ng-container>actif</mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-            <mat-list>
-                <mat-list-item>
-                    <mat-icon matListItemIcon>date_range</mat-icon>
-                    <span matListItemTitle>Date entrée<ng-container *ngIf="bail.dateFin">/sortie</ng-container></span>
-                    <span matListItemMeta>
-                        <span>{{bail.dateDebut| date:'longDate':'fr-FR'}}</span>
-                        <span *ngIf="bail.dateFin">&nbsp;-&nbsp;{{bail.dateFin| date:'longDate':'fr-FR'}}</span>
-                    </span>
-                </mat-list-item>
-                <mat-list-item>
-                    <mat-icon matListItemIcon>euro_symbol</mat-icon>
-                    <div matListItemTitle>Montant loyer</div>
-                    <span matListItemMeta>{{(bail.loyer)| currency:'EUR':'symbol':'1.0-0'}} + {{(bail.charges)| currency:'EUR':'symbol':'1.0-0'}}</span>
-                </mat-list-item>
-                <mat-list-item>
-                    <mat-icon matListItemIcon>receipt_long</mat-icon>
-                    <div matListItemTitle>Date paiement</div>
-                    <span matListItemMeta>{{bailPeriodePaiements[bail.paiementPeriodicite]}} - {{bail.paiementDate| date:'d':'fr-FR' }} du mois</span>
-                </mat-list-item>
-                <ng-container *ngIf="!bail.dateFin">
-                </ng-container>
-                <mat-list-item *ngIf="bail.commentaire">
-                    <mat-icon matListItemIcon>feed</mat-icon>
-                    <div matListItemTitle>Commentaires</div>
-                    <span matListItemLine [innerHTML]="bail.commentaireHTML"></span>
-                </mat-list-item>
-            </mat-list>
-        </mat-card-content>
-        <mat-card-actions class="no-print">
-            <button mat-icon-button color="accent" routerLink="/fiche/bail/{{bail.id}}" ><mat-icon>visibility</mat-icon></button>
-            <button mat-icon-button color="accent" routerLink="/bail/{{bail.id}}" ><mat-icon>edit</mat-icon></button>
-        </mat-card-actions>
-    </mat-card>
+    <div *ngIf="bailsVisibility">
+        <mat-card appearance="outlined" class="card-box" *ngFor="let bail of bails">
+            <mat-card-header>
+                <div mat-card-avatar class="avatar-letter" [ngClass]="{'old': bail.dateFin}"><mat-icon>assignment</mat-icon></div>
+                <mat-card-title><mat-icon>apartment</mat-icon>{{bail.bien.nom}}<mat-icon>multiple_stop</mat-icon>{{bail.locataire.nom}}<mat-icon>people</mat-icon></mat-card-title>
+                <mat-card-subtitle>Bail de location <ng-container *ngIf="bail.dateFin">in</ng-container>actif</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <mat-list>
+                    <mat-list-item>
+                        <mat-icon matListItemIcon>date_range</mat-icon>
+                        <span matListItemTitle>Date entrée<ng-container *ngIf="bail.dateFin">/sortie</ng-container></span>
+                        <span matListItemMeta>
+                            <span>{{bail.dateDebut| date:'longDate':'fr-FR'}}</span>
+                            <span *ngIf="bail.dateFin">&nbsp;-&nbsp;{{bail.dateFin| date:'longDate':'fr-FR'}}</span>
+                        </span>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <mat-icon matListItemIcon>euro_symbol</mat-icon>
+                        <div matListItemTitle>Montant loyer</div>
+                        <span matListItemMeta>{{(bail.loyer)| currency:'EUR':'symbol':'1.0-0'}} + {{(bail.charges)| currency:'EUR':'symbol':'1.0-0'}}</span>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <mat-icon matListItemIcon>receipt_long</mat-icon>
+                        <div matListItemTitle>Date paiement</div>
+                        <span matListItemMeta>{{bailPeriodePaiements[bail.paiementPeriodicite]}} - {{bail.paiementDate| date:'d':'fr-FR' }} du mois</span>
+                    </mat-list-item>
+                    <ng-container *ngIf="!bail.dateFin">
+                    </ng-container>
+                    <mat-list-item *ngIf="bail.commentaire">
+                        <mat-icon matListItemIcon>feed</mat-icon>
+                        <div matListItemTitle>Commentaires</div>
+                        <span matListItemLine [innerHTML]="bail.commentaireHTML"></span>
+                    </mat-list-item>
+                </mat-list>
+            </mat-card-content>
+            <mat-card-actions class="no-print">
+                <button mat-icon-button color="accent" routerLink="/fiche/bail/{{bail.id}}" ><mat-icon>visibility</mat-icon></button>
+                <button mat-icon-button color="accent" routerLink="/bail/{{bail.id}}" ><mat-icon>edit</mat-icon></button>
+            </mat-card-actions>
+        </mat-card>
+    </div>
 
-    <app-pieces-jointes-fiche [container]="bien" [pieceSpecific]="'BIEN_PHOT'" [piecesObligatoires]="piecesObligatoires"></app-pieces-jointes-fiche>
+    <app-pieces-jointes-fiche *ngIf="piecesVisibility" [container]="bien" [pieceSpecific]="'BIEN_PHOT'" [piecesObligatoires]="piecesObligatoires"></app-pieces-jointes-fiche>
     
 </div>
     

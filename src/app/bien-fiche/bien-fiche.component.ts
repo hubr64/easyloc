@@ -47,6 +47,13 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
   public piecesObligatoires: string;
   //The HTML element that contains element to display in PDF
   @ViewChild('fiche') fiche: ElementRef;
+  //Toggle visibility of various elements
+  [key: string]: any;
+  public eventsVisibility: boolean = true;
+  public compteursVisibility: boolean = true;
+  public mouvementsVisibility: boolean = true;
+  public bailsVisibility: boolean = true;
+  public piecesVisibility: boolean = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -131,6 +138,12 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
 
   public printFiche(){
     setTimeout(()=>window.print(),1000);
+  }
+
+  public toggleVisibily($event:any, visibleCard: string){
+    this[visibleCard] = !this[visibleCard] ;
+    $event.stopPropagation();
+
   }
 
 }
