@@ -2,6 +2,7 @@ import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { Location } from '@angular/common';
 
 import { EChartsOption, SeriesOption } from 'echarts';
+import 'echarts/theme/dark.js';
 
 import { Bien } from '../_modeles/bien';
 import { Mouvement } from '../_modeles/mouvement';
