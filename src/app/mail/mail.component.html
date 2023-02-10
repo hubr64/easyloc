@@ -30,8 +30,28 @@
             <mat-error *ngIf="contenu?.errors?.minlength">Le contenu doit être d'au moins 5 caractères.</mat-error>
         </mat-form-field>
     </form>
+    <mat-card appearance="outlined" class="card-box">
+        <mat-card-content *ngIf="nbFiles()>0">
+            <div class="piece-attached">
+                <span class="loaded" *ngFor="let pieceLoaded of mailPiecesLoaded | keyvalue">
+                    <span><mat-icon>{{pieceLoaded.value.piece.codeIcone}}</mat-icon></span>
+                    <span>{{pieceLoaded.value.piece.description}}</span>
+                    <span><mat-icon color="warn" (click)="detachFile(pieceLoaded.value.piece)">delete</mat-icon></span>
+                </span>
+                <span class="unloaded" *ngFor="let piece of mailPieces">
+                    <span><mat-icon>{{piece.codeIcone}}</mat-icon></span>
+                    <span>{{piece.description}}</span>
+                    <span><mat-icon color="warn" (click)="detachFile(piece)">delete</mat-icon></span>
+                </span>
+            </div>
+        </mat-card-content>
+        <mat-card-actions align="end">
+            <mat-progress-bar *ngIf="mailPieces.length>0" color="primary" mode="indeterminate"></mat-progress-bar> 
+            <button color="primary" *ngIf="mailPieces.length==0" mat-flat-button (click)="attachFile()" ><mat-icon>attach_file</mat-icon>Ajouter</button>
+        </mat-card-actions>
+    </mat-card>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-    <button color="primary" mat-flat-button (click)="sendMail()" [mat-dialog-close]="true" [disabled]="!mailForm.valid || mailService.isLoading">Envoyer</button>
+    <button color="primary" mat-flat-button (click)="sendMail()" [mat-dialog-close]="true" [disabled]="!mailForm.valid || mailService.isLoading || mailPieces.length>0">Envoyer</button>
     <button color="warn" mat-flat-button [mat-dialog-close]="false">Annuler</button>
 </mat-dialog-actions>
