@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 
 import * as Configuration from '../_helpers/global';
 import { environment } from '../../environments/environment';
@@ -14,6 +15,9 @@ export class ConfigurationService {
   public configurationItems: any;
   // Configuration categories
   public categories : any[];
+  // Configuration of the dark mode
+  public darkModeCheck = true;
+  public darkModeChange: Subject<boolean> = new Subject<boolean>();
   
   constructor() {
 
@@ -58,6 +62,20 @@ export class ConfigurationService {
 
     // Load local storage that replace the global initial storage
     this.load();
+
+    //Default is set to false
+    this.darkModeCheck = false;
+    //Prepare subscription
+    this.darkModeChange.subscribe((value: boolean) => {
+        this.darkModeCheck = value
+    });
+    //Get default dark mode configuration
+    this.darkModeChange.next(this.getValue('defaultTheme') == 'dark');
+
+    //If the browser supports dark mode and dark mode is selected then force the dark mode
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+      this.darkModeCheck = true;
+    }
   }
 
   load() {
@@ -96,5 +114,15 @@ export class ConfigurationService {
       //Remove from local memory
       localStorage.removeItem(this.storageConfigurationPrefix + index);
     }
-  }  
+  }
+
+  isDarkMode(){
+    return this.darkModeCheck;
+  }
+
+  switchDisplayMode(){
+    //Toggle display mode
+    this.darkModeChange.next(!this.darkModeCheck)
+  }
+
 }
