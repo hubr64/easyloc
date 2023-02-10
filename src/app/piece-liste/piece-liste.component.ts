@@ -13,12 +13,14 @@ import { AlertService } from '../_services/alert.service';
 import { DriveService } from '../_services/drive.service';
 import { DocumentService } from '../_services/document.service';
 import { ExportCsvService }      from '../_services/export-csv.service';
+import { UserService } from '../_services/user.service';
 import { Piece } from '../_modeles/piece';
 import { PIECECODE as pieceCodes } from '../_modeles/piece';
 import { DialogDeleteConfirmComponent } from '../dialog-delete-confirm/dialog-delete-confirm.component';
 import { PieceDetailsComponent } from '../piece-details/piece-details.component';
 import { UploadComponent } from '../upload/upload.component';
 import { PieceUsersComponent } from '../piece-users/piece-users.component';
+import { MailComponent } from '../mail/mail.component';
 
 @Component({
   selector: 'app-piece-liste',
@@ -87,6 +89,7 @@ export class PieceListeComponent implements AfterViewInit  {
     public driveService: DriveService,
     public documentService: DocumentService,
     private exportCsvService: ExportCsvService,
+    public userService: UserService,
     public dialog: MatDialog,
     private _bottomSheet: MatBottomSheet,
     private cdr: ChangeDetectorRef
@@ -256,7 +259,6 @@ export class PieceListeComponent implements AfterViewInit  {
   }
 
   deleteAll(): void {
-    var bailleursMail: string[] = [];
     for (let item of this.selection.selected) {
       this.delete(item);
     }
@@ -330,6 +332,39 @@ export class PieceListeComponent implements AfterViewInit  {
 
   public compareCodes(a: any, b: any){
     return (a.value < b.value ? -1 : a.value > b.value ? 1 : 0)
+  }
+
+  public mail(piece: Piece){
+    //Display the mail dialog
+    this.dialog.open(MailComponent, {
+      data: {
+        destinataires: '',
+        emetteur: this.userService.currentUser.mail,
+        sujet: piece.description,
+        contenu: "Veuillez trouver ci-joint "+ piece.description + " (" + piece.nom + ")." + "\r\n\r\nCordialement.\r\n"+this.userService.currentUser.nom,
+        pieces: [piece]
+      }
+    });
+  }
+
+  public mailAll(){
+    //Manage all selected pieces
+    var selectedPieces: Piece[]  = [];
+    var selectedPiecesText: string = "";
+    for (let item of this.selection.selected) {
+      selectedPieces.push(item);
+      selectedPiecesText += " - "+item.description + " (" + item.nom + ")\r\n"
+    }
+    //Display the mail dialog
+    this.dialog.open(MailComponent, {
+      data: {
+        destinataires: '',
+        emetteur: this.userService.currentUser.mail,
+        sujet: "",
+        contenu: "Veuillez trouver ci-joint :\r\n"+ selectedPiecesText + "\r\n\r\nCordialement.\r\n"+this.userService.currentUser.nom,
+        pieces: selectedPieces
+      }
+    });
   }
 
 }
