@@ -15,6 +15,7 @@ import { AlertService } from '../_services/alert.service';
 import { DocumentService } from '../_services/document.service';
 import { ExportCsvService }      from '../_services/export-csv.service';
 import { Bail } from '../_modeles/bail';
+import { Mouvement } from '../_modeles/mouvement';
 import { BAILTERMEPAIEMENT as bailTermePaiements } from '../_modeles/bail';
 import { BAILTYPEPAIEMENT as bailTypePaiements } from '../_modeles/bail';
 import { BAILPERIODEPAIEMENT as bailPeriodePaiements } from '../_modeles/bail';
@@ -255,6 +256,24 @@ export class BailListeComponent implements AfterViewInit {
 
   goBack(): void {
     this.location.back();
+  }
+
+  public acquitter(bail: Bail){
+    //First step is to create a mouvment
+    let tmpMouvement: Mouvement = new Mouvement();
+    tmpMouvement.id = this.documentService.getUniqueId(4);
+    tmpMouvement.date = new Date();
+    tmpMouvement.bien = bail.bien;
+    tmpMouvement.libelle = "Loyer de " + bail.toString();
+    tmpMouvement.montant = bail.loyer + bail.charges;
+    tmpMouvement.tiers = bail.locataire.toString();
+    tmpMouvement.commentaires = 'Création depuis le bail';
+    //Then add the mouvement in the document
+    this.documentService.document.mouvements.push(tmpMouvement);
+    //Then go to the quittance generation
+    setTimeout(()=>{
+      this.router.navigate(['/quittance',  tmpMouvement.id])
+    },1000);
   }
 
 }

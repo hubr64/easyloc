@@ -140,6 +140,8 @@
                         <mat-icon>more_vert</mat-icon>
                     </button>
                     <mat-menu #menuItem="matMenu" yPosition="below" [overlapTrigger]="false">
+                        <button mat-menu-item title="Acquitter" (click)="acquitter(row)"><mat-icon color="accent">receipt_long</mat-icon> Acquitter</button>
+                        <mat-divider></mat-divider>
                         <button mat-menu-item title="Consulter" routerLink="/fiche/bail/{{row.id}}"><mat-icon color="primary">visibility</mat-icon> Consulter</button>
                         <button mat-menu-item title="Editer" (click)="edit(row)"><mat-icon color="primary">edit</mat-icon> Editer</button>
                         <button mat-menu-item title="Dupliquer" (click)="duplicate(row)"><mat-icon color="primary">content_copy</mat-icon> Dupliquer</button>
