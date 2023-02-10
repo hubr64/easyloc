@@ -259,7 +259,6 @@ export class PieceListeComponent implements AfterViewInit  {
   }
 
   deleteAll(): void {
-    var bailleursMail: string[] = [];
     for (let item of this.selection.selected) {
       this.delete(item);
     }
@@ -344,6 +343,26 @@ export class PieceListeComponent implements AfterViewInit  {
         sujet: piece.description,
         contenu: "Veuillez trouver ci-joint "+ piece.description + " (" + piece.nom + ")." + "\r\n\r\nCordialement.\r\n"+this.userService.currentUser.nom,
         pieces: [piece]
+      }
+    });
+  }
+
+  public mailAll(){
+    //Manage all selected pieces
+    var selectedPieces: Piece[]  = [];
+    var selectedPiecesText: string = "";
+    for (let item of this.selection.selected) {
+      selectedPieces.push(item);
+      selectedPiecesText += " - "+item.description + " (" + item.nom + ")\r\n"
+    }
+    //Display the mail dialog
+    this.dialog.open(MailComponent, {
+      data: {
+        destinataires: '',
+        emetteur: this.userService.currentUser.mail,
+        sujet: "",
+        contenu: "Veuillez trouver ci-joint :\r\n"+ selectedPiecesText + "\r\n\r\nCordialement.\r\n"+this.userService.currentUser.nom,
+        pieces: selectedPieces
       }
     });
   }
