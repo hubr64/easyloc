@@ -93,7 +93,9 @@ export class UserService {
             this.gis_token_client = google.accounts.oauth2.initTokenClient({
                 client_id: this.g_client_id,
                 scope: 'https://www.googleapis.com/auth/drive \
-                        https://www.googleapis.com/auth/gmail.send',
+                        https://www.googleapis.com/auth/gmail.send \
+                        https://www.googleapis.com/auth/gmail.readonly \
+                        https://www.googleapis.com/auth/gmail.modify',
                 prompt: '',
                 callback: (tokenResponse: any) => {
                     console.log("UserService:googleInitClient:initTokenClient:callback");
