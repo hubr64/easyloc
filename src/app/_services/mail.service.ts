@@ -197,6 +197,24 @@ export class MailService {
                               });
                             }
                           }
+                          if(pieceContainer.length==4){
+                            if(pieceContainer[0].trim().toLowerCase()=="compteur"){
+                              this.documentService.document.compteurs.forEach((compteur:any) => {
+                                if(compteur.bien.nom.toLowerCase().indexOf(pieceContainer[1].trim().toLowerCase()) !== -1 && 
+                                  compteur.designation.toLowerCase().indexOf(pieceContainer[2].trim().toLowerCase()) !== -1){
+                                    var compteurValueMail = parseFloat(pieceContainer[3]);
+                                    if(compteurValueMail){
+                                      let compteurValueNew: CompteurValue = new CompteurValue();
+                                      compteurValueNew.dateReleve = new Date();
+                                      compteurValueNew.valeur = compteurValueMail;
+                                      compteurValueNew.preuve = tmpPiece;
+                                      compteurValueNew.commentaires = "Reçu par mail"
+                                      compteur.valeurs.push(compteurValueNew);
+                                    }
+                                }
+                              });
+                            }
+                          }
                         }
                       },
                       (error:any) => {
@@ -204,12 +222,7 @@ export class MailService {
                   });
                 }else{
                   if(mailAttachment.body){
-
-                    console.log("Get mail body without attachment : ");
-                    console.dir(mailBody);
-
                     if(mailBody && mailBody!=''){
-
                       gapi.client.gmail.users.messages.modify({
                         'userId':'me',
                         'id':message.id,
@@ -230,7 +243,6 @@ export class MailService {
                             if(compteur.bien.nom.toLowerCase().indexOf(pieceContainer[1].trim().toLowerCase()) !== -1 && 
                               compteur.designation.toLowerCase().indexOf(pieceContainer[2].trim().toLowerCase()) !== -1){
                                 var compteurValueMail = parseFloat(pieceContainer[3]);
-                                console.dir(compteurValueMail);
                                 if(compteurValueMail){
                                   let compteurValueNew: CompteurValue = new CompteurValue();
                                   compteurValueNew.dateReleve = new Date();
