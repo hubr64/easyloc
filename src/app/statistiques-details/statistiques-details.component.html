@@ -10,11 +10,12 @@
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>Rentabilité globale</mat-panel-title>
-                <mat-panel-description>Rentabilité générale par année sur l'ensemble des biens détenus<mat-icon>stacked_line_chart</mat-icon></mat-panel-description>
+                <mat-panel-description *ngIf="!defaultBien">Rentabilité générale par année sur l'ensemble des biens détenus<mat-icon>stacked_line_chart</mat-icon></mat-panel-description>
+                <mat-panel-description *ngIf="defaultBien">Rentabilité générale par année<mat-icon>stacked_line_chart</mat-icon></mat-panel-description>
             </mat-expansion-panel-header>
             <div echarts [options]="chartOptionGlobaRentability" [loading]="true" class="main-chart mat-elevation-z1" [theme]="configurationService.isDarkMode()?'dark':''"></div>
         </mat-expansion-panel>
-        <mat-expansion-panel>
+        <mat-expansion-panel *ngIf="!defaultBien">
             <mat-expansion-panel-header>
                 <mat-panel-title>Rentabilité ventilée par bien</mat-panel-title>
                 <mat-panel-description>Rentabilité par bien par année<mat-icon>query_stats</mat-icon></mat-panel-description>
@@ -42,6 +43,13 @@
             </mat-expansion-panel-header>
             <div echarts [options]="chartOptionTaux" [loading]="true" class="main-chart mat-elevation-z1" [theme]="configurationService.isDarkMode()?'dark':''"></div>
         </mat-expansion-panel>
+        <mat-expansion-panel *ngIf="!defaultBien">
+            <mat-expansion-panel-header>
+                <mat-panel-title>Investissements par année</mat-panel-title>
+                <mat-panel-description>Investissements globaux par année<mat-icon>account_balance_wallet</mat-icon></mat-panel-description>
+            </mat-expansion-panel-header>
+            <div echarts [options]="chartOptionGlobaInvest" [loading]="true" class="main-chart mat-elevation-z1" [theme]="configurationService.isDarkMode()?'dark':''"></div>
+        </mat-expansion-panel>
     </mat-accordion>
 </div>
 
@@ -56,8 +64,9 @@
         <mat-list>
             <mat-list-item><mat-icon class="stat-icon" color="primary">north_east</mat-icon><span class="stat-title">Entrées</span><span>{{this.bilan[elementToDisplay].in | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].in | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
             <mat-list-item><mat-icon class="stat-icon" color="warn">south_east</mat-icon><span class="stat-title">Sorties</span><span>{{this.bilan[elementToDisplay].out | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].out | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
-            <mat-list-item><mat-icon class="stat-icon">savings</mat-icon><span class="stat-title">Gains cumulés</span><span>{{this.bilan[elementToDisplay].gains | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].gains | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
+            <mat-list-item><mat-icon class="stat-icon">savings</mat-icon><span class="stat-title">Gains cumulés brut</span><span>{{this.bilan[elementToDisplay].gains | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].gains | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
             <mat-list-item><mat-icon class="stat-icon">query_stats</mat-icon><span class="stat-title">Rentabilité Moyenne</span><span>{{this.bilan[elementToDisplay].rentability*100 | number: '1.1-1' }} % <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].rentability*100 | number: '1.1-1' }} %</span></span></mat-list-item>
+            <mat-list-item><mat-icon class="stat-icon">add_business</mat-icon><span class="stat-title">Investissements</span><span>{{this.bilan[elementToDisplay].investissable | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].investissable | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
             <mat-list-item><mat-icon class="stat-icon">event_upcoming</mat-icon><span class="stat-title">Revenus par mois</span><span>{{this.bilan[elementToDisplay].revenuMensuel | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].revenuMensuel | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
             <mat-list-item><mat-icon class="stat-icon">key</mat-icon><span class="stat-title">Taux de location</span><span>{{this.bilan[elementToDisplay].locationRate*100 | number: '1.1-1' }} % <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].locationRate*100 | number: '1.1-1' }} %</span></span></mat-list-item>
             <mat-list-item><mat-icon class="stat-icon">apartment</mat-icon><span class="stat-title">Loyer moyen</span><span>{{this.bilan[elementToDisplay].loyer | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].loyer | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
