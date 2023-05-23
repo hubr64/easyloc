@@ -105,7 +105,7 @@ export class Compteur {
     }
 
     toString(): string{
-        return this.designation + " (" + this.id + ")";
+        return this.bien.nom + " - " + this.designation + " (" + this.id + ")";
     }
 
     public get derniereValeur(): CompteurValue|null {

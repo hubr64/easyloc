@@ -67,6 +67,11 @@
             <td mat-cell *matCellDef="let row">{{row.derniereValeur?row.derniereValeur.valeur+' '+row.unite+' ('+(row.derniereValeur.dateReleve | date:'shortDate':'fr-FR')+')':'-'}}</td>
         </ng-container>
 
+        <ng-container matColumnDef="reference">
+            <th mat-header-cell *matHeaderCellDef>Référence</th>
+            <td mat-cell *matCellDef="let row">{{row.id}}</td>
+        </ng-container>
+
         <ng-container matColumnDef="nbValeur">
             <th mat-header-cell *matHeaderCellDef>Nombre relevés</th>
             <td mat-cell *matCellDef="let row">{{row.valeurs.length}}</td>

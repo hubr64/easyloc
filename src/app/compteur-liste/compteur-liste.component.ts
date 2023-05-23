@@ -46,7 +46,7 @@ export class CompteurListeComponent implements AfterViewInit{
   public expandedElement: Compteur | null = null;
 
   // Columns displayed in the table. Columns IDs can be added, removed, or reordered.
-  public displayedColumns = ['select', 'bien', 'designation', 'derniereValeur', 'nbValeur', 'actions'];
+  public displayedColumns = ['select', 'bien', 'designation', 'reference', 'derniereValeur', 'nbValeur', 'actions'];
   public displayedColumnsEmbedded = ['designation', 'derniereValeur', 'nbValeur','visualisation'];
   //Multi selection management
   public initialSelection = [];
