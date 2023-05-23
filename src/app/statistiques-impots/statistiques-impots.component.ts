@@ -6,7 +6,6 @@ import { MAT_RADIO_DEFAULT_OPTIONS} from '@angular/material/radio';
 import { Bien } from '../_modeles/bien';
 import { Mouvement } from '../_modeles/mouvement';
 import { Bail } from '../_modeles/bail';
-import { AlertService } from '../_services/alert.service';
 import { DocumentService } from '../_services/document.service';
 import { ConfigurationService } from '../_services/configuration.service';
 
@@ -35,6 +34,7 @@ type BienTotal = {
 };
 type RegularisationCharges = {
   [key: string]: {
+    chargeNonRecuperees: number,
     chargeNonDeductible: number,
     chargeTropPercu: number
   }
@@ -57,7 +57,7 @@ export class StatistiquesImpotsComponent implements OnInit {
   //Input and output of the components
   @Input() defaultBien: Bien;
 
-  //Varible to store all years to ask to user
+  //Variable to store all years to ask to user
   public annees = Array(10).fill(0).map((x,i)=>new Date().getFullYear() - i);
 
   //Name of the selected bien and selected year
@@ -73,11 +73,18 @@ export class StatistiquesImpotsComponent implements OnInit {
   public txtOut : string[];
   //Boolean to state if the computation of all valus has ended or not
   public computeEnded: boolean = false;
+  //Bolean used to choose if user wants to display or not mouvements details
+  public hideMouvements: boolean = false;
 
-  //Forfait used for the micro-foncier regime (modified after by configuration)
-  public forfaitDeduction: number = 0.3;
+  //Taux used for the micro-foncier regime (modified after by configuration)
+  public tauxMicroFoncier: number = 0.3;
   //The name of the category to group all uncategorized mouvements
   public categorieAutre = "Autre";
+  //Forfait used for to manage each bien
+  public forfaitGestion: number = 20;
+  //Mean taux that is normally  
+  public tauxPartLocataire: number = 0.7;
+
   // All in mouvements classified for each bien by each year
   public mouvementClassifiedIn: MouvementClassified;
   public mouvementClassifiedOut: MouvementClassified;
@@ -97,12 +104,16 @@ export class StatistiquesImpotsComponent implements OnInit {
     this.txtIn.push(this.categorieAutre);
     this.txtOut.push(this.categorieAutre);
     //Get forfait of micro-foncier from configuration
-    this.forfaitDeduction = parseFloat(this.configurationService.getValue('impotDeductionForfaitaire'));
+    this.tauxMicroFoncier = parseFloat(this.configurationService.getValue('impotDeductionForfaitaire'));
+    //Get forfait of micro-foncier from configuration
+    this.forfaitGestion = -parseFloat(this.configurationService.getValue('impotForfaitGestion'));
+    //Get forfait of micro-foncier from configuration
+    this.tauxPartLocataire = parseFloat(this.configurationService.getValue('impotChargesPartLocataire'));
   }
 
   ngOnInit(): void {
     //Initialise the default selected values in the form which is previous year by default
-    this.selectedAnnee = new Date().getFullYear()-1;
+    this.selectedAnnee = new Date().getFullYear();
     if(this.defaultBien){
       this.selectedBien = this.defaultBien.nom;
     }else{
@@ -123,17 +134,31 @@ export class StatistiquesImpotsComponent implements OnInit {
   }
 
   //Fonction to get the loyer without charges of a mouvement corresponding to a loyer paiement (as for taxes both values need to be separated)
-  private getLoyerForMouvement(mouvement: Mouvement): number{
-    var loyer = 0;
+  private getBailForMouvement(mouvement: Mouvement): Bail|undefined{
+    var searchedBail:Bail|undefined;
     //Look into all bails to find the bien of the mouvement
     this.documentService.document.bails.forEach( (bail:Bail) => {
       //If the bail correspond to the mouvement (good bien and good dates) then we have found good bail
-      if(bail.bien == mouvement.bien && bail.dateDebut <= mouvement.date && (!bail.dateFin || bail.dateFin >= mouvement.date )){
+      if(bail.bien == mouvement.bien && bail.dateDebut.setHours(0, 0, 0, 0) <= mouvement.date.setHours(0, 0, 0, 0) && (!bail.dateFin || bail.dateFin.setHours(0, 0, 0, 0) >= mouvement.date.setHours(0, 0, 0, 0) )){
         //Get the loyer of the found bail
-        loyer = bail.loyer;
+        searchedBail = bail;
       }
     });
-    return loyer;
+    return searchedBail;
+  }
+
+  //Function in charge of filtering categories that may not enter in the impot computation (undeductible charge for example)
+  public isUndesiredCategory(category:string): boolean {
+
+    let isUndesiredCategory: boolean = false;
+
+    if(category.indexOf("Travaux de construction")!=-1){
+      isUndesiredCategory = true;
+    }
+    if(category.indexOf("Frais non déductibles")!=-1){
+      isUndesiredCategory = true;
+    }
+    return isUndesiredCategory;
   }
 
   //Global function to compute everything
@@ -153,7 +178,7 @@ export class StatistiquesImpotsComponent implements OnInit {
       if(bien.nom == this.selectedBien || this.selectedBien == 'total'){
         this.mouvementClassifiedIn[bien.nom] = {};
         this.mouvementClassifiedOut[bien.nom] = {};
-        this.regulCharges[bien.nom] = {chargeNonDeductible: 0, chargeTropPercu: 0};
+        this.regulCharges[bien.nom] = {chargeNonRecuperees: 0, chargeNonDeductible: 0, chargeTropPercu: 0};
         this.bienTotal[bien.nom] = {};
       }
     });
@@ -186,52 +211,70 @@ export class StatistiquesImpotsComponent implements OnInit {
 
         //If this is an input
         if(mouvement.montant > 0){
-          //Loop thourgh all possibles texts to organise mouvements by categories
+          //Loop though all possibles texts to organise mouvements by categories
           this.txtIn.forEach( (txt:string) => {
             if(mouvement.libelle.toLowerCase().includes(txt.toLowerCase())){
-
-              //The loyer is a specific input that must be managed to seprate charges from loyer
-              if(txt.toLowerCase().includes("loyer")){
-                var loyer = this.getLoyerForMouvement(mouvement);
-                this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].liste.push({libelle:mouvement.libelle, montant: loyer});
-                this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].total += loyer;
-                this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].charges += mouvement.montant - loyer;
-                this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].total += loyer;
-              }else{
-                this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].liste.push({libelle:mouvement.libelle, montant: mouvement.montant});
-                this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].total += mouvement.montant;
-                this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].total += mouvement.montant;
+              if(!this.isUndesiredCategory(txt)) {
+                //The loyer is a specific input that must be managed to seprate charges from loyer
+                if(txt.toLowerCase().includes("loyer")){
+                  var bail = this.getBailForMouvement(mouvement);
+                  var montantLoyer = bail ? mouvement.montant - bail.charges : mouvement.montant;
+                  this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].liste.push({libelle:mouvement.toString(), montant:montantLoyer});
+                  this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].total += montantLoyer;
+                  //On mémorise le montant des charges perçues
+                  this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].charges += bail ? bail.charges: 0;
+                  this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].total += montantLoyer;
+                }else{
+                  this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].liste.push({libelle:mouvement.toString(), montant: mouvement.montant});
+                  this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].total += mouvement.montant;
+                  this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].total += mouvement.montant;
+                }
               }
               foundLibelle = true;
             }
           });
           // If the mouvement can not be categorized then put it in the default category
           if(!foundLibelle){
-            this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[this.categorieAutre].liste.push({libelle:mouvement.libelle, montant: mouvement.montant});
+            this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[this.categorieAutre].liste.push({libelle:mouvement.toString(), montant: mouvement.montant});
             this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[this.categorieAutre].total += mouvement.montant;
             this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].total += mouvement.montant;
           }
         //If this is an output
         }else{
-          //Loop thourgh all possibles texts to organise mouvements by categories
+          //Loop through all possibles texts to organise mouvements by categories
           this.txtOut.forEach( (txt:string) => {
             if(mouvement.libelle.toLowerCase().includes(txt.toLowerCase())){
-              this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].liste.push({libelle:mouvement.libelle, montant: mouvement.montant});
-              this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].total += mouvement.montant;
+              if(!this.isUndesiredCategory(txt)) {
+                this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].liste.push({libelle:mouvement.toString(), montant: mouvement.montant});
+                this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].total += mouvement.montant;
+                this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].total += mouvement.montant;
+                //On mémorise le montant des charges payées
+                if(mouvement.libelle.toLowerCase().includes("charge")){
+                  this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].charges += mouvement.montant;
+                }
+              }
               foundLibelle = true;
             }
           });
           // If the mouvement can not be categorized then put it in the default category
           if(!foundLibelle){
-            this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[this.categorieAutre].liste.push({libelle:mouvement.libelle, montant: mouvement.montant});
+            this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[this.categorieAutre].liste.push({libelle:mouvement.toString(), montant: mouvement.montant});
             this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[this.categorieAutre].total += mouvement.montant;
+            this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].total += mouvement.montant;
           }
 
-          this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].total += mouvement.montant;
         }
       }
     });
 
+    //Add the forfait accepted by default by the impots for each bien management
+    for (let keyBien in this.mouvementClassifiedIn) {
+      for (let keyYear in this.mouvementClassifiedOut[keyBien]) {
+        this.mouvementClassifiedOut[keyBien][keyYear].mouvements[this.categorieAutre].liste.push({libelle:"Forfait gestion pour frais divers", montant: this.forfaitGestion});
+        this.mouvementClassifiedOut[keyBien][keyYear].mouvements[this.categorieAutre].total += this.forfaitGestion;
+        this.mouvementClassifiedOut[keyBien][keyYear].total += this.forfaitGestion;
+      }
+    }
 
     //Now that all mouvement are categorized compute the total for all categories and the total of the total if all biens are displayed
     for (let keyBien in this.mouvementClassifiedIn) {
@@ -245,7 +288,7 @@ export class StatistiquesImpotsComponent implements OnInit {
         this.bienTotal[keyBien][keyYear].totalIn = tmpIn.total;
         this.bienTotal[keyBien][keyYear].totalOut = tmpOut.total;
         //Compute whther it's better to choose real or micro-foncier deduction
-        if(tmpIn.total * this.forfaitDeduction > -tmpOut.total){
+        if(tmpIn.total * this.tauxMicroFoncier > -tmpOut.total){
           this.bienTotal[keyBien][keyYear].bestForfait = true;
         }
         //Also compute the total of all totals
@@ -261,14 +304,14 @@ export class StatistiquesImpotsComponent implements OnInit {
 
     //Now that the total of total is filled we can decide which regime is the best for the total
     for (let keyYear in this.bienTotal['total']) {
-      if(this.bienTotal['total'][keyYear].totalIn * this.forfaitDeduction > -this.bienTotal['total'][keyYear].totalOut){
+      if(this.bienTotal['total'][keyYear].totalIn * this.tauxMicroFoncier > -this.bienTotal['total'][keyYear].totalOut){
         this.bienTotal['total'][keyYear].bestForfait = true;
       }
     }
+
     //Computation is now fully ended
     this.computeEnded = true;
   }
-
 
   //Function used to get the pointage field of the CERFA document according to the computed catgeory
   public getPointage(txt:string): string{
@@ -298,7 +341,7 @@ export class StatistiquesImpotsComponent implements OnInit {
     if(txt.toLowerCase().includes("intérêts")){
       returnStr = "250";
     }
-    if(txt.toLowerCase().includes("frais")){
+    if(txt.toLowerCase().includes("garantie")){
       returnStr = "250";
     }
     return returnStr;
@@ -316,8 +359,9 @@ export class StatistiquesImpotsComponent implements OnInit {
     }
     return total;
   }
+
   //Compute the total for all recuperables charges of all biens
-  public getChargesRecuperablesTotal(annee: number){
+  public getChargesPercuesTotal(annee: number){
     var chargesRecuperables = 0
     for (let keyBien in this.mouvementClassifiedIn) {
       if(this.mouvementClassifiedIn[keyBien][annee]) {
@@ -325,6 +369,25 @@ export class StatistiquesImpotsComponent implements OnInit {
       }
     }
     return chargesRecuperables;
+  }
+  //Compute the total for all recuperables charges of all biens
+  public getChargesPayeesTotal(annee: number){
+    var chargesRecuperables = 0
+    for (let keyBien in this.mouvementClassifiedOut) {
+      if(this.mouvementClassifiedOut[keyBien][annee]) {
+        chargesRecuperables +=  this.mouvementClassifiedOut[keyBien][annee].charges;
+      }
+    }
+    return chargesRecuperables;
+  }
+
+  //Compute the total for all non recupered charges of all biens
+  public getChargesNonRecupereesTotal(){
+    var chargeNonRecuperees = 0
+    for (let keyBien in this.regulCharges) {
+      chargeNonRecuperees +=  this.regulCharges[keyBien].chargeNonRecuperees;
+    }
+    return chargeNonRecuperees;
   }
   //Compute the total for all non deductibles charges of all biens
   public getChargesNonDeductiblesTotal(){
@@ -345,11 +408,12 @@ export class StatistiquesImpotsComponent implements OnInit {
 
   //Compute the global regularisation charges values according to all possibles catgories of regularisation charges
   public getRegularisationCharges(bienNom: string){
-    var charges = 0;
+    var charges:number = 0;
     this.documentService.document.biens.forEach( (bien:Bien) => {
       if(bien.nom == bienNom || bienNom == 'total'){
         if(this.regulCharges[bien.nom]){
-          //Get the two values input by the user
+          //Get the values input by the user
+          charges -= this.regulCharges[bien.nom].chargeNonRecuperees; // Theses charges are negatives as they decrease our plus-values
           charges += this.regulCharges[bien.nom].chargeNonDeductible;
           charges += this.regulCharges[bien.nom].chargeTropPercu;
         }
@@ -372,7 +436,7 @@ export class StatistiquesImpotsComponent implements OnInit {
       const tmpOut = this.bienTotal[bienNom][annee].totalOut;
       //Ask result for the micro-foncier
       if(this.selectedRegime == 2){
-        toDeclare = tmpIn - tmpIn * this.forfaitDeduction;
+        toDeclare = tmpIn - tmpIn * this.tauxMicroFoncier;
       }
       //Ask result for the real so need to take into account the regularised charges
       if(this.selectedRegime == 1){
