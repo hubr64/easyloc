@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA} from '@angular/material/dialog';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, ValidatorFn, ValidationErrors, AbstractControl } from '@angular/forms';
 import { Observable} from 'rxjs';
 import { map, startWith} from 'rxjs/operators';
 
@@ -31,11 +31,14 @@ export class MouvementDetailsComponent implements OnInit {
     const Out = this.configurationService.getValue('mouvementAutoCompleteOut').split(";");
     //Concatenate both lists together
     this.libellesAuto = In.concat(Out); 
+    // Supprimer les doublons en utilisant un Set
+    this.libellesAuto = [...new Set(this.libellesAuto)];
     //Sort list alphabetically
     this.libellesAuto = this.libellesAuto.sort();
   }
 
   ngOnInit(): void {
+
     this.mouvementForm = new FormGroup({
       'date': new FormControl('', [
         Validators.required
@@ -142,6 +145,18 @@ export class MouvementDetailsComponent implements OnInit {
     }else{
       return -1;
     }
+  }
+
+  public isMouvementForCharge(): boolean {
+
+    let mouvementIsCharge: boolean = false;
+
+    //If a montant is provided and if it is negative
+    if(this.montant && parseFloat(this.montant.value) < 0){
+      mouvementIsCharge = true;
+    }
+
+    return mouvementIsCharge;
   }
 
 }

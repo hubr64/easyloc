@@ -48,10 +48,20 @@ export class MouvementListeComponent implements AfterViewInit {
   public bienFilter = new FormControl('');
   public typeFilter = new FormControl('');
   public searchFilter = new FormControl('');
-  public filterValues: any = {
+  public startDateFilter = new FormControl<Date | null>(null);
+  public endDateFilter = new FormControl<Date | null>(null);
+  public filterValues: {
+    bien: string|null,
+    type: string|null,
+    search: string|null,
+    startDate: Date|null,
+    endDate: Date|null
+  } = {
     bien: '',
     type: '',
-    search: ''
+    search: '',
+    startDate: null,
+    endDate: null
   }
 
   constructor(
@@ -95,6 +105,14 @@ export class MouvementListeComponent implements AfterViewInit {
       this.filterValues.search = search;
       this.dataSource.filter = JSON.stringify(this.filterValues);
     });
+    this.startDateFilter.valueChanges.subscribe((startDate:Date | null) => {
+      this.filterValues.startDate = startDate;
+      this.dataSource.filter = JSON.stringify(this.filterValues);
+    });
+    this.endDateFilter.valueChanges.subscribe((endDate:Date | null) => {
+      this.filterValues.endDate = endDate;
+      this.dataSource.filter = JSON.stringify(this.filterValues);
+    });
   }
 
   getData(): void {
@@ -128,8 +146,12 @@ export class MouvementListeComponent implements AfterViewInit {
   private createFilter(): (mouvement: Mouvement, filter: string) => boolean {
     let filterFunction = function (mouvement: Mouvement, filter: string): boolean {
       let searchTerms = JSON.parse(filter);
+      if(searchTerms.startDate){searchTerms.startDate = new Date(searchTerms.startDate);}
+      if(searchTerms.endDate){searchTerms.endDate = new Date(searchTerms.endDate);}
       return (searchTerms.bien.length==0 || (searchTerms.bien.length>0 && mouvement.bien.id.indexOf(searchTerms.bien) !== -1))
-        && (searchTerms.type.length==0 || (searchTerms.type.length>0 && ((searchTerms.type=='in'&& mouvement.montant > 0) || (searchTerms.type=='out'&& mouvement.montant < 0))))
+        && (searchTerms.type.length==0 || (searchTerms.type.length>0 && ((searchTerms.type=='in'&& mouvement.montant > 0) || (searchTerms.type=='out'&& mouvement.montant < 0) )))
+        && (searchTerms.startDate == null || (searchTerms.startDate!=null && mouvement.date.getTime() >= searchTerms.startDate.getTime()))
+        && (searchTerms.endDate == null || (searchTerms.endDate!=null && mouvement.date.getTime() <= searchTerms.endDate.getTime()))
         && JSON.stringify(mouvement.toJSON()).toLowerCase().indexOf(searchTerms.search.toLowerCase()) !== -1;
     }
     return filterFunction;
@@ -141,6 +163,8 @@ export class MouvementListeComponent implements AfterViewInit {
     if(!this.defaultBien){
       this.bienFilter.setValue('');
     }
+    this.startDateFilter.setValue(null);
+    this.endDateFilter.setValue(null);
   }
 
   public getTotal(): number{
@@ -185,7 +209,7 @@ export class MouvementListeComponent implements AfterViewInit {
       if(result){
         mouvement.date = result.date;
         mouvement.libelle = result.libelle;
-        mouvement.montant = result.montant;
+        mouvement.montant = parseFloat(result.montant);
         mouvement.tiers = result.tiers;
         mouvement.commentaires = result.commentaires;
         this.documentService.document.biens.forEach((docBien:Bien) => {
