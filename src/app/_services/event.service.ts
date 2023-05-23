@@ -558,7 +558,7 @@ export class EventService {
               var monthFound = false;
 
               //If the compare period is before the begining of the bail then it is considered as paid
-              if(comparePeriod < bail.dateDebut){
+              if(comparePeriod.setHours(0, 0, 0, 0) < bail.dateDebut.setHours(0, 0, 0, 0)){
                 monthFound = true;
               }
     

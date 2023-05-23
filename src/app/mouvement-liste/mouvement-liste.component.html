@@ -27,8 +27,18 @@
         </mat-select>
     </mat-form-field>
     <mat-form-field>
+        <mat-label>Date</mat-label>
+        <mat-icon matPrefix>date_range</mat-icon> 
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate [formControl]="startDateFilter">
+          <input matEndDate [formControl]="endDateFilter">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker startView="year" #picker></mat-date-range-picker>
+      </mat-form-field>
+    <mat-form-field>
         <mat-label>Type</mat-label>
-        <mat-icon matPrefix>shuffle</mat-icon> 
+        <mat-icon matPrefix>open_in_full</mat-icon> 
         <mat-select [formControl]="typeFilter">
             <mat-option value="" selected>Tous</mat-option>
             <mat-option value="in">Entrées</mat-option>

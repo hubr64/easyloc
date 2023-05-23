@@ -16,7 +16,7 @@
     min-height: 48px;
 }
 table{
-    min-width: 1360px;
+    min-width: 1365px;
 }
 table td:nth-child(4),
 table td:nth-child(6),
@@ -39,8 +39,11 @@ table td:nth-child(3){
     min-width: 160px;
 }
 table td:nth-child(5){
-    min-width: 125px;
+    min-width: 130px;
     text-align: left;
+}
+table td:nth-child(5) mat-icon{
+    vertical-align:middle;
 }
 .success-alert .success-border{
     border-left-width: 5px;

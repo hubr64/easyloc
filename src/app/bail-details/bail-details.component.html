@@ -143,4 +143,10 @@
         </ng-template>
         <app-pieces-jointes-details *ngIf="bail" [container]="bail"></app-pieces-jointes-details>
     </mat-tab>
+    <mat-tab [disabled]="!bail">
+        <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">euro</mat-icon> Suivi de charges
+        </ng-template>
+        <app-statistiques-bails [bail]="bail" *ngIf="bail"></app-statistiques-bails>
+    </mat-tab>
 </mat-tab-group>

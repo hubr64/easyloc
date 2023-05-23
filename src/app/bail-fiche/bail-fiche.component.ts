@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { MatPaginator } from '@angular/material/paginator';
@@ -34,14 +34,14 @@ export class BailFicheComponent implements OnInit, AfterViewInit {
   public bailTermePaiements = bailTermePaiements;
   public bailTypePaiements = bailTypePaiements;
   public bailPeriodePaiements = bailPeriodePaiements;
-  // All table elements for mouvements
+  // All table elements for loyer mouvements
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table!: MatTable<Mouvement>;
   public dataSource: MatTableDataSource<Mouvement>;
   public displayedColumns = ['date', 'libelle', 'montant', 'quittance'];
-  //All mouvements for the current bien
-  public mouvements: Mouvement[];
+  //All loyer mouvements for the current bail
+  public quittances: Mouvement[];
   //Get in configuration the mandatary pieces for the piece container provided
   public piecesObligatoires: string;
   //The HTML element that contains element to display in PDF
@@ -66,15 +66,15 @@ export class BailFicheComponent implements OnInit, AfterViewInit {
     this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
       if(isLoaded){
           this.getData();
-          this.getMouvements();
+          this.getQuittances();
       }
     });
   }
 
   ngAfterViewInit(): void {
     
-    //Get specific mouvements related to that bail (mouvement for the bien, with quittance and during the bail)
-    this.getMouvements();
+    //Get specific loyer mouvements related to that bail (mouvement for the bien, with quittance and during the bail)
+    this.getQuittances();
   }
 
   getData(): void {
@@ -105,21 +105,21 @@ export class BailFicheComponent implements OnInit, AfterViewInit {
     this.location.back();
   }
 
-  public getMouvements(){
-    this.mouvements = [];
+  public getQuittances(){
+    this.quittances = [];
     for (var _i = 0; _i < this.documentService.document.mouvements.length; _i++) {
       // Find the requested one
       if(this.documentService.document.mouvements[_i].bien.id == this.bail.bien.id && 
         this.documentService.document.mouvements[_i].quittance &&
-        this.documentService.document.mouvements[_i].date > this.bail.dateDebut &&
-        (!this.bail.dateFin || this.documentService.document.mouvements[_i].date < this.bail.dateFin)
+        this.documentService.document.mouvements[_i].date.setHours(0, 0, 0, 0) >= this.bail.dateDebut.setHours(0, 0, 0, 0) &&
+        (!this.bail.dateFin || this.documentService.document.mouvements[_i].date.setHours(0, 0, 0, 0) <= this.bail.dateFin.setHours(0, 0, 0, 0))
       ){
-        this.mouvements.push(this.documentService.document.mouvements[_i]);
+        this.quittances.push(this.documentService.document.mouvements[_i]);
       }
     }
     
     // Configure table
-    this.dataSource = new MatTableDataSource(this.mouvements);
+    this.dataSource = new MatTableDataSource(this.quittances);
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
   }
