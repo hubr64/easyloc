@@ -95,12 +95,13 @@ import { MouvementPickDialogComponent } from './mouvement-pick-dialog/mouvement-
 import { CompteurListeComponent } from './compteur-liste/compteur-liste.component';
 import { CompteurDetailsComponent } from './compteur-details/compteur-details.component';
 import { CompteurValueDetailsComponent } from './compteur-value-details/compteur-value-details.component';
+import { CompteurValueFicheComponent } from './compteur-value-fiche/compteur-value-fiche.component';
+import { StatistiquesBailsComponent } from './statistiques-bails/statistiques-bails.component';
 // Helpers
 import { FilterConfigurationPipe } from './_helpers/filter-configuration.pipe';
 import { DndDirective } from './_helpers/dnd.directive';
 import { VarDirective } from './_helpers/ng-var.directive';
 import { OrderByPipe } from './_helpers/orderby.pipe';
-import { CompteurValueFicheComponent } from './compteur-value-fiche/compteur-value-fiche.component';
 
 registerLocaleData(localeFr);
 
@@ -162,7 +163,8 @@ const globalRippleConfig: RippleGlobalOptions = {
     CompteurListeComponent,
     CompteurDetailsComponent,
     CompteurValueDetailsComponent,
-    CompteurValueFicheComponent
+    CompteurValueFicheComponent,
+    StatistiquesBailsComponent
   ],
   imports: [
     BrowserModule,
