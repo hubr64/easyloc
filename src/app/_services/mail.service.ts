@@ -21,6 +21,8 @@ export class MailService {
   public destinataires : string[] = [];
   //Boundary for mail with atachments
   private uploadBoundary = "000000000001981foo_bar_baz";
+  //Boolean to only read mail once per sessions
+  private readMail: boolean = false;
 
   constructor(
     public alertService: AlertService,
@@ -50,8 +52,11 @@ export class MailService {
       //Loading is finished
       this.isLoading = false;
       console.log("MailService:constructor:isLoading " + this.isLoading);
-      //Now read for mails
-      this.readEasylocMails();
+      //Now read for mails only once a session
+      if(!this.readMail){
+        this.readEasylocMails();
+        this.readMail = true;
+      }
     });
   }
 
@@ -80,7 +85,7 @@ export class MailService {
           }).execute( (messageGetRes:any) => {
             //Get all the parts of the mail content
             var mailParts = messageGetRes.payload.parts;
-
+            console.dir(messageGetRes);
             //If there are more than one part (the cbody and at least one piece)
             if(mailParts.length>1){
               //Get mail body
@@ -91,7 +96,7 @@ export class MailService {
                 //Get the first part body which should be the text plain part
                 mailBody = mailBody.parts[0].body
                 //Convert base64 string to classic string
-                mailBody = atob(mailBody.data);
+                mailBody = this.b64DecodeUnicode(mailBody.data);
               }
               //If this a plaintext body (without attachment)
               if(mailBody.mimeType == "text/plain"){
@@ -111,7 +116,7 @@ export class MailService {
                 //If the attachment has a body and inside it an attachment id then can continue
                 if(mailAttachment.body && mailAttachment.body.attachmentId){
                   //Get this attachment base on its id and parent message id
-                  console.log("Chargement de la piece " + mailAttachment.body.attachmentId);
+                  console.log("Chargement de la pièce...");
                   gapi.client.gmail.users.messages.attachments.get({
                     'userId': 'me',
                     'messageId': message.id,
@@ -131,7 +136,7 @@ export class MailService {
                     const blobPiece = new Blob([ar], {type: mailAttachment.mimeType});
                     const filePiece = new File([blobPiece], mailAttachment.filename, { type: mailAttachment.mimeType });
 
-                    console.log("Conversion File terminée et envoi dans le Drive de la piece " + mailAttachment.body.attachmentId);
+                    console.log("Conversion en fichier terminée et envoi dans le Drive");
 
                     //Add this file to the drive easyloc folder
                     this.driveService.addFileInDocumentFolder(filePiece).subscribe(
@@ -148,17 +153,6 @@ export class MailService {
                         //Inform user that a new piece is now retreived
                         this.alertService.success("Une nouvelle pièce a été importée par mail ("+mailAttachment.filename+").")
 
-                        gapi.client.gmail.users.messages.modify({
-                          'userId':'me',
-                          'id':message.id,
-                          'resource': {
-                              'addLabelIds':[],
-                              'removeLabelIds': ['UNREAD']
-                          }
-                        }).execute( (messageModifyRes:any) => {
-                          console.log("UNREAD label is now removed.");
-                        });
-
                         //Now try to link the piece with an object
                         if(mailBody && mailBody!=''){
                           //Explode the body to get container information
@@ -166,6 +160,7 @@ export class MailService {
                           //Container must be defined with at least two informations
                           if(pieceContainer.length==2){
                             if(pieceContainer[0].trim().toLowerCase()=="bien"){
+                              console.log("Mail attachment is for bien.");
                               this.documentService.document.biens.forEach((bien:any) => {
                                 if(bien.nom.toLowerCase().indexOf(pieceContainer[1].trim().toLowerCase()) !== -1){
                                   bien.pieces.push(tmpPiece);
@@ -173,6 +168,7 @@ export class MailService {
                               });
                             }
                             if(pieceContainer[0].trim().toLowerCase()=="locataire"){
+                              console.log("Mail attachment is for locataire.");
                               this.documentService.document.locataires.forEach((locataire:any) => {
                                 if(locataire.nom.toLowerCase().indexOf(pieceContainer[1].trim().toLowerCase()) !== -1){
                                   locataire.pieces.push(tmpPiece);
@@ -180,16 +176,15 @@ export class MailService {
                               });
                             }
                             if(pieceContainer[0].trim().toLowerCase()=="bail"){
+                              console.log("Mail attachment is for bail.");
                               this.documentService.document.bails.forEach((bail:any) => {
                                 if(bail.locataire.nom.toLowerCase().indexOf(pieceContainer[1].trim().toLowerCase()) !== -1){
-                                  bail.pieces.push(tmpPiece);
-                                }
-                                if(bail.bien.nom.toLowerCase().indexOf(pieceContainer[1].trim().toLowerCase()) !== -1){
                                   bail.pieces.push(tmpPiece);
                                 }
                               });
                             }
                             if(pieceContainer[0].trim().toLowerCase()=="bailleur"){
+                              console.log("Mail attachment is for bailleur.");
                               this.documentService.document.bailleurs.forEach((bailleur:any) => {
                                 if(bailleur.nom.toLowerCase().indexOf(pieceContainer[1].trim().toLowerCase()) !== -1){
                                   bailleur.pieces.push(tmpPiece);
@@ -199,6 +194,7 @@ export class MailService {
                           }
                           if(pieceContainer.length==4){
                             if(pieceContainer[0].trim().toLowerCase()=="compteur"){
+                              console.log("Mail attachment is for compteur.");
                               this.documentService.document.compteurs.forEach((compteur:any) => {
                                 if(compteur.bien.nom.toLowerCase().indexOf(pieceContainer[1].trim().toLowerCase()) !== -1 && 
                                   compteur.designation.toLowerCase().indexOf(pieceContainer[2].trim().toLowerCase()) !== -1){
@@ -210,12 +206,25 @@ export class MailService {
                                       compteurValueNew.preuve = tmpPiece;
                                       compteurValueNew.commentaires = "Reçu par mail"
                                       compteur.valeurs.push(compteurValueNew);
+                                      tmpPiece.description = compteur.bien.nom + " - Preuve compteur - " + compteur.designation;
                                     }
                                 }
                               });
                             }
                           }
                         }
+
+                        //Remove read status of the mail
+                        gapi.client.gmail.users.messages.modify({
+                          'userId':'me',
+                          'id':message.id,
+                          'resource': {
+                              'addLabelIds':[],
+                              'removeLabelIds': ['UNREAD']
+                          }
+                        }).execute( (messageModifyRes:any) => {
+                          console.log("UNREAD label is now removed.");
+                        });
                       },
                       (error:any) => {
                       });
@@ -223,16 +232,6 @@ export class MailService {
                 }else{
                   if(mailAttachment.body){
                     if(mailBody && mailBody!=''){
-                      gapi.client.gmail.users.messages.modify({
-                        'userId':'me',
-                        'id':message.id,
-                        'resource': {
-                            'addLabelIds':[],
-                            'removeLabelIds': ['UNREAD']
-                        }
-                      }).execute( (messageModifyRes:any) => {
-                        console.log("UNREAD label is now removed.");
-                      });
 
                       //Explode the body to get container information
                       var pieceContainer: string[] = mailBody.trim().split(":");
@@ -254,6 +253,18 @@ export class MailService {
                           });
                         }
                       }
+
+                      //Remove read status of the mail
+                      gapi.client.gmail.users.messages.modify({
+                        'userId':'me',
+                        'id':message.id,
+                        'resource': {
+                            'addLabelIds':[],
+                            'removeLabelIds': ['UNREAD']
+                        }
+                      }).execute( (messageModifyRes:any) => {
+                        console.log("UNREAD label is now removed.");
+                      });
                     }
                   }
                 }
