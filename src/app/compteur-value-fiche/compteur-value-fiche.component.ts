@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ViewChild } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild, ChangeDetectorRef } from '@angular/core';
 
 import { EChartsOption, SeriesOption } from 'echarts';
 import { MatTable } from '@angular/material/table';
@@ -9,6 +9,7 @@ import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AlertService } from '../_services/alert.service';
 import { DocumentService } from '../_services/document.service';
 import { ConfigurationService } from '../_services/configuration.service';
+import { DriveService } from '../_services/drive.service';
 import { Compteur, CompteurValue } from '../_modeles/compteur';
 import { Piece } from '../_modeles/piece';
 import { DialogDeleteConfirmComponent } from '../dialog-delete-confirm/dialog-delete-confirm.component';
@@ -30,15 +31,22 @@ export class CompteurValueFicheComponent implements OnInit {
 
   // Columns displayed in the table. Columns IDs can be added, removed, or reordered.
   public displayedColumns = ['dateReleve', 'valeur', 'preuve', 'actions'];
-
+  //Chart options to see value evoltuion
   public chartOptions: EChartsOption;
+
+  //URL for each proof
+  public urlPreuves: {[key: string]: string} = {};
+  //404 error for each proof
+  public errorPreuves: {[key: string]: number} = {};
 
   constructor(
     public alertService: AlertService,
     public documentService: DocumentService,
     public configurationService: ConfigurationService,
+    public driveService: DriveService,
     public dialog: MatDialog,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -65,6 +73,28 @@ export class CompteurValueFicheComponent implements OnInit {
     // Manage values to prepare charting them
     var tmpValues = this.prepareValuesToGraph();
     this.computeChartOptions(tmpValues);
+
+    //Get download link for the value proof
+    this.compteur.valeurs.forEach((valeur:CompteurValue) => {
+      if(valeur.preuve && valeur.preuve.id){
+        this.driveService.get(valeur.preuve.id).then( 
+          (response: any) => {
+            if(valeur.preuve && valeur.preuve.id){
+              this.urlPreuves[valeur.preuve.id] = response.result.webContentLink;
+              this.cdr.detectChanges();
+            }
+          },
+          (error:any) => {
+            if(error.status==404){
+              if(valeur.preuve && valeur.preuve.id){
+                this.errorPreuves[valeur.preuve.id] = error.status;
+                this.cdr.detectChanges();
+              }
+            }
+          }
+        );
+      }
+    });
 
   }
 
