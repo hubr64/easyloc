@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild, Inject, Input, Output, EventEmitter } from '@angular/core';
+import { AfterViewInit, Component, ViewChild, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { FormControl } from '@angular/forms';
@@ -11,6 +11,7 @@ import { MatDialog} from '@angular/material/dialog';
 
 import { AlertService } from '../_services/alert.service';
 import { DocumentService } from '../_services/document.service';
+import { DriveService } from '../_services/drive.service';
 import { ExportCsvService }      from '../_services/export-csv.service';
 import { Mouvement } from '../_modeles/mouvement';
 import { Bien } from '../_modeles/bien';
@@ -64,10 +65,17 @@ export class MouvementListeComponent implements AfterViewInit {
     endDate: null
   }
 
+  //URL for each quittance
+  public urlQuittances: {[key: string]: string} = {};
+  //404 error for each quittance
+  public errorQuittances: {[key: string]: number} = {};
+
   constructor(
     public alertService: AlertService,
     public documentService: DocumentService,
     private exportCsvService: ExportCsvService,
+    public driveService: DriveService,
+    private cdr: ChangeDetectorRef,
     private router: Router,
     public dialog: MatDialog
   ) {}
@@ -129,6 +137,27 @@ export class MouvementListeComponent implements AfterViewInit {
     this.selection.changed.subscribe(()=>{
       this.selected.emit(this.selection.selected);
     })
+    //Get download link for each quittance
+    this.documentService.document.mouvements.forEach((mouvement:Mouvement) => {
+      if(mouvement.quittance && mouvement.quittance.id){
+        this.driveService.get(mouvement.quittance.id).then( 
+          (response: any) => {
+            if(mouvement.quittance && mouvement.quittance.id){
+              this.urlQuittances[mouvement.quittance.id] = response.result.webContentLink;
+              this.cdr.detectChanges();
+            }
+          },
+          (error:any) => {
+            if(error.status==404){
+              if(mouvement.quittance && mouvement.quittance.id){
+                this.errorQuittances[mouvement.quittance.id] = error.status;
+                this.cdr.detectChanges();
+              }
+            }
+          }
+        );
+      }
+    });
   }
 
   isAllSelected() {

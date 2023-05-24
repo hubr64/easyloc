@@ -1357,16 +1357,13 @@ export class StatistiquesDetailsComponent implements OnInit {
     series.push({
       name: "Total investi",
       color: 'rgb(154, 96, 180)',
-      type: 'bar',
+      type: 'line',
       label: {
         show: true,
-        formatter: '{c} €',
-        position: 'insideTop'
+        formatter: '{c} €'
       },
-      barGap: 0,
-      emphasis: {
-        focus: 'series'
-      },
+      smooth: true,
+      yAxisIndex: 1,
       data: totalData
     });
 
@@ -1402,13 +1399,20 @@ export class StatistiquesDetailsComponent implements OnInit {
         type: 'category',
         data: xAxisArray,
       },
-      yAxis: {
+      yAxis: [{
         type: 'value',
         name: 'Montants investis',
         axisLabel: {
           formatter: '{value} €'
         }
       },
+      {
+        type: 'value',
+        name: 'Total',
+        axisLabel: {
+          formatter: '{value} €'
+        }
+      }],
       series: series,
     };
   }

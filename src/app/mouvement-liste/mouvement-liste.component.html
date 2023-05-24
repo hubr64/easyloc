@@ -121,11 +121,22 @@
                     <mat-icon>more_vert</mat-icon>
                 </button>
                 <mat-menu #menuItem="matMenu" yPosition="below" [overlapTrigger]="false">
-                    <button mat-menu-item title="Générer quittance" (click)="generateQuittance(row)"><mat-icon color="accent">receipt_long</mat-icon> Générer quittance</button>
-                    <button mat-menu-item title="Associer quittance" (click)="addQuittance(row)"><mat-icon color="accent" matBadgeColor="accent" matBadge="+">receipt_long</mat-icon> Associer quittance</button>
                     <button mat-menu-item title="Editer" (click)="edit(row)"><mat-icon color="primary">edit</mat-icon> Editer</button>
                     <button mat-menu-item title="Dupliquer" (click)="duplicate(row)"><mat-icon color="primary">content_copy</mat-icon> Dupliquer</button>
                     <button mat-menu-item title="Supprimer" (click)="delete(row)"><mat-icon color="warn">delete</mat-icon> Supprimer</button>
+                    <mat-divider></mat-divider>
+                    <button mat-menu-item title="Générer quittance" (click)="generateQuittance(row)"><mat-icon color="accent">receipt_long</mat-icon> Générer quittance</button>
+                    <button mat-menu-item title="Associer quittance" (click)="addQuittance(row)"><mat-icon color="accent" matBadgeColor="accent" matBadge="+">receipt_long</mat-icon> Associer quittance</button>
+                    <ng-container *ngIf="row.quittance">
+                        <ng-container [ngSwitch]="errorQuittances[row.quittance.id]">
+                            <button mat-menu-item *ngSwitchCase="403" disabled><mat-icon color="warn" title="Erreur 403">report</mat-icon> Télécharger quittance</button>
+                            <button mat-menu-item *ngSwitchCase="404" disabled><mat-icon color="warn" title="Erreur 404">sd_card_alert</mat-icon> Télécharger quittance</button>
+                            <ng-container *ngSwitchDefault>
+                                <a mat-menu-item *ngIf="urlQuittances[row.quittance.id]" [href]="urlQuittances[row.quittance.id]" target="_blank"><mat-icon color="accent" title="Télécharger">cloud_download</mat-icon> Télécharger quittance</a>
+                                <button mat-menu-item *ngIf="!urlQuittances[row.quittance.id]" disabled><mat-icon title="Erreur inconnue">question_mark</mat-icon> Télécharger quittance</button>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
                 </mat-menu>
             </td>
             <td mat-footer-cell *matFooterCellDef>-</td>
