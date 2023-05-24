@@ -21,6 +21,11 @@ export class BienDetailsComponent implements OnInit {
   public bien: Bien;
   //Conversion of bien types in text
   public bienTypes = bienTypes;
+  //Store temporarily the list of bien lies;
+  public biensLies: ({
+    bien: Bien|null,
+    ratio: number
+  }|null)[] = []; 
 
   constructor(
     private route: ActivatedRoute,
@@ -124,11 +129,20 @@ export class BienDetailsComponent implements OnInit {
         commentaire: this.bien.commentaire
       });
   
-      // If the requseted one can not be found (normally impossible) go back;
+      // If the requested one can not be found (normally impossible) go back;
       if(!this.bien){
         this.goBack();
         this.alertService.error('Impossible de trouver le bien demandé !');
       }
+
+      //If the bien is an immeuble and if it has linked biens
+      this.biensLies = [];
+      if(this.bien.type == 'Immeuble' && this.bien.bienslies.length > 0){
+        for (var _i = 0; _i < this.bien.bienslies.length; _i++) {
+          this.addBienLie(this.bien.bienslies[_i]);
+        }
+      }
+
     // New one requested
     }else{
       this.bienForm.patchValue({
@@ -156,11 +170,24 @@ export class BienDetailsComponent implements OnInit {
     const reqId = this.route.snapshot.paramMap.get('_id') || '';
     // IF not new, found existing and replace it
     if(reqId != 'new'){
-      //We update with new values from form and we backup the pieces
+      //We backup the pieces before updating the bien
       const tmpPieces = this.bien.pieces;
+      //We update with new values from form 
       this.bien = Bien.fromJSON(this.bienForm.value, this.documentService.document.bailleurs);
+      //Set the id with the requested id
       this.bien.id = reqId;
+      //Add the pieces previsously backedup
       this.bien.pieces = tmpPieces;
+      //Now linked the biens if existed
+      for (var _i = 0; _i < this.biensLies.length; _i++) {
+        if(this.biensLies[_i] && this.biensLies[_i]!.bien){
+          this.bien.bienslies.push({
+            bien: this.biensLies[_i]!.bien as any,
+            ratio: this.biensLies[_i]!.ratio
+          })
+        }
+      }
+
       //Then we update in the list
       for (var _i = 0; _i < this.documentService.document.biens.length; _i++) {
         if(this.documentService.document.biens[_i].id == this.bien.id){
@@ -171,14 +198,108 @@ export class BienDetailsComponent implements OnInit {
       this.alertService.success('Le bien est maintenant modifié.');
     // If new push it at the end
     }else{
+      //Check if this bien is compliant
       if(this.documentService.checkBien(this.bienForm.value, true)){
+        //Create a bien from form values
         let tmpNew: Bien = Bien.fromJSON(this.bienForm.value, this.documentService.document.bailleurs);
+        //Generate a new UUID
         tmpNew.id = this.documentService.getUniqueId(4);
+        //Now linked the biens if existed
+        for (var _i = 0; _i < this.biensLies.length; _i++) {
+          if(this.biensLies[_i] && this.biensLies[_i]!.bien){
+            tmpNew.bienslies.push({
+              bien: this.biensLies[_i]!.bien as any,
+              ratio: this.biensLies[_i]!.ratio
+            })
+          }
+        }
+        //Add the bien in the document
         this.documentService.document.biens.push(tmpNew);
+        
+        //Final actions
         this.alertService.success('Le bien est maintenant ajouté.');
         this.goBack();
       }
     }
+  }
+
+  public addBienLie(bienLie: any = null){
+    //Add the new bien lie in the list of biens lies
+    this.biensLies.push({
+      bien: bienLie?bienLie.bien:null,
+      ratio: bienLie?bienLie.ratio:0
+    });
+    //Add the control for this bien linked
+    this.bienForm.addControl('bienlie_' + (this.biensLies.length-1) + '_bien', new FormControl('', [Validators.required]));
+    this.bienForm.addControl('bienlie_' + (this.biensLies.length-1) + "_ratio", new FormControl('', [Validators.required,Validators.pattern('[0-9]*')]));
+    //Prefilled control with the value
+    this.bienForm.controls['bienlie_' + (this.biensLies.length-1) + '_bien'].patchValue(this.biensLies[this.biensLies.length-1]?.bien?.id);
+    this.bienForm.controls['bienlie_' + (this.biensLies.length-1) + '_ratio'].patchValue(this.biensLies[this.biensLies.length-1]?.ratio);
+  }
+
+  public removeBienLie(index: number){
+    //Set the linked bien as null (do not remve it otherwise the control name systme won't work any more)
+    this.biensLies[index] = null;
+    //Remove the control (in this way the validators won't raised any more)
+    this.bienForm.removeControl('bienlie_' + index + '_bien');
+    this.bienForm.removeControl('bienlie_' + index + '_ratio');
+    //Update Ratio computation as a bien has been removed
+    this.updateRatio();
+  }
+
+  public updateBienLie(event: any, index: number){
+
+    //Select has changed so try to find the bien according to select value (id of the bien)
+    for (var _i = 0; _i < this.documentService.document.biens.length; _i++) {
+      //The bien has been found in the list
+      if(this.documentService.document.biens[_i].id == event.value){
+        //Update the field with the bien found
+        this.biensLies[index]!.bien = this.documentService.document.biens[_i];
+      }
+    }
+
+    //Update Ratio computation
+    this.updateRatio();
+  }
+
+  public updateBienLieRatio(event: any, index: number){
+    //We just update the ratio in the model but we don't recompute the ratio as it will erase the value input by the user
+    this.biensLies[index]!.ratio = Math.round(event.target.value);
+  }
+
+  public updateRatio(){
+
+    //Loop through all biens lies first to get the maximum
+    let maximum:number = 0;
+    for (var _i = 0; _i < this.biensLies.length; _i++) {
+      if(this.biensLies[_i]){
+        if(this.biensLies[_i]!.bien){
+          maximum += this.biensLies[_i]!.bien!.surface;
+        }
+      }
+    }
+
+    //Now maximum is know compute the ratio for each bien linked
+    for (var _i = 0; _i < this.biensLies.length; _i++) {
+      if(this.biensLies[_i]){
+        if(this.biensLies[_i]!.bien){
+          //Compute ratio
+          this.biensLies[_i]!.ratio = Math.round(this.biensLies[_i]!.bien!.surface/maximum * 100);
+          //Then update the field with the new value
+          this.bienForm.controls['bienlie_' + (_i) + '_ratio'].patchValue(this.biensLies[_i]!.ratio);
+        }
+      }
+    }
+  }
+
+  public isRatioCompliant(): boolean{
+    let sumRatio: number = 0;
+    for (var _i = 0; _i < this.biensLies.length; _i++) {
+      if(this.biensLies[_i]){
+        sumRatio+= this.biensLies[_i]!.ratio;
+      }
+    }
+    return sumRatio == 100;
   }
 
   goBack(): void {

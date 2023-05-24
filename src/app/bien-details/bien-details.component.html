@@ -122,6 +122,44 @@
                     <mat-hint align="end">Commentaires libres pour information</mat-hint>
                 </mat-form-field>
             </div>
+
+            <ng-container *ngIf="bienForm.value.type == 'Immeuble'">
+                <h3><button mat-mini-fab color="accent"><mat-icon>apartment</mat-icon></button> Biens liés</h3>
+                <div class="form-group">
+                    <ng-container *ngFor="let bienlie of biensLies; let i = index">
+                        <ng-container *ngIf="bienlie">
+                            <div class="form-group-bien-lie">
+                                <mat-form-field appearance="fill">
+                                    <mat-label>Bien lié</mat-label>
+                                    <mat-select id="bienlie_{{i}}_bien" formControlName="bienlie_{{i}}_bien" required (selectionChange)="updateBienLie($event, i)">
+                                        <ng-container *ngFor="let docBien of documentService.document.biens | orderBy:'nom'">
+                                            <mat-option *ngIf="docBien.id!= bien.id && docBien.type != 'Immeuble'" [value]="docBien.id">
+                                                {{docBien.nom}}
+                                            </mat-option>
+                                        </ng-container>
+                                    </mat-select>
+                                    <mat-icon *ngIf="bienForm.value['bienlie_'+i+'_bien']" matSuffix color="accent" [routerLink]="'/fiche/bien/'+bienForm.value['bienlie_'+i+'_bien']">visibility</mat-icon>
+                                    <mat-hint align="end">Bien inclus dans l'immeuble</mat-hint>
+                                    <mat-error *ngIf="bienForm.get('bienlie_'+i+'_bien')?.errors?.required">Le bien est obligatoire.</mat-error>
+                                </mat-form-field>
+                                <mat-form-field appearance="fill">
+                                    <mat-label>Tantièmes</mat-label>
+                                    <input type="number" matInput placeholder="Ratio" id="bienlie_{{i}}_ratio" formControlName="bienlie_{{i}}_ratio"  (change)="updateBienLieRatio($event, i)"required>
+                                    <mat-hint align="end">Tantièmes du bien sur l'immeuble (ratio)</mat-hint>
+                                    <mat-error *ngIf="bienForm.get('bienlie_'+i+'_ratio')?.errors?.pattern">Les tantièmes sont un nombre positif.</mat-error>
+                                    <mat-error *ngIf="bienForm.get('bienlie_'+i+'_ratio')?.errors?.required">Les tantièmes sont obligatoires.</mat-error>
+                                </mat-form-field>
+                                <button mat-mini-fab color="warn" type="button" title="Supprimer ce bien lié" (click)="removeBienLie(i)"><mat-icon>close</mat-icon></button>
+                            </div>
+                            <mat-divider></mat-divider>
+                        </ng-container>
+                    </ng-container>
+                    <button mat-mini-fab color="accent" type="button" title="Ajouter un bien lié" (click)="addBienLie()"><mat-icon>add</mat-icon></button>
+                    <button mat-mini-fab *ngIf="biensLies.length>0" color="accent" type="button" title="Recalculer les ratio" (click)="updateRatio()"><mat-icon>data_usage</mat-icon></button>
+                    <mat-error class="bien-lie-error" *ngIf="biensLies.length>0 && !isRatioCompliant()"><mat-icon color="warn">running_with_errors</mat-icon> La somme des tantièmes n'est pas égale à 100.</mat-error>
+                </div>
+            </ng-container>
+
             <div class="form-button">
                 <button mat-flat-button color="primary" type="submit" [disabled]="!bienForm.valid">Enregistrer</button>
             </div>
@@ -133,7 +171,7 @@
         </ng-template>
         <app-pieces-jointes-details *ngIf="bien" [container]="bien"></app-pieces-jointes-details>
     </mat-tab>
-    <mat-tab [disabled]="!bien">
+    <mat-tab [disabled]="!bien || (bien && bien.type=='Immeuble')">
         <ng-template mat-tab-label>
             <mat-icon class="tab-label-icon">query_stats</mat-icon><span class="tab-label-text">Statistiques</span>
         </ng-template>
@@ -151,7 +189,7 @@
         </ng-template>
         <app-compteur-liste *ngIf="bien" [embedded]="true" [defaultBien]="bien"></app-compteur-liste>
     </mat-tab>
-    <mat-tab [disabled]="!bien">
+    <mat-tab [disabled]="!bien || (bien && bien.type=='Immeuble')">
         <ng-template mat-tab-label>
             <mat-icon class="tab-label-icon">account_balance</mat-icon><span class="tab-label-text">Impôts</span>
         </ng-template>
