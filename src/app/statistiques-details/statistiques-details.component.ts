@@ -351,10 +351,6 @@ export class StatistiquesDetailsComponent implements OnInit {
       this.bilan[keyBien].locationRate = (sum / locationRates.length) || 0;
     }
 
-    console.dir(this.bilanParAn);
-    console.dir(this.bilan);
-
-
     if(!this.simple){
       this.computeChartOptionsForGlobalRentability();
       this.computeChartOptionsForBienRentability();
