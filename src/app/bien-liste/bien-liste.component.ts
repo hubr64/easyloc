@@ -175,7 +175,7 @@ export class BienListeComponent implements AfterViewInit {
 
   duplicate(bien: Bien){
     //Duplicate (deep-copy) and first change the name as we can not have the same name in the file
-    const newBien = Bien.fromJSON(bien.toJSON(), this.documentService.document.bailleurs, this.documentService.document.pieces);
+    const newBien = Bien.fromJSON(bien.toJSON(), this.documentService.document.bailleurs, this.documentService.document.pieces, this.documentService.document.biens);
     newBien.id = this.documentService.getUniqueId(4);
     //Add the current bien once again
     this.documentService.document.biens.push(newBien);
