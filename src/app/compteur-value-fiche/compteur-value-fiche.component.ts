@@ -72,6 +72,7 @@ export class CompteurValueFicheComponent implements OnInit {
     this.dataSource.sort = this.sort;
     // Manage values to prepare charting them
     var tmpValues = this.prepareValuesToGraph();
+    //Compute options for graph according to computed values to chart
     this.computeChartOptions(tmpValues);
 
     //Get download link for the value proof
