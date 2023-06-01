@@ -103,6 +103,8 @@ export class StatistiquesImpotsComponent implements OnInit {
     //Add a category for all other mouvements
     this.txtIn.push(this.categorieAutre);
     this.txtOut.push(this.categorieAutre);
+    //Add a specific category for the "Forfait de gestion" authorised by impots 
+    this.txtOut.push("Autres frais de gestion");
     //Get forfait of micro-foncier from configuration
     this.tauxMicroFoncier = parseFloat(this.configurationService.getValue('impotDeductionForfaitaire'));
     //Get forfait of micro-foncier from configuration
@@ -175,11 +177,13 @@ export class StatistiquesImpotsComponent implements OnInit {
 
     //First fill global variables with the list of biens (just the one requested or all if total is selected)
     this.documentService.document.biens.forEach( (bien:Bien) => {
-      if(bien.nom == this.selectedBien || this.selectedBien == 'total'){
-        this.mouvementClassifiedIn[bien.nom] = {};
-        this.mouvementClassifiedOut[bien.nom] = {};
-        this.regulCharges[bien.nom] = {chargeNonRecuperees: 0, chargeNonDeductible: 0, chargeTropPercu: 0};
-        this.bienTotal[bien.nom] = {};
+      if(!bien.isImmeuble()){
+        if(bien.nom == this.selectedBien || this.selectedBien == 'total'){
+          this.mouvementClassifiedIn[bien.nom] = {};
+          this.mouvementClassifiedOut[bien.nom] = {};
+          this.regulCharges[bien.nom] = {chargeNonRecuperees: 0, chargeNonDeductible: 0, chargeTropPercu: 0};
+          this.bienTotal[bien.nom] = {};
+        }
       }
     });
     if(this.selectedBien == 'total'){
@@ -189,89 +193,107 @@ export class StatistiquesImpotsComponent implements OnInit {
     //First analyse all mouvements to get in and outs for each bien and for each year
     this.documentService.document.mouvements.forEach( (mouvement:Mouvement) => {
 
-      // We just get mouvements for selected bien or for all if total is selected
-      if(mouvement.bien.nom == this.selectedBien || this.selectedBien == 'total'){
+      //Le mouvement à analyser est par défaut le mouvement en train d'être parcouru
+      let mouvementsToAnalyse: {
+        montant: number,
+        bien: string
+      }[] = [{montant: mouvement.montant, bien: mouvement.bien.nom}];
 
-        //If objects are not initialized then initialize them first
-        if(!this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()]){
-          this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()] = {mouvements: {}, total: 0, charges: 0};
-          this.txtIn.forEach((txt:string) => {
-            this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt] = {liste:[], total: 0};
-          });
-        }
-        if(!this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()]){
-          this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()] =  {mouvements: {}, total: 0, charges: 0};
-          this.txtOut.forEach((txt:string) => {
-            this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt] = {liste:[], total: 0};
-          });
-        }
-
-        //The variable to define if the mouvement can be categorized or must be add the default category
-        var foundLibelle = false;
-
-        //If this is an input
-        if(mouvement.montant > 0){
-          //Loop though all possibles texts to organise mouvements by categories
-          this.txtIn.forEach( (txt:string) => {
-            if(mouvement.libelle.toLowerCase().includes(txt.toLowerCase())){
-              if(!this.isUndesiredCategory(txt)) {
-                //The loyer is a specific input that must be managed to seprate charges from loyer
-                if(txt.toLowerCase().includes("loyer")){
-                  var bail = this.getBailForMouvement(mouvement);
-                  var montantLoyer = bail ? mouvement.montant - bail.charges : mouvement.montant;
-                  this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].liste.push({libelle:mouvement.toString(), montant:montantLoyer});
-                  this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].total += montantLoyer;
-                  //On mémorise le montant des charges perçues
-                  this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].charges += bail ? bail.charges: 0;
-                  this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].total += montantLoyer;
-                }else{
-                  this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].liste.push({libelle:mouvement.toString(), montant: mouvement.montant});
-                  this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].total += mouvement.montant;
-                  this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].total += mouvement.montant;
-                }
-              }
-              foundLibelle = true;
-            }
-          });
-          // If the mouvement can not be categorized then put it in the default category
-          if(!foundLibelle){
-            this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[this.categorieAutre].liste.push({libelle:mouvement.toString(), montant: mouvement.montant});
-            this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[this.categorieAutre].total += mouvement.montant;
-            this.mouvementClassifiedIn[mouvement.bien.nom][mouvement.date.getFullYear()].total += mouvement.montant;
-          }
-        //If this is an output
-        }else{
-          //Loop through all possibles texts to organise mouvements by categories
-          this.txtOut.forEach( (txt:string) => {
-            if(mouvement.libelle.toLowerCase().includes(txt.toLowerCase())){
-              if(!this.isUndesiredCategory(txt)) {
-                this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].liste.push({libelle:mouvement.toString(), montant: mouvement.montant});
-                this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[txt].total += mouvement.montant;
-                this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].total += mouvement.montant;
-                //On mémorise le montant des charges payées
-                if(mouvement.libelle.toLowerCase().includes("charge")){
-                  this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].charges += mouvement.montant;
-                }
-              }
-              foundLibelle = true;
-            }
-          });
-          // If the mouvement can not be categorized then put it in the default category
-          if(!foundLibelle){
-            this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[this.categorieAutre].liste.push({libelle:mouvement.toString(), montant: mouvement.montant});
-            this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].mouvements[this.categorieAutre].total += mouvement.montant;
-            this.mouvementClassifiedOut[mouvement.bien.nom][mouvement.date.getFullYear()].total += mouvement.montant;
-          }
-
-        }
+      //SI le mouvement est celui d'un bien qui est un immeuble alors il faut ventiler tout aux biens lies
+      if(mouvement.bien.isImmeuble()){
+        mouvementsToAnalyse = [];
+        //ON parcours donc chaque bien lie pour définir le montant ventilé et le bien à rattacher
+        mouvement.bien.bienslies.forEach(bienlie => {
+          mouvementsToAnalyse.push({montant: mouvement.montant * bienlie.ratio / 100, bien: bienlie.bien.nom})
+        });
       }
+
+      //Pour chaque mouvement à analyser ( 1 si bien non immeuble, n si immeuble avec n biens lies)
+      mouvementsToAnalyse.forEach(mouvementToAnalyse => {
+
+        // We just get mouvements for selected bien or for all if total is selected
+        if(mouvementToAnalyse.bien == this.selectedBien || this.selectedBien == 'total'){
+
+          //If objects are not initialized then initialize them first
+          if(!this.mouvementClassifiedIn[mouvementToAnalyse.bien][mouvement.date.getFullYear()]){
+            this.mouvementClassifiedIn[mouvementToAnalyse.bien][mouvement.date.getFullYear()] = {mouvements: {}, total: 0, charges: 0};
+            this.txtIn.forEach((txt:string) => {
+              this.mouvementClassifiedIn[mouvementToAnalyse.bien][mouvement.date.getFullYear()].mouvements[txt] = {liste:[], total: 0};
+            });
+          }
+          if(!this.mouvementClassifiedOut[mouvementToAnalyse.bien][mouvement.date.getFullYear()]){
+            this.mouvementClassifiedOut[mouvementToAnalyse.bien][mouvement.date.getFullYear()] =  {mouvements: {}, total: 0, charges: 0};
+            this.txtOut.forEach((txt:string) => {
+              this.mouvementClassifiedOut[mouvementToAnalyse.bien][mouvement.date.getFullYear()].mouvements[txt] = {liste:[], total: 0};
+            });
+          }
+
+          //The variable to define if the mouvement can be categorized or must be add the default category
+          var foundLibelle = false;
+
+          //If this is an input
+          if(mouvementToAnalyse.montant > 0){
+            //Loop though all possibles texts to organise mouvements by categories
+            this.txtIn.forEach( (txt:string) => {
+              if(mouvement.libelle.toLowerCase().includes(txt.toLowerCase())){
+                if(!this.isUndesiredCategory(txt)) {
+                  //The loyer is a specific input that must be managed to separate charges from loyer
+                  if(txt.toLowerCase().includes("loyer")){
+                    var bail = this.getBailForMouvement(mouvement);
+                    var montantLoyer = bail ? mouvementToAnalyse.montant - bail.charges : mouvementToAnalyse.montant;
+                    this.mouvementClassifiedIn[mouvementToAnalyse.bien][mouvement.date.getFullYear()].mouvements[txt].liste.push({libelle:mouvement.toString(), montant:montantLoyer, fromImmeuble: false});
+                    this.mouvementClassifiedIn[mouvementToAnalyse.bien][mouvement.date.getFullYear()].mouvements[txt].total += montantLoyer;
+                    //On mémorise le montant des charges perçues
+                    this.mouvementClassifiedIn[mouvementToAnalyse.bien][mouvement.date.getFullYear()].charges += bail ? bail.charges: 0;
+                    this.mouvementClassifiedIn[mouvementToAnalyse.bien][mouvement.date.getFullYear()].total += montantLoyer;
+                  }else{
+                    this.mouvementClassifiedIn[mouvementToAnalyse.bien][mouvement.date.getFullYear()].mouvements[txt].liste.push({libelle:mouvement.toString(), montant: mouvementToAnalyse.montant, fromImmeuble: mouvementToAnalyse.montant!=mouvement.montant});
+                    this.mouvementClassifiedIn[mouvementToAnalyse.bien][mouvement.date.getFullYear()].mouvements[txt].total += mouvementToAnalyse.montant;
+                    this.mouvementClassifiedIn[mouvementToAnalyse.bien][mouvement.date.getFullYear()].total += mouvementToAnalyse.montant;
+                  }
+                }
+                foundLibelle = true;
+              }
+            });
+            // If the mouvement can not be categorized then put it in the default category
+            if(!foundLibelle){
+              this.mouvementClassifiedIn[mouvementToAnalyse.bien][mouvement.date.getFullYear()].mouvements[this.categorieAutre].liste.push({libelle:mouvement.toString(), montant: mouvementToAnalyse.montant, fromImmeuble: mouvementToAnalyse.montant!=mouvement.montant});
+              this.mouvementClassifiedIn[mouvementToAnalyse.bien][mouvement.date.getFullYear()].mouvements[this.categorieAutre].total += mouvementToAnalyse.montant;
+              this.mouvementClassifiedIn[mouvementToAnalyse.bien][mouvement.date.getFullYear()].total += mouvementToAnalyse.montant;
+            }
+          //If this is an output
+          }else{
+            //Loop through all possibles texts to organise mouvements by categories
+            this.txtOut.forEach( (txt:string) => {
+              if(mouvement.libelle.toLowerCase().includes(txt.toLowerCase())){
+                if(!this.isUndesiredCategory(txt)) {
+                  this.mouvementClassifiedOut[mouvementToAnalyse.bien][mouvement.date.getFullYear()].mouvements[txt].liste.push({libelle:mouvement.toString(), montant: mouvementToAnalyse.montant, fromImmeuble: mouvementToAnalyse.montant!=mouvement.montant});
+                  this.mouvementClassifiedOut[mouvementToAnalyse.bien][mouvement.date.getFullYear()].mouvements[txt].total += mouvementToAnalyse.montant;
+                  this.mouvementClassifiedOut[mouvementToAnalyse.bien][mouvement.date.getFullYear()].total += mouvementToAnalyse.montant;
+                  //On mémorise le montant des charges payées
+                  if(mouvement.libelle.toLowerCase().includes("charge")){
+                    this.mouvementClassifiedOut[mouvementToAnalyse.bien][mouvement.date.getFullYear()].charges += mouvementToAnalyse.montant;
+                  }
+                }
+                foundLibelle = true;
+              }
+            });
+            // If the mouvement can not be categorized then put it in the default category
+            if(!foundLibelle){
+              this.mouvementClassifiedOut[mouvementToAnalyse.bien][mouvement.date.getFullYear()].mouvements[this.categorieAutre].liste.push({libelle:mouvement.toString(), montant: mouvementToAnalyse.montant, fromImmeuble: mouvementToAnalyse.montant!=mouvement.montant});
+              this.mouvementClassifiedOut[mouvementToAnalyse.bien][mouvement.date.getFullYear()].mouvements[this.categorieAutre].total += mouvementToAnalyse.montant;
+              this.mouvementClassifiedOut[mouvementToAnalyse.bien][mouvement.date.getFullYear()].total += mouvementToAnalyse.montant;
+            }
+          }
+        }
+      });
     });
 
     //Add the forfait accepted by default by the impots for each bien management
     for (let keyBien in this.mouvementClassifiedIn) {
       for (let keyYear in this.mouvementClassifiedOut[keyBien]) {
-        this.mouvementClassifiedOut[keyBien][keyYear].mouvements[this.categorieAutre].liste.push({libelle:"Forfait gestion pour frais divers", montant: this.forfaitGestion});
-        this.mouvementClassifiedOut[keyBien][keyYear].mouvements[this.categorieAutre].total += this.forfaitGestion;
+        this.mouvementClassifiedOut[keyBien][keyYear].mouvements["Autres frais de gestion"].liste.push({libelle:"Forfait gestion pour frais divers", montant: this.forfaitGestion});
+        this.mouvementClassifiedOut[keyBien][keyYear].mouvements["Autres frais de gestion"].total += this.forfaitGestion;
         this.mouvementClassifiedOut[keyBien][keyYear].total += this.forfaitGestion;
       }
     }
@@ -326,9 +348,6 @@ export class StatistiquesImpotsComponent implements OnInit {
     if(txt.toLowerCase().includes("achat")){
       returnStr = "224";
     }
-    if(txt.toLowerCase().includes("autre")){
-      returnStr = "224";
-    }
     if(txt.toLowerCase().includes("taxe")){
       returnStr = "227";
     }
@@ -343,6 +362,9 @@ export class StatistiquesImpotsComponent implements OnInit {
     }
     if(txt.toLowerCase().includes("garantie")){
       returnStr = "250";
+    }
+    if(txt.toLowerCase().includes("autres frais de gestion")){
+      returnStr = "222";
     }
     return returnStr;
   }

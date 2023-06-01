@@ -18,9 +18,11 @@
         <mat-label>Bien déclaré</mat-label>
         <mat-select #bien required [(ngModel)]="selectedBien" [disabled]="computeEnded">
             <mat-option [value]="'total'">Tous</mat-option>
-            <mat-option *ngFor="let bien of documentService.document.biens | orderBy:'nom'" [value]="bien.nom">
-                {{bien.nom}}
-            </mat-option>
+            <ng-container *ngFor="let bien of documentService.document.biens | orderBy:'nom'">
+                <mat-option *ngIf="!bien.isImmeuble()" [value]="bien.nom">
+                    {{bien.nom}}
+                </mat-option>
+            </ng-container>
         </mat-select>
     </mat-form-field>
     <button mat-flat-button color="accent" type="button" (click)="computeImpots()" *ngIf="!computeEnded"><mat-icon>calculate</mat-icon>Calculer</button>
@@ -82,7 +84,7 @@
                 </tr>
                 <ng-container *ngIf="selectedBien!='total' && !hideMouvements">
                     <tr class="details-category" *ngFor="let mouvement of mouvementClassifiedIn[selectedBien][this.selectedAnnee-1].mouvements[txt].liste">
-                        <td class="details-category">{{mouvement.libelle}}</td>
+                        <td class="details-category"><mat-icon *ngIf="mouvement.fromImmeuble">apartment</mat-icon> {{mouvement.libelle}}</td>
                         <td class="details-category">{{mouvement.montant | currency:'EUR':'symbol':'1.0-0'}}</td>
                         <td class="details-category">&nbsp;</td>
                     </tr>
@@ -148,7 +150,7 @@
                 </tr>
                 <ng-container *ngIf="selectedBien!='total'&&!hideMouvements">
                     <tr *ngFor="let mouvement of mouvementClassifiedOut[selectedBien][this.selectedAnnee-1].mouvements[txt].liste">
-                        <td class="details-category">{{mouvement.libelle}}</td>
+                        <td class="details-category"><mat-icon *ngIf="mouvement.fromImmeuble">apartment</mat-icon> {{mouvement.libelle}}</td>
                         <td class="details-category">{{-mouvement.montant | currency:'EUR':'symbol':'1.0-0'}}</td>
                         <td class="details-category">&nbsp;</td>
                     </tr>
