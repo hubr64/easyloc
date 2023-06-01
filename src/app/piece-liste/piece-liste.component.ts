@@ -32,7 +32,7 @@ export class PieceListeComponent implements AfterViewInit  {
   // COmponent input and output
   @Input() embedded: boolean = false;
   @Output() selected = new EventEmitter<Piece[]>();
-  
+  @Input() piecesComplementaires: Piece[]|undefined;
   private _defaultPieces: Piece[];
   @Input() 
   set defaultPieces(value: Piece[]) {
@@ -128,8 +128,24 @@ export class PieceListeComponent implements AfterViewInit  {
   }
 
   getData(): void {
+
+    //On établit d'abord la liste des pièces à afficher
+    let dataSourcePieces: Piece[] = [];
+    //Si on a une liste de pièce bien définie à afficher
+    if(this.defaultPieces){
+      //Alors on utilise cette liste de pieces
+      dataSourcePieces = dataSourcePieces.concat(this.defaultPieces);
+      //Et s'il y en a on ajoute les pièces complémentaires
+      if(this.piecesComplementaires){
+        dataSourcePieces = dataSourcePieces.concat(this.piecesComplementaires);
+      }
+    }else{
+      //SInon on affiche toutes les pièces existantes
+      dataSourcePieces = this.documentService.document.pieces
+    }
+
     //Create datasource from data
-    this.dataSource = new MatTableDataSource(this.defaultPieces?this.defaultPieces:this.documentService.document.pieces);
+    this.dataSource = new MatTableDataSource(dataSourcePieces);
     // Add sort and paginator
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
@@ -162,13 +178,18 @@ export class PieceListeComponent implements AfterViewInit  {
   isAllSelected() {
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.data.length;
-    return numSelected == numRows;
+    return numSelected == (numRows-(this.piecesComplementaires?this.piecesComplementaires.length:0));
   }
 
   masterToggle() {
     this.isAllSelected() ?
         this.selection.clear() :
-        this.dataSource.filteredData.forEach(row => this.selection.select(row));
+        this.dataSource.filteredData.forEach(row => {
+          if(!this.piecesComplementaires || (this.piecesComplementaires && this.piecesComplementaires.indexOf(row)==-1)){
+            this.selection.select(row)
+          }
+          
+        });
   }
 
   private createFilter(): (piece: Piece, filter: string) => boolean {
