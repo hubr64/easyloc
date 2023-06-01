@@ -29,6 +29,9 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
   //The current bien
   public bien: Bien = new Bien();
   public bienType = BIENTYPE;
+  //L'éventuel immeuble auqel appartient le bien
+  public immeuble: Bien|null;
+
   //All bails for the current bien
   public bails: Bail[];
   //Conversion of types in text
@@ -40,9 +43,11 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table!: MatTable<Mouvement>;
   public dataSource: MatTableDataSource<Mouvement>;
-  public displayedColumns = ['type', 'date', 'libelle', 'montant', 'tiers'];
+  public displayedColumns = ['type', 'date', 'libelle', 'montant', 'tiers','immeuble'];
   //All mouvements for the current bien
   public mouvements: Mouvement[];
+  //Tous les mouvements de l'éventuel immeuble du bien
+  public mouvementsImmeuble: Mouvement[];
   //Get in configuration the mandatary pieces for the piece container provided
   public piecesObligatoires: string;
   //The HTML element that contains element to display in PDF
@@ -111,6 +116,10 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
           }
         }
       }
+
+      //On reupère l'éventuel immeuble associé
+      this.immeuble = this.documentService.getImmeuble(this.bien);
+
     // NO one requested
     }else{
       this.goBack();
@@ -126,8 +135,19 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
         this.mouvements.push(this.documentService.document.mouvements[_i]);
       }
     }
+
+    this.mouvementsImmeuble = [];
+    if(this.immeuble){
+      for (var _i = 0; _i < this.documentService.document.mouvements.length; _i++) {
+        // Find the requested one
+        if(this.documentService.document.mouvements[_i].bien.id == this.immeuble.id){
+          this.mouvementsImmeuble.push(this.documentService.document.mouvements[_i]);
+        }
+      }
+    }
+
     // Configure table
-    this.dataSource = new MatTableDataSource(this.mouvements);
+    this.dataSource = new MatTableDataSource(this.mouvements.concat(this.mouvementsImmeuble));
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
   }

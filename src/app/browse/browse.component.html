@@ -1,5 +1,5 @@
 <mat-toolbar color="primary" class="primary-darker sticky-toolbar no-print">
-    <mat-icon>apartment</mat-icon>
+    <mat-icon>key</mat-icon>
     <span>Vue générale des biens gérés</span>
     <span class="flex"></span>
     <mat-button-toggle-group>
@@ -57,11 +57,6 @@
                         <div matListItemTitle>Adresse</div>
                         <span matListItemLine [innerHTML]="bien.adresseHTML"></span>
                     </mat-list-item>
-                    <mat-list-item>
-                        <mat-icon matListItemIcon>savings</mat-icon>
-                        <div matListItemTitle>Rentabilité sur l'année</div>
-                        <span matListItemMeta>{{(bien.getYearRentability(documentService.document.mouvements) * 100)| number: '1.2-2'}} %</span>
-                    </mat-list-item>
                     <mat-list-item *ngVar="bien.getInOutMontant(documentService.document.mouvements) as bienInOut">
                         <mat-icon matListItemIcon color="warn">south_east</mat-icon>
                         <div matListItemTitle>Total des sorties</div>
@@ -77,12 +72,12 @@
                         <div matListItemTitle>Evènements</div>
                         <span matListItemMeta><app-events-liste [container]="bien"></app-events-liste></span>
                     </mat-list-item>
-                    <mat-list-item *ngIf="bien.surface">
+                    <mat-list-item *ngIf="!bien.isImmeuble() && bien.surface">
                         <mat-icon matListItemIcon>expand</mat-icon>
-                        <div matListItemTitle>Surface totale annoncée</div>
+                        <div matListItemTitle>Surface annoncée</div>
                         <span matListItemMeta>{{bien.surface}} m²</span>
                     </mat-list-item>
-                    <mat-list-item *ngIf="bien.nbPieces">
+                    <mat-list-item *ngIf="!bien.isImmeuble() && bien.nbPieces">
                         <mat-icon matListItemIcon>auto_awesome_mosaic</mat-icon>
                         <div matListItemTitle>Nombre de pièces</div>
                         <span matListItemMeta>{{bien.nbPieces}} pièces</span>
@@ -95,7 +90,7 @@
             </mat-card-actions>
         </mat-card>
         <div class="card-link" *ngIf="visibility?visibility[i]:false" [ngStyle]="{'background': colors[i]}">&nbsp;</div>
-        <mat-card appearance="outlined" class="locataire-card" *ngIf="bail && visibility?visibility[i]:false" [ngStyle]="{'border-color': colors[i]}" (click)="toggle(i)">
+        <mat-card appearance="outlined" class="locataire-card" *ngIf="!bien.isImmeuble() && bail && visibility?visibility[i]:false" [ngStyle]="{'border-color': colors[i]}" (click)="toggle(i)">
             <mat-card-header>
                 <div mat-card-avatar class="locataire-avatar-letter" [ngStyle]="{'background': colors[i]}">{{bail.locataire.nom[0]}}</div>
                 <mat-card-title>{{bail.locataire.nom}}</mat-card-title>
@@ -141,12 +136,29 @@
                 <button mat-icon-button color="accent" (click)="contact(bail.locataire, $event)"><mat-icon>mail</mat-icon></button>
             </mat-card-actions>
         </mat-card>
-        <mat-card appearance="outlined" class="locataire-card" *ngIf="!bail && visibility?visibility[i]:false" [ngStyle]="{'border-color': colors[i]}" (click)="toggle(i)">
+        <mat-card appearance="outlined" class="locataire-card" *ngIf="!bien.isImmeuble() && !bail && visibility?visibility[i]:false" [ngStyle]="{'border-color': colors[i]}" (click)="toggle(i)">
             <mat-card-header>
                 <div mat-card-avatar class="locataire-avatar-letter" [ngStyle]="{'background': colors[i]}">!</div>
                 <mat-card-title>Non Loué</mat-card-title>
                 <mat-card-subtitle>Ce bien n'est pas loué...</mat-card-subtitle>
             </mat-card-header>
+        </mat-card>
+        <mat-card appearance="outlined" class="locataire-card" *ngIf="bien.isImmeuble() && visibility?visibility[i]:false" [ngStyle]="{'border-color': colors[i]}" (click)="toggle(i)">
+            <mat-card-header>
+                <div mat-card-avatar class="locataire-avatar-letter" [ngStyle]="{'background': colors[i]}"><mat-icon>key</mat-icon></div>
+                <mat-card-title>Biens</mat-card-title>
+                <mat-card-subtitle>Biens liés à cet immeuble</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <mat-list>
+                    <mat-list-item *ngFor="let bienLien of bien.bienslies; let i = index">
+                        <mat-icon matListItemIcon>key</mat-icon>
+                        <div matListItemTitle>{{bienLien.bien.nom}}</div>
+                        <div matListItemLine>{{bienLien.bien.surface}} m²</div>
+                        <span matListItemMeta>{{(bienLien.ratio).toFixed(1)}} %</span>
+                    </mat-list-item>
+                </mat-list>
+            </mat-card-content>
         </mat-card>
         <mat-divider *ngIf="i < documentService.document.biens.length-1"></mat-divider>
     </ng-container>

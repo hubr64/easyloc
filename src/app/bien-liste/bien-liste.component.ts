@@ -205,7 +205,7 @@ export class BienListeComponent implements AfterViewInit {
           "Syndic":bien.syndic,
           "Fabrication":bien.dateFabrication.toLocaleDateString(),
           "Achat":bien.dateAchat.toLocaleDateString(),
-          "Prix d'achat":bien.prixAchat,
+          "Prix d'achat":this.documentService.getPrixAchatTotal(bien),
           "Surface (m²)":bien.surface,
           "Nb Pièces":bien.nbPieces,
           "Parking":bien.parking,

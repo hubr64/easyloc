@@ -1,6 +1,6 @@
 <mat-toolbar color="primary" class="primary-darker sticky-toolbar">
     <button mat-icon-button (click)="goBack()"><mat-icon>chevron_left</mat-icon></button>
-    <mat-icon>apartment</mat-icon>
+    <mat-icon>key</mat-icon>
     <span *ngIf="bien">Modification d'un bien</span>
     <span *ngIf="!bien">Ajout d'un nouveau bien</span>
     <span class="flex"></span>
@@ -94,7 +94,7 @@
                 <mat-form-field appearance="fill">
                     <mat-label>Prix d'achat</mat-label>
                     <input matInput placeholder="Prix d'achat" id="prixAchat" formControlName="prixAchat" required>
-                    <mat-hint align="end">Prix d'achat du bien (pour rentabilité)</mat-hint>
+                    <mat-hint align="end">Prix d'achat du bien (0 si via immeuble)</mat-hint>
                     <mat-error *ngIf="prixAchat?.errors?.required">Le prix d'achat est obligatoire.</mat-error>
                     <mat-error *ngIf="prixAchat?.errors?.pattern">Le prix d'achat doit être un nombre.</mat-error>
                 </mat-form-field>
@@ -133,7 +133,7 @@
                                     <mat-label>Bien lié</mat-label>
                                     <mat-select id="bienlie_{{i}}_bien" formControlName="bienlie_{{i}}_bien" required (selectionChange)="updateBienLie($event, i)">
                                         <ng-container *ngFor="let docBien of documentService.document.biens | orderBy:'nom'">
-                                            <mat-option *ngIf="docBien.id!= bien.id && docBien.type != 'Immeuble'" [value]="docBien.id">
+                                            <mat-option *ngIf="docBien.id!= bien.id && !docBien.isImmeuble()" [value]="docBien.id">
                                                 {{docBien.nom}}
                                             </mat-option>
                                         </ng-container>
@@ -171,7 +171,7 @@
         </ng-template>
         <app-pieces-jointes-details *ngIf="bien" [container]="bien"></app-pieces-jointes-details>
     </mat-tab>
-    <mat-tab [disabled]="!bien || (bien && bien.type=='Immeuble')">
+    <mat-tab [disabled]="!bien || (bien && bien.isImmeuble())">
         <ng-template mat-tab-label>
             <mat-icon class="tab-label-icon">query_stats</mat-icon><span class="tab-label-text">Statistiques</span>
         </ng-template>
@@ -189,7 +189,7 @@
         </ng-template>
         <app-compteur-liste *ngIf="bien" [embedded]="true" [defaultBien]="bien"></app-compteur-liste>
     </mat-tab>
-    <mat-tab [disabled]="!bien || (bien && bien.type=='Immeuble')">
+    <mat-tab [disabled]="!bien || (bien && bien.isImmeuble())">
         <ng-template mat-tab-label>
             <mat-icon class="tab-label-icon">account_balance</mat-icon><span class="tab-label-text">Impôts</span>
         </ng-template>

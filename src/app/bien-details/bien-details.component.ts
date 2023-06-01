@@ -137,7 +137,7 @@ export class BienDetailsComponent implements OnInit {
 
       //If the bien is an immeuble and if it has linked biens
       this.biensLies = [];
-      if(this.bien.type == 'Immeuble' && this.bien.bienslies.length > 0){
+      if(this.bien.isImmeuble() && this.bien.bienslies.length > 0){
         for (var _i = 0; _i < this.bien.bienslies.length; _i++) {
           this.addBienLie(this.bien.bienslies[_i]);
         }
@@ -231,7 +231,7 @@ export class BienDetailsComponent implements OnInit {
     });
     //Add the control for this bien linked
     this.bienForm.addControl('bienlie_' + (this.biensLies.length-1) + '_bien', new FormControl('', [Validators.required]));
-    this.bienForm.addControl('bienlie_' + (this.biensLies.length-1) + "_ratio", new FormControl('', [Validators.required,Validators.pattern('[0-9]*')]));
+    this.bienForm.addControl('bienlie_' + (this.biensLies.length-1) + "_ratio", new FormControl('', [Validators.required,Validators.pattern('[0-9.,]*')]));
     //Prefilled control with the value
     this.bienForm.controls['bienlie_' + (this.biensLies.length-1) + '_bien'].patchValue(this.biensLies[this.biensLies.length-1]?.bien?.id);
     this.bienForm.controls['bienlie_' + (this.biensLies.length-1) + '_ratio'].patchValue(this.biensLies[this.biensLies.length-1]?.ratio);
@@ -284,7 +284,7 @@ export class BienDetailsComponent implements OnInit {
       if(this.biensLies[_i]){
         if(this.biensLies[_i]!.bien){
           //Compute ratio
-          this.biensLies[_i]!.ratio = Math.round(this.biensLies[_i]!.bien!.surface/maximum * 100);
+          this.biensLies[_i]!.ratio = Math.round(this.biensLies[_i]!.bien!.surface/maximum * 100 * 10) / 10;
           //Then update the field with the new value
           this.bienForm.controls['bienlie_' + (_i) + '_ratio'].patchValue(this.biensLies[_i]!.ratio);
         }
@@ -299,7 +299,7 @@ export class BienDetailsComponent implements OnInit {
         sumRatio+= this.biensLies[_i]!.ratio;
       }
     }
-    return sumRatio == 100;
+    return Math.round(sumRatio) == 100;
   }
 
   goBack(): void {
