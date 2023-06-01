@@ -97,16 +97,21 @@ export class EventService {
 
     private loadBienEvent() {
         //We take each bail one by one to look for events
-        this.documentService.document.biens.forEach((bien:Bien) => {
-            //Get info if this bien is not rent
-            var unrentBien = this.getUnrentBien(bien);
-            if(unrentBien){
-                this.bienEvents.push(unrentBien);
+        this.documentService.document.biens.forEach((bien:Bien) => {  
+            //Un bien de type immeuble n'est pas louable et n'est pas assuré directement
+            if(!bien.isImmeuble()){
+                //Get info if this bien is not rent
+                var unrentBien = this.getUnrentBien(bien);
+                if(unrentBien){
+                    this.bienEvents.push(unrentBien);
+                }
+                //Get info if this bien is not assured
+                var nonAssureBien = this.getBienNonAssure(bien);
+                if(nonAssureBien){
+                    this.bienEvents.push(nonAssureBien);
+                }
             }
-            var nonAssureBien = this.getBienNonAssure(bien);
-            if(nonAssureBien){
-                this.bienEvents.push(nonAssureBien);
-            }
+            //Get info if the tax of this bien has not been paied
             var nonTaxBien = this.getBienTaxeNonpaye(bien);
             if(nonTaxBien){
                 this.bienEvents.push(nonTaxBien);
@@ -247,11 +252,26 @@ export class EventService {
                 var pieceAltFound = false;
                 //Now look in all pieces linked with the piece to find the alternative piece
                 piecesContainer.pieces.forEach((piece: Piece) => {
-                // Found an alternative piece
-                if(piece.code == pieceObligatoireAlt){
-                    pieceAltFound = true;
-                }
+                    // Found an alternative piece
+                    if(piece.code == pieceObligatoireAlt){
+                        pieceAltFound = true;
+                    }
                 });
+                //Si le container est un bien alors on peut regarder si la pièce n'est pas ailleurs
+                if(piecesContainer.className=='Bien'){
+                    //ON recupère l'immeuble du bien
+                    let bienImmeuble = this.documentService.getImmeuble(piecesContainer);
+                    //Si le bien a un immeuble les pièces sont peut être dans l'immeuble (ex : acte de vente ou règlement de Copropriété, ...)
+                    if(bienImmeuble){
+                        bienImmeuble.pieces.forEach((piece: Piece) => {
+                            // Found an alternative piece
+                            if(piece.code == pieceObligatoireAlt){
+                                pieceAltFound = true;
+                            }
+                        });
+                    }
+                }
+
                 // The result is an 'OR' as this is an alternative
                 pieceFound =  pieceFound || pieceAltFound;
             });
@@ -298,7 +318,7 @@ export class EventService {
             if(bailDeltaNbJour == 10000){
                 unrentEvent.designation = "Le bien n'a jamais été loué";
                 unrentEvent.gravite = 2;
-                unrentEvent.icone = "apartment";
+                unrentEvent.icone = "key";
             }else{
                 unrentEvent.designation = "Le bien n'est pas loué depuis "+bailDeltaNbJour+" jours";
                 unrentEvent.gravite = 2;
@@ -401,7 +421,7 @@ export class EventService {
             // If the bien is assured and the mouvement is found then just inform
             if(mouvementAssure != undefined){
                 var assureEvent: Event = new Event();
-                assureEvent.designation = "Le bien est assuré via "+ mouvementAssure;
+                assureEvent.designation = "Le bien est assuré par "+ mouvementAssure;
                 assureEvent.gravite = 0;
                 assureEvent.icone = "shield";
                 assureEvent.object = bien;
@@ -479,6 +499,29 @@ export class EventService {
                 });
             }
 
+            var taxBienImmeuble: Event|undefined; 
+            //Si le paiement de la taxe n'a pas été trouvé alors on va chercher dans l'immeuble qui le contiendrait éventuellement
+            if(isNotTaxed==0){
+                //On reupere l'immeuble du bien
+                var bienImmeuble = this.documentService.getImmeuble(bien);
+                //SI le bien est dans un immeuble
+                if(bienImmeuble){
+                    //On regarde si cette immeuble a bien payé la taxe
+                    taxBienImmeuble = this.getBienTaxeNonpaye(bienImmeuble);
+                    //Si un évènement est retourné et que cette évènement dit que la taxe a été payée
+                    if(taxBienImmeuble && taxBienImmeuble.gravite == 0){
+                        //Alors on considerre que pour le bien courant on a bien payé la taxe
+                        isNotTaxed = 1;
+                    }
+                    //Si un évènement est retourné et que cette évènement dit que la taxe a été payée en retard
+                    if(taxBienImmeuble && taxBienImmeuble.gravite == 1){
+                        //Alors on considerre que pour le bien courant on a bien payé la taxe
+                        isNotTaxed = 2;
+                    }
+                }
+            }
+
+
             //The tax paiement is late or not realised then add an event to alert
             if(isNotTaxed==0 || isNotTaxed==2){
     
@@ -492,9 +535,12 @@ export class EventService {
                     nonTaxEvent.gravite = 2;
                 }else{
                     if(mouvementTaxe){
-                        nonTaxEvent.designation = "La taxe foncière a été payée en retard via "+ mouvementTaxe;
+                        nonTaxEvent.designation = "La taxe foncière a été payée en retard par "+ mouvementTaxe;
                     }else{
                         nonTaxEvent.designation = "La taxe foncière a été payée en retard";
+                        if(taxBienImmeuble){
+                            nonTaxEvent.designation = taxBienImmeuble.designation + " via l'immeuble";
+                        }
                     }
                     nonTaxEvent.gravite = 1;
                 }
@@ -514,11 +560,20 @@ export class EventService {
                 // If the tax has been paied for the bien and the mouvement is found then just inform
                 if(mouvementTaxe != undefined){
                     var taxEvent: Event = new Event();
-                    taxEvent.designation = "La taxe foncière a été payée via "+ mouvementTaxe;
+                    taxEvent.designation = "La taxe foncière a été payée par "+ mouvementTaxe;
                     taxEvent.gravite = 0;
                     taxEvent.icone = "account_balance";
                     taxEvent.object = bien;
                     return taxEvent;
+                }else{
+                    if(taxBienImmeuble){
+                        var taxEvent: Event = new Event();
+                        taxEvent.designation = taxBienImmeuble.designation + " via l'immeuble";
+                        taxEvent.gravite = 0;
+                        taxEvent.icone = "account_balance";
+                        taxEvent.object = bien;
+                        return taxEvent;
+                    }
                 }
             }
         }
