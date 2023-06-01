@@ -52,7 +52,6 @@ export class StatistiquesDetailsComponent implements OnInit {
     }
    } = {};
 
-
   public chartOptionGlobaRentability: EChartsOption;
   public chartOptionBienRentability: EChartsOption;
   public chartOptionGains: EChartsOption;
@@ -99,39 +98,62 @@ export class StatistiquesDetailsComponent implements OnInit {
 
     //We first begin to fill with all biens and we add at least a value for current yeat
     this.documentService.document.biens.forEach( (bien:Bien) => {
-      if(!this.bilanParAn[bien.nom]){
-        this.bilanParAn[bien.nom] = {};
+      //On ne fait pas de statistiques détaillées pour un immeuble
+      if(!bien.isImmeuble()){
+        if(!this.bilanParAn[bien.nom]){
+          this.bilanParAn[bien.nom] = {};
+        }
+        this.bilanParAn[bien.nom][currentDate.getFullYear()] = {in:0, out:0, gains: 0, gainsCumules:0, revenuMensuel:0, investissable:0, rentability:0, loyer:0, locationRate: 0, achatsBiens: 0};
       }
-      this.bilanParAn[bien.nom][currentDate.getFullYear()] = {in:0, out:0, gains: 0, gainsCumules:0, revenuMensuel:0, investissable:0, rentability:0, loyer:0, locationRate: 0, achatsBiens: 0};
     });
 
     //First analyse all mouvements to get in and outs for each bien and for each year
     this.documentService.document.mouvements.forEach( (mouvement:Mouvement) => {
       //We just compute for now and passed mouvement but not for future year
       if(mouvement.date.getFullYear() <= currentDate.getFullYear()){
-        // If the object for this bien for this year still doesn't exist then create it
-        if(!this.bilanParAn[mouvement.bien.nom][mouvement.date.getFullYear()]){
-          this.bilanParAn[mouvement.bien.nom][mouvement.date.getFullYear()] = {in:0, out:0, gains: 0, gainsCumules:0, revenuMensuel:0, investissable:0, rentability:0, loyer:0, locationRate: 0, achatsBiens: 0};
-        }
-        // If the object for the total for this year still doesn't exist then create it
-        if(!this.bilanParAn["total"][mouvement.date.getFullYear()]){
-          this.bilanParAn["total"][mouvement.date.getFullYear()] = {in:0, out:0, gains: 0, gainsCumules:0, revenuMensuel:0, investissable:0, rentability:0, loyer:0, locationRate: 0, achatsBiens: 0};
-        }
-        //If this in an IN then add it to the in (in is positive)
-        if(mouvement.montant>0){
-          this.bilanParAn[mouvement.bien.nom][mouvement.date.getFullYear()].in += mouvement.montant;
-          this.bilanParAn["total"][mouvement.date.getFullYear()].in += mouvement.montant;
-        //If this in an OUT then add it to the out (out is negative)
-        }else{
-          this.bilanParAn[mouvement.bien.nom][mouvement.date.getFullYear()].out += mouvement.montant;
-          this.bilanParAn["total"][mouvement.date.getFullYear()].out += mouvement.montant;
 
-          //Memorize investissable mouvements that have to be taken into account for rentability as part as the buy price (investissable are positive even if mouvement is negative)
-          if(mouvement.montant<0 && (mouvement.libelle.toLowerCase().indexOf("travaux de construction")!=-1 || mouvement.libelle.toLowerCase().indexOf("travaux de rénovation")!=-1)){
-            this.bilanParAn[mouvement.bien.nom][mouvement.date.getFullYear()].investissable += -mouvement.montant;
-            this.bilanParAn["total"][mouvement.date.getFullYear()].investissable += -mouvement.montant;
-          }
+        //Le mouvement à analyser est par défaut le mouvement en train d'être parcouru
+        let mouvementsToAnalyse: {
+          montant: number,
+          bien: string
+        }[] = [{montant: mouvement.montant, bien: mouvement.bien.nom}];
+
+        //SI le mouvement est celui d'un bien qui est un immeuble alors il faut ventiler tout aux biens lies
+        if(mouvement.bien.isImmeuble()){
+          mouvementsToAnalyse = [];
+          //ON parcours donc chaque bien lie pour définir le montant ventilé et le bien à rattacher
+          mouvement.bien.bienslies.forEach(bienlie => {
+            mouvementsToAnalyse.push({montant: mouvement.montant * bienlie.ratio / 100, bien: bienlie.bien.nom})
+          });
         }
+
+        //Pour chaque mouvement à analyser ( 1 si bien non immeuble, n si immeuble avec n biens lies)
+        mouvementsToAnalyse.forEach(mouvementToAnalyse => {
+            // If the object for this bien for this year still doesn't exist then create it
+            if(!this.bilanParAn[mouvementToAnalyse.bien][mouvement.date.getFullYear()]){
+              this.bilanParAn[mouvementToAnalyse.bien][mouvement.date.getFullYear()] = {in:0, out:0, gains: 0, gainsCumules:0, revenuMensuel:0, investissable:0, rentability:0, loyer:0, locationRate: 0, achatsBiens: 0};
+            }
+            // If the object for the total for this year still doesn't exist then create it
+            if(!this.bilanParAn["total"][mouvement.date.getFullYear()]){
+              this.bilanParAn["total"][mouvement.date.getFullYear()] = {in:0, out:0, gains: 0, gainsCumules:0, revenuMensuel:0, investissable:0, rentability:0, loyer:0, locationRate: 0, achatsBiens: 0};
+            }
+
+            //If this in an IN then add it to the in (in is positive)
+            if(mouvementToAnalyse.montant>0){
+              this.bilanParAn[mouvementToAnalyse.bien][mouvement.date.getFullYear()].in += mouvementToAnalyse.montant;
+              this.bilanParAn["total"][mouvement.date.getFullYear()].in += mouvementToAnalyse.montant;
+            //If this in an OUT then add it to the out (out is negative)
+            }else{
+              this.bilanParAn[mouvementToAnalyse.bien][mouvement.date.getFullYear()].out += mouvementToAnalyse.montant;
+              this.bilanParAn["total"][mouvement.date.getFullYear()].out += mouvementToAnalyse.montant;
+
+              //Memorize investissable mouvements that have to be taken into account for rentability as part as the buy price (investissable are positive even if mouvement is negative)
+              if(mouvementToAnalyse.montant<0 && (mouvement.libelle.toLowerCase().indexOf("travaux de construction")!=-1 || mouvement.libelle.toLowerCase().indexOf("travaux de rénovation")!=-1)){
+                this.bilanParAn[mouvementToAnalyse.bien][mouvement.date.getFullYear()].investissable += -mouvementToAnalyse.montant;
+                this.bilanParAn["total"][mouvement.date.getFullYear()].investissable += -mouvementToAnalyse.montant;
+              }
+            }
+        });        
       }
     });
 
@@ -157,24 +179,26 @@ export class StatistiquesDetailsComponent implements OnInit {
     }
     //Now that gains are computed, compute the rentability (rentability is computed with bien cost that has to be defined)
     this.documentService.document.biens.forEach( (bien:Bien) => {
-      //Investissable mouvemens are cumulated as the affect the rentability from the year ther were buy to the future
-      var cumulatedInvestissable: number = 0;
-      //The bien cost is defined
-      if(bien.prixAchat!=0){
-        //The bien is defined in the variable (otherwise it means that the bien exist but no mouvement thus the bien is not exploited)
-        if(this.bilanParAn[bien.nom]){
-          //Compute rentability for each year
-          for (let keyYear in this.bilanParAn[bien.nom]) {
-            cumulatedInvestissable += this.bilanParAn[bien.nom][keyYear].investissable;
-            if(parseInt(keyYear) !== currentDate.getFullYear()){
-              this.bilanParAn[bien.nom][keyYear].rentability = (this.bilanParAn[bien.nom][keyYear].gains + this.bilanParAn[bien.nom][keyYear].investissable) / (bien.prixAchat + cumulatedInvestissable);
-            }else{
-              //When this is the current year we extrapolate the year based on the elapsed month only (if don't do so, the current year will be underestimated)
-              this.bilanParAn[bien.nom][keyYear].rentability = (this.bilanParAn[bien.nom][keyYear].gains + this.bilanParAn[bien.nom][keyYear].investissable) * (12 / (currentDate.getMonth()+1)) / (bien.prixAchat + cumulatedInvestissable); 
+      if(!bien.isImmeuble()){
+        //Investissable mouvemens are cumulated as the affect the rentability from the year ther were buy to the future
+        var cumulatedInvestissable: number = 0;
+        //The bien cost is defined
+        if(this.documentService.getPrixAchatTotal(bien)!=0){
+          //The bien is defined in the variable (otherwise it means that the bien exist but no mouvement thus the bien is not exploited)
+          if(this.bilanParAn[bien.nom]){
+            //Compute rentability for each year
+            for (let keyYear in this.bilanParAn[bien.nom]) {
+              cumulatedInvestissable += this.bilanParAn[bien.nom][keyYear].investissable;
+              if(parseInt(keyYear) !== currentDate.getFullYear()){
+                this.bilanParAn[bien.nom][keyYear].rentability = (this.bilanParAn[bien.nom][keyYear].gains + this.bilanParAn[bien.nom][keyYear].investissable) / (this.documentService.getPrixAchatTotal(bien) + cumulatedInvestissable);
+              }else{
+                //When this is the current year we extrapolate the year based on the elapsed month only (if don't do so, the current year will be underestimated)
+                this.bilanParAn[bien.nom][keyYear].rentability = (this.bilanParAn[bien.nom][keyYear].gains + this.bilanParAn[bien.nom][keyYear].investissable) * (12 / (currentDate.getMonth()+1)) / (this.documentService.getPrixAchatTotal(bien) + cumulatedInvestissable); 
+              }
             }
           }
+          this.bilanParAn["total"][bien.dateAchat.getFullYear()].achatsBiens += this.documentService.getPrixAchatTotal(bien);
         }
-        this.bilanParAn["total"][bien.dateAchat.getFullYear()].achatsBiens += bien.prixAchat;
       }
     });
 
@@ -184,11 +208,13 @@ export class StatistiquesDetailsComponent implements OnInit {
       var prixAchatBiensAll: number = 0;
       //Loop through all biens to get their buy date
       this.documentService.document.biens.forEach( (bien:Bien) => {
-        //If the bien was bought the current computed year then add its cost to the cumulated cost
-        if(bien.dateAchat.getFullYear() <= parseInt(keyYear)){
-          //If the bien has a rentability then can consider it otherwise it is probably still not exact
-          if(this.bilanParAn[bien.nom][keyYear] && this.bilanParAn[bien.nom][keyYear].rentability!=0){
-              prixAchatBiensAll += bien.prixAchat;
+        if(!bien.isImmeuble()){
+          //If the bien was bought the current computed year then add its cost to the cumulated cost
+          if(bien.dateAchat.getFullYear() <= parseInt(keyYear)){
+            //If the bien has a rentability then can consider it otherwise it is probably still not exact
+            if(this.bilanParAn[bien.nom][keyYear] && this.bilanParAn[bien.nom][keyYear].rentability!=0){
+                prixAchatBiensAll += this.documentService.getPrixAchatTotal(bien);
+            }
           }
         }
       });
@@ -197,11 +223,13 @@ export class StatistiquesDetailsComponent implements OnInit {
       var investissableAll: number = 0;
       //Loop through all biens
       this.documentService.document.biens.forEach( (bien:Bien) => {
-        //If the bien was bought the current computed year then add its cost to the cumulated cost
-        if(bien.dateAchat.getFullYear() <= parseInt(keyYear)){
-          //If the bien has a rentability then can consider it otherwise it is probably still not exact
-          if(this.bilanParAn[bien.nom][keyYear] && this.bilanParAn[bien.nom][keyYear].rentability!=0){
-            investissableAll += this.bilanParAn[bien.nom][keyYear].investissable
+        if(!bien.isImmeuble()){
+          //If the bien was bought the current computed year then add its cost to the cumulated cost
+          if(bien.dateAchat.getFullYear() <= parseInt(keyYear)){
+            //If the bien has a rentability then can consider it otherwise it is probably still not exact
+            if(this.bilanParAn[bien.nom][keyYear] && this.bilanParAn[bien.nom][keyYear].rentability!=0){
+              investissableAll += this.bilanParAn[bien.nom][keyYear].investissable
+            }
           }
         }
       });
@@ -259,41 +287,43 @@ export class StatistiquesDetailsComponent implements OnInit {
     
     //Look for each bien
     this.documentService.document.biens.forEach( (bien:Bien) => {
-      //If the bien is exploited
-      if(this.bilanParAn[bien.nom]){
-        //For each year of this bien let's make the computation
-        for (let keyYear in this.bilanParAn[bien.nom]) {
-          //Two vars to count nb of month located...
-          var monthLocation : number = 0;
-          //...and number of month should be rented
-          var nbLocation: number = 0;
-          //Browse twelve months of a year
-          for (let i = 0; i < 12; i++) {
-            var tmpDate = new Date(parseInt(keyYear), i, 1, 0, 0, 0, 0);
-            //If the lloking month is after bien buy date and before today
-            if(bien.dateAchat<= tmpDate && tmpDate <= currentDate){   
-              //Bien should be rented
-              nbLocation++;
-              //By default not rented unless if we found a bail
-              var foundLocation = false;
-              //Browse all bails to llok for a location at this month
-              this.documentService.document.bails.forEach( (bail:Bail) => {
-                //Look the bail only for this bien
-                if(bail.bien == bien){
-                  //If the bail covers the looking month then has found a location
-                  if(bail.dateDebut.setHours(0, 0, 0, 0) <= tmpDate.setHours(0, 0, 0, 0) && (!bail.dateFin || bail.dateFin.setHours(0, 0, 0, 0) >= tmpDate.setHours(0, 0, 0, 0) ) ){
-                    foundLocation = true;
+      if(!bien.isImmeuble()){
+        //If the bien is exploited
+        if(this.bilanParAn[bien.nom]){
+          //For each year of this bien let's make the computation
+          for (let keyYear in this.bilanParAn[bien.nom]) {
+            //Two vars to count nb of month located...
+            var monthLocation : number = 0;
+            //...and number of month should be rented
+            var nbLocation: number = 0;
+            //Browse twelve months of a year
+            for (let i = 0; i < 12; i++) {
+              var tmpDate = new Date(parseInt(keyYear), i, 1, 0, 0, 0, 0);
+              //If the lloking month is after bien buy date and before today
+              if(bien.dateAchat<= tmpDate && tmpDate <= currentDate){   
+                //Bien should be rented
+                nbLocation++;
+                //By default not rented unless if we found a bail
+                var foundLocation = false;
+                //Browse all bails to llok for a location at this month
+                this.documentService.document.bails.forEach( (bail:Bail) => {
+                  //Look the bail only for this bien
+                  if(bail.bien == bien){
+                    //If the bail covers the looking month then has found a location
+                    if(bail.dateDebut.setHours(0, 0, 0, 0) <= tmpDate.setHours(0, 0, 0, 0) && (!bail.dateFin || bail.dateFin.setHours(0, 0, 0, 0) >= tmpDate.setHours(0, 0, 0, 0) ) ){
+                      foundLocation = true;
+                    }
                   }
+                });
+                //If a location is found thus add it to the month located
+                if(foundLocation){
+                  monthLocation++;
                 }
-              });
-              //If a location is found thus add it to the month located
-              if(foundLocation){
-                monthLocation++;
               }
             }
+            //The location rate is the number of month located over the number of month should be locate
+            this.bilanParAn[bien.nom][keyYear].locationRate = monthLocation/nbLocation;
           }
-          //The location rate is the number of month located over the number of month should be locate
-          this.bilanParAn[bien.nom][keyYear].locationRate = monthLocation/nbLocation;
         }
       }
     });
@@ -674,32 +704,8 @@ export class StatistiquesDetailsComponent implements OnInit {
       xAxisArray.push(keyYear);
     }
 
-    var gainsCumulesData = [];
-    legend.push("Gains cumulés");
-    for (let keyYear in this.bilanParAn[elementToDisplay]) {
-      if(this.bilanParAn[elementToDisplay][keyYear]){
-        gainsCumulesData.push(Math.round(this.bilanParAn[elementToDisplay][keyYear].gainsCumules));
-      }else{
-        gainsCumulesData.push(0);
-      }
-    }
-    series.push({
-      name: "Gains cumulés",
-      type: 'bar',
-      label: {
-        show: true,
-        formatter: '{c} €',
-        position: 'insideTop'
-      },
-      barGap: 0,
-      emphasis: {
-        focus: 'series'
-      },
-      data: gainsCumulesData
-    });
-
     var gainsData = [];
-    legend.push("Gains");
+    legend.push("Gains bruts");
     for (let keyYear in this.bilanParAn[elementToDisplay]) {
       if(this.bilanParAn[elementToDisplay][keyYear]){
         gainsData.push(Math.round(this.bilanParAn[elementToDisplay][keyYear].gains));
@@ -708,7 +714,7 @@ export class StatistiquesDetailsComponent implements OnInit {
       }
     }
     series.push({
-      name: "Gains",
+      name: "Gains bruts",
       type: 'bar',
       label: {
         show: true,
@@ -722,17 +728,94 @@ export class StatistiquesDetailsComponent implements OnInit {
       data: gainsData
     });
 
-    var revenusData = [];
-    legend.push("Revenus nets par mois");
+    var gainsCumulesData = [];
+    legend.push("Gains bruts cumulés");
     for (let keyYear in this.bilanParAn[elementToDisplay]) {
       if(this.bilanParAn[elementToDisplay][keyYear]){
-        revenusData.push(Math.round(this.bilanParAn[elementToDisplay][keyYear].revenuMensuel));
+        gainsCumulesData.push(Math.round(this.bilanParAn[elementToDisplay][keyYear].gainsCumules));
       }else{
-        revenusData.push(0);
+        gainsCumulesData.push(0);
       }
     }
     series.push({
-      name: "Revenus nets par mois",
+      name: "Gains bruts cumulés",
+      type: 'bar',
+      label: {
+        show: true,
+        formatter: '{c} €',
+        position: 'insideTop'
+      },
+      barGap: 0,
+      emphasis: {
+        focus: 'series'
+      },
+      data: gainsCumulesData
+    });
+
+    var gainsNetsData = [];
+    var gainsNetParMoisData = [];
+    legend.push("Gains nets");
+    for (let keyYear in this.bilanParAn[elementToDisplay]) {
+      if(this.bilanParAn[elementToDisplay][keyYear]){
+        gainsNetsData.push(Math.round(this.bilanParAn[elementToDisplay][keyYear].gains + this.bilanParAn[elementToDisplay][keyYear].investissable));
+        gainsNetParMoisData.push(Math.round((this.bilanParAn[elementToDisplay][keyYear].gains + this.bilanParAn[elementToDisplay][keyYear].investissable)/12));
+      }else{
+        gainsNetsData.push(0);
+        gainsNetParMoisData.push(0);
+      }
+    }
+    series.push({
+      name: "Gains nets",
+      type: 'bar',
+      label: {
+        show: true,
+        formatter: '{c} €',
+        position: 'insideTop'
+      },
+      barGap: 0,
+      emphasis: {
+        focus: 'series'
+      },
+      data: gainsNetsData
+    });
+
+    var gainsNetsCumulesData = [];
+    let investissablesCumules = 0;
+    legend.push("Gains nets cumulés");
+    for (let keyYear in this.bilanParAn[elementToDisplay]) {
+      if(this.bilanParAn[elementToDisplay][keyYear]){
+        investissablesCumules += this.bilanParAn[elementToDisplay][keyYear].investissable
+        gainsNetsCumulesData.push(Math.round(this.bilanParAn[elementToDisplay][keyYear].gainsCumules + investissablesCumules));
+      }else{
+        gainsNetsCumulesData.push(0);
+      }
+    }
+    series.push({
+      name: "Gains nets cumulés",
+      type: 'bar',
+      label: {
+        show: true,
+        formatter: '{c} €',
+        position: 'insideTop'
+      },
+      barGap: 0,
+      emphasis: {
+        focus: 'series'
+      },
+      data: gainsNetsCumulesData
+    });
+
+    var gainsParMoisData = [];
+    legend.push("Gains bruts par mois");
+    for (let keyYear in this.bilanParAn[elementToDisplay]) {
+      if(this.bilanParAn[elementToDisplay][keyYear]){
+        gainsParMoisData.push(Math.round(this.bilanParAn[elementToDisplay][keyYear].revenuMensuel));
+      }else{
+        gainsParMoisData.push(0);
+      }
+    }
+    series.push({
+      name: "Gains bruts par mois",
       type: 'line',
       label: {
         show: true,
@@ -741,34 +824,24 @@ export class StatistiquesDetailsComponent implements OnInit {
       },
       smooth: true,
       yAxisIndex: 1,
-      data: revenusData
+      data: gainsParMoisData
     });
 
-    //if we display just for a specific bien then we also add the total to have a comparison
-    var revenusDataTotal: any[] = [];
-    if(elementToDisplay != 'total'){
-      legend.push("Revenus nets par mois moyens");
-      for (let keyYear in this.bilanParAn[elementToDisplay]) {
-        if(this.bilanParAn["total"][keyYear]){
-          revenusDataTotal.push(Math.round(this.bilanParAn["total"][keyYear].revenuMensuel));
-        }else{
-          revenusDataTotal.push(0);
-        }
-      }
-      series.push({
-        name: "Revenus nets moyens par mois",
-        type: 'line',
-        smooth: true,
-        label: {
-          show: true,
-          color: 'inherit',
-          formatter: '{c} €/mois'
-        },
-        color: '#73c0de',
-        yAxisIndex: 1,
-        data: revenusDataTotal
-      });
-    }
+    
+    var gainsParMoisData = [];
+    legend.push("Gains nets par mois");
+    series.push({
+      name: "Gains nets par mois",
+      type: 'line',
+      label: {
+        show: true,
+        color: 'inherit',
+        formatter: '{c} €/mois'
+      },
+      smooth: true,
+      yAxisIndex: 1,
+      data: gainsNetParMoisData
+    });
 
     this.chartOptionGains = {
       tooltip: {

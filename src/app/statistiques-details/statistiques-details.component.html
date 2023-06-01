@@ -5,7 +5,7 @@
     <span class="flex"></span>
 </mat-toolbar>
 
-<div class="main-container" *ngIf="!simple">
+<div class="main-container" *ngIf="!simple && (!defaultBien || (defaultBien && !defaultBien.isImmeuble()))">
     <mat-accordion multi>
         <mat-expansion-panel>
             <mat-expansion-panel-header>
@@ -25,14 +25,14 @@
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>Gains</mat-panel-title>
-                <mat-panel-description>Gains nets et cumulés par année<mat-icon>savings</mat-icon></mat-panel-description>
+                <mat-panel-description>Gains et gains cumulés par année<mat-icon>savings</mat-icon></mat-panel-description>
             </mat-expansion-panel-header>
             <div echarts [options]="chartOptionGains" [loading]="true" class="main-chart mat-elevation-z1" [theme]="configurationService.isDarkMode()?'dark':''"></div>
         </mat-expansion-panel>
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 <mat-panel-title>Evolution des loyers</mat-panel-title>
-                <mat-panel-description>Evolution moyenne des loyers par année<mat-icon>apartment</mat-icon></mat-panel-description>
+                <mat-panel-description>Evolution moyenne des loyers par année<mat-icon>key</mat-icon></mat-panel-description>
             </mat-expansion-panel-header>
             <div echarts [options]="chartOptionLoyers" [loading]="true" class="main-chart mat-elevation-z1" [theme]="configurationService.isDarkMode()?'dark':''"></div>
         </mat-expansion-panel>
@@ -54,7 +54,7 @@
 </div>
 
 <ng-container *ngVar="(defaultBien?defaultBien.nom:'total') as elementToDisplay">
-    <div class="main-container" [ngClass]="{'compact-stat': defaultBien?false:true}" *ngIf="simple &&  this.bilan[elementToDisplay]">
+    <div class="main-container" [ngClass]="{'compact-stat': defaultBien?false:true}" *ngIf="simple && this.bilan[elementToDisplay]">
         <h3><mat-icon>savings</mat-icon>Entrées/Sorties {{currentYear}}</h3>
         <div *ngIf="!defaultBien" #chartSimple echarts [options]="chartOptionSimple" [loading]="true" class="simple-chart" [theme]="configurationService.isDarkMode()?'dark':''"></div>
         <div *ngIf="defaultBien" #chartSimple echarts [options]="chartOptionSimpleBien" [loading]="true" class="simple-chart" [theme]="configurationService.isDarkMode()?'dark':''"></div>
@@ -64,12 +64,14 @@
         <mat-list>
             <mat-list-item><mat-icon class="stat-icon" color="primary">north_east</mat-icon><span class="stat-title">Entrées</span><span>{{this.bilan[elementToDisplay].in | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].in | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
             <mat-list-item><mat-icon class="stat-icon" color="warn">south_east</mat-icon><span class="stat-title">Sorties</span><span>{{this.bilan[elementToDisplay].out | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].out | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
-            <mat-list-item><mat-icon class="stat-icon">savings</mat-icon><span class="stat-title">Gains cumulés brut</span><span>{{this.bilan[elementToDisplay].gains | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].gains | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
-            <mat-list-item><mat-icon class="stat-icon">query_stats</mat-icon><span class="stat-title">Rentabilité Moyenne</span><span>{{this.bilan[elementToDisplay].rentability*100 | number: '1.1-1' }} % <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].rentability*100 | number: '1.1-1' }} %</span></span></mat-list-item>
+            <mat-list-item><mat-icon class="stat-icon">savings</mat-icon><span class="stat-title">Gains brut</span><span>{{this.bilan[elementToDisplay].gains | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].gains | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
+            <mat-list-item><mat-icon class="stat-icon">event_upcoming</mat-icon><span class="stat-title">Gains bruts par mois</span><span>{{this.bilan[elementToDisplay].revenuMensuel | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].revenuMensuel | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
+            <mat-divider></mat-divider>
             <mat-list-item><mat-icon class="stat-icon">add_business</mat-icon><span class="stat-title">Investissements</span><span>{{this.bilan[elementToDisplay].investissable | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].investissable | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
-            <mat-list-item><mat-icon class="stat-icon">event_upcoming</mat-icon><span class="stat-title">Revenus par mois</span><span>{{this.bilan[elementToDisplay].revenuMensuel | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].revenuMensuel | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
+            <mat-list-item><mat-icon class="stat-icon">query_stats</mat-icon><span class="stat-title">Rentabilité Moyenne</span><span>{{this.bilan[elementToDisplay].rentability*100 | number: '1.1-1' }} % <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].rentability*100 | number: '1.1-1' }} %</span></span></mat-list-item>
+            <mat-divider></mat-divider>
             <mat-list-item><mat-icon class="stat-icon">key</mat-icon><span class="stat-title">Taux de location</span><span>{{this.bilan[elementToDisplay].locationRate*100 | number: '1.1-1' }} % <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].locationRate*100 | number: '1.1-1' }} %</span></span></mat-list-item>
-            <mat-list-item><mat-icon class="stat-icon">apartment</mat-icon><span class="stat-title">Loyer moyen</span><span>{{this.bilan[elementToDisplay].loyer | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].loyer | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
+            <mat-list-item><mat-icon class="stat-icon">key</mat-icon><span class="stat-title">Loyer moyen</span><span>{{this.bilan[elementToDisplay].loyer | currency:'EUR':'symbol':'1.0-0' }} <span class="generalites-current-year">{{this.bilanParAn[elementToDisplay][currentYear].loyer | currency:'EUR':'symbol':'1.0-0' }}</span></span></mat-list-item>
         </mat-list>
     </div>
 </ng-container>
