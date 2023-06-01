@@ -79,8 +79,9 @@
                     <mat-icon>more_vert</mat-icon>
                 </button>
                 <mat-menu #menuItem="matMenu" yPosition="below" [overlapTrigger]="false">
+                    <button mat-menu-item title="Contacter" (click)="contact(row)"><mat-icon color="accent">email</mat-icon> Contacter</button>
+                    <mat-divider></mat-divider>
                     <button mat-menu-item title="Editer" (click)="edit(row)"><mat-icon color="primary">edit</mat-icon> Editer</button>
-                    <button mat-menu-item title="Contacter" (click)="contact(row)"><mat-icon color="primary">email</mat-icon> Contacter</button>
                     <button mat-menu-item title="Dupliquer" (click)="duplicate(row)"><mat-icon color="primary">content_copy</mat-icon> Dupliquer</button>
                     <button mat-menu-item title="Supprimer" (click)="delete(row)"><mat-icon color="warn">delete</mat-icon> Supprimer</button>
                 </mat-menu>

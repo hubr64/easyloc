@@ -16,14 +16,27 @@
         <span matListItemLine>{{pieceCode[piece.code]}}</span>
         <span matListItemLine>{{piece.nom}}</span>
         <span matListItemMeta>
+            <a *ngIf="urlPieces[piece.id] && data.canRemove" mat-icon-button (click)="deletePiece(piece, $event)" title="Dissocier"><mat-icon color="warn">link_off</mat-icon></a>
             <a *ngIf="urlPieces[piece.id]" mat-icon-button color="primary" title="Télécharger" [href]="urlPieces[piece.id]" target="_blank"><mat-icon>cloud_download</mat-icon></a>
-            <a (click)="deletePiece(piece, $event)" title="Dissocier"><mat-icon *ngIf="data.canRemove" color="warn">link_off</mat-icon></a>
         </span>
     </button>
     <button mat-list-item *ngIf="pieces.length == 0" [disabled]="true">
         <mat-icon matListItemIcon color="accent">help</mat-icon>
         <span matListItemTitle>Aucune pièce jointe</span>
     </button>
+    <ng-container *ngIf="piecesComplementaires && piecesComplementaires.length > 0">
+        <mat-divider></mat-divider>
+        <button mat-list-item *ngFor="let pieceComplementaire of piecesComplementaires">
+            <mat-icon matListItemIcon>{{pieceComplementaire.codeIcone}}</mat-icon>
+            <h3 matListItemTitle>{{pieceComplementaire.description}}</h3>
+            <span matListItemLine>{{pieceCode[pieceComplementaire.code]}}</span>
+            <span matListItemLine>{{pieceComplementaire.nom}}</span>
+            <span matListItemMeta>
+                <mat-icon>apartment</mat-icon>
+                <a *ngIf="urlPieces[pieceComplementaire.id]" mat-icon-button color="primary" title="Télécharger" [href]="urlPieces[pieceComplementaire.id]" target="_blank"><mat-icon>cloud_download</mat-icon></a>
+            </span>
+        </button>
+    </ng-container>
     
     <mat-list-item *ngIf="missedPieces.length>0">
         <mat-icon matListItemIcon color="warn">error</mat-icon>

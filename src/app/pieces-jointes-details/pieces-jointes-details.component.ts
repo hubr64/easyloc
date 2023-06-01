@@ -24,6 +24,9 @@ export class PiecesJointesDetailsComponent implements OnInit {
   public pieceCode = PIECECODE;
   // The list of pieces the user wants to remove
   public piecesToRemove: Piece[] = [];
+  //Pieces complémentaires à afficher en parallèle des pièces du container
+  //Utiles pour les biens associés à des immeubles
+  public piecesComplementaires: Piece[];
 
   constructor(
     public dialog: MatDialog,
@@ -31,14 +34,31 @@ export class PiecesJointesDetailsComponent implements OnInit {
     public documentService: DocumentService) { }
 
   ngOnInit(): void {
-    this.pieces = this.container.pieces;
+    
+    this.getData();
 
     //If document is reloaded then get data again and recompute list of mouvements
     this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
       if(isLoaded){
-        this.pieces = this.container.pieces;
+        this.getData();
       }
     });
+  }
+
+  public getData(){
+    //ON recupere les pieces du container
+    this.pieces = this.container.pieces;
+
+    this.piecesComplementaires = [];
+    //Si le container est un Bien alors un traitement supplémentaire est à prévoir
+    if(this.container.className=='Bien'){
+      //ON recupère l'immeuble du bien
+      let bienImmeuble = this.documentService.getImmeuble(this.container);
+      //Si le bien a un immeuble des pièces sont peut être dans l'immeuble (ex : acte de vente ou règlement de Copropriété, ...)
+      if(bienImmeuble){
+        this.piecesComplementaires = bienImmeuble.pieces;
+      }
+    }
   }
 
   addPieces(){

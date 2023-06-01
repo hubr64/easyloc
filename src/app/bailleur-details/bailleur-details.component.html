@@ -78,7 +78,7 @@
     </mat-tab>
     <mat-tab [disabled]="!bailleur">
         <ng-template mat-tab-label>
-            <mat-icon class="tab-label-icon">apartment</mat-icon> Biens
+            <mat-icon class="tab-label-icon">key</mat-icon> Biens
         </ng-template>
         <app-bien-liste *ngIf="bailleur" [embedded]="true" [defaultProprietaire]="bailleur"></app-bien-liste>
     </mat-tab>

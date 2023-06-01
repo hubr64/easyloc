@@ -8,9 +8,11 @@
 <mat-form-field>
     <mat-label>Bien à louer</mat-label>
     <mat-select [formControl]="bienControl" required>
-        <mat-option *ngFor="let bien of documentService.document.biens" [value]="bien.id">
-            {{bien.nom}}
-        </mat-option>
+        <ng-container *ngFor="let bien of documentService.document.biens | orderBy:'nom'">
+            <mat-option *ngIf="!bien.isImmeuble()" [value]="bien.id">
+                {{bien.nom}}
+            </mat-option>
+        </ng-container>
     </mat-select>
     <mat-icon *ngIf="bienALouer" matSuffix color="accent" [routerLink]="'/fiche/bien/'+bienALouer.id">visibility</mat-icon>
 </mat-form-field>
@@ -18,7 +20,7 @@
 <p *ngIf="!bienALouer">Veuillez choisir au préalable <b>un bien à louer</b> !</p>
 <mat-stepper orientation="vertical" #stepper *ngIf="bienALouer">
     <mat-step state="apartment">
-        <ng-template matStepLabel><mat-icon>apartment</mat-icon>Bien à louer</ng-template>
+        <ng-template matStepLabel><mat-icon>key</mat-icon>Bien à louer</ng-template>
         <p *ngIf="annoncesBien.length>0">Vous pouvez utiliser les annonces suivantes pour mettre le bien à louer :</p>
         <div class="piece-container" *ngIf="annoncesBien.length>0">
             <ng-container *ngFor="let annonce of annoncesBien" [ngTemplateOutlet]="pieceBox" [ngTemplateOutletContext]="{piece: annonce}"></ng-container>
@@ -99,8 +101,8 @@
         <p *ngIf="etatSortantBien.length==0"><b>Aucun état des lieux entrant</b> trouvé pour le bail en cours ! Veuillez utiliser un état des lieux vierge tel que défini à l'étape <i>Bail à signer</i>.</p>
         <p>Plus d'infos sur <a href="https://www.service-public.fr/particuliers/vosdroits/N339" target="_blank">https://www.service-public.fr/particuliers/vosdroits/N339</a></p>
     </mat-step>
-    <ng-template matStepperIcon="apartment">
-        <mat-icon>apartment</mat-icon>
+    <ng-template matStepperIcon="key">
+        <mat-icon>key</mat-icon>
     </ng-template>
     <ng-template matStepperIcon="people">
         <mat-icon>people</mat-icon>

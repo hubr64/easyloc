@@ -34,6 +34,9 @@ export class PiecesJointesFicheComponent implements OnInit {
   public mandatoryPieces: Piece[] = [];
   public specificPieces: Piece[] = [];
   public otherPieces: Piece[] = [];
+  //Pieces complémentaires à afficher en parallèle des pièces du container
+  //Utiles pour les biens associés à des immeubles
+  public piecesComplementaires: Piece[];
 
   constructor(
     public dialog: MatDialog,
@@ -59,9 +62,23 @@ export class PiecesJointesFicheComponent implements OnInit {
     this.mandatoryPieces = [];
     this.specificPieces = [];
     this.otherPieces = [];
+    this.piecesComplementaires = [];
+
+    //Si le container est un Bien alors un traitement supplémentaire est à prévoir
+    if(this.container.className=='Bien'){
+      //ON recupère l'immeuble du bien
+      let bienImmeuble = this.documentService.getImmeuble(this.container);
+      //Si le bien a un immeuble des pièces sont peut être dans l'immeuble (ex : acte de vente ou règlement de Copropriété, ...)
+      if(bienImmeuble){
+        this.piecesComplementaires = bienImmeuble.pieces;
+      }
+    }
+
+    //ON construit un tableau à partir de toutes les pièces
+    let allPieces = this.container.pieces.concat(this.piecesComplementaires)
 
     //Get all pieces information
-    this.container.pieces.forEach((piece:Piece) => {
+    allPieces.forEach((piece:Piece) => {
 
       if(this.piecesObligatoires.indexOf(piece.code) != -1 ){
         this.mandatoryPieces.push(piece);
@@ -89,6 +106,8 @@ export class PiecesJointesFicheComponent implements OnInit {
         }
       );
     });
+
+    //Si le container
   }
 
   addPieces(){

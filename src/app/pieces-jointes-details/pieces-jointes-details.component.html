@@ -1,5 +1,5 @@
 <div class="pieces-list" *ngIf="container">
-    <app-piece-liste [embedded]="true" [defaultPieces]="pieces" (selected)="onSelectedRemove($event)"></app-piece-liste>
+    <app-piece-liste [embedded]="true" [defaultPieces]="pieces" [piecesComplementaires]="piecesComplementaires" (selected)="onSelectedRemove($event)"></app-piece-liste>
     <button type="button" mat-flat-button color="warn" [disabled]="piecesToRemove.length == 0" (click)="removePieces()">Dissocier <mat-icon>link_off</mat-icon></button>
     <button type="button" mat-flat-button color="primary" (click)="addPieces()"><mat-icon>add_link</mat-icon> Associer</button>
     <button type="button" mat-flat-button color="primary" (click)="uploadPieces()"><mat-icon>note_add</mat-icon> Ajouter</button>

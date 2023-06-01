@@ -12,6 +12,7 @@ import { Bailleur, BailleurType } from '../_modeles/bailleur';
 import { Bien } from '../_modeles/bien';
 import { Piece } from '../_modeles/piece';
 import { Bail } from '../_modeles/bail';
+import { Mouvement } from '../_modeles/mouvement';
 import { DialogReloadComponent } from '../dialog-reload/dialog-reload.component';
 
 declare const gapi: any;
@@ -466,30 +467,40 @@ export class DocumentService {
     return pieceUsers;
   }
 
-  public getYearRentability(){
+  public getImmeuble(bien: Bien): Bien|null{
+    let immeuble: Bien|null = null;
 
-    var rentabilities: number[] = [];
-
-    this.document.biens.forEach((bien:Bien) => {
-      const bienRentability = bien.getYearRentability(this.document.mouvements);
-      if(bienRentability != 0){
-        rentabilities.push(bienRentability);
-      }
-    });
-
-    //Compute sum and then average in two lines
-    const sum = rentabilities.reduce((a, b) => a + b, 0);
-    const avg = (sum / rentabilities.length) || 0;
-    //Return the global rentability (which is the mean of all rentabilities)
-    return avg;
+    //Un immeuble ne peut pas appartenir à un autre immeuble
+    if(!bien.isImmeuble()){
+      //On recherche dans les biens fournis si un bien est un immeuble
+      this.document.biens.forEach((docBien:Bien) => {
+        if(docBien.isImmeuble()){
+          //SI le bien de la liste est un immble alors on regarde tout ses biens liés
+          docBien.bienslies.forEach((bienlie: any) => {
+            //Si l'un des biens lies correspond au bien courant alors on a trouvé l'immeuble
+            if(bienlie.bien.id == bien.id){
+              immeuble = docBien;
+            }
+          });
+        }
+      });
+    }
+    return immeuble;
   }
 
-  public getBilan(){
-    var gains: number = 0;
-    this.document.biens.forEach((bien:Bien) => {
-      gains = gains + bien.getBilan(this.document.mouvements);
-    });
-    //Return the global bilan
-    return Math.round(gains);
+  public getPrixAchatTotal(bien:Bien): number{
+
+    //S'il le bien est associé à un immeuble
+    let immeuble = this.getImmeuble(bien);
+    let prixAchatTotal: number = 0;
+    //SI le bien a un prix défini ou si il n'est pas ssocié à un immeuble
+    if(bien.prixAchat>0 || !immeuble){
+      prixAchatTotal = bien.prixAchat;
+    }else{
+      //Si le bien a un prix nul et si un immeuble est défini
+      prixAchatTotal = immeuble.prixAchat * immeuble.getBienLieRatio(bien) / 100
+    }
+
+    return prixAchatTotal;
   }
 }

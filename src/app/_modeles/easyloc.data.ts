@@ -9,7 +9,7 @@ import { Compteur } from './compteur';
 export const TYPEICON: {[key: string]: string} = {
   "Locataire": 'people',
   "svg.Bailleur": 'bailleur',
-  "Bien": 'apartment',
+  "Bien": 'key',
   "Bail": 'assignment',
   "Quittance": 'receipt_long',
   "Mouvement": 'euro_symbol',
@@ -77,6 +77,27 @@ export class EasylocData {
       for (const key of Object.keys(input.biens)) {
         tmp.biens.push(Bien.fromJSON(input.biens[key], tmp.bailleurs, tmp.pieces));
       }
+      //Once biens are loaded the load biens linked
+      for (const key of Object.keys(input.biens)) {
+        if(input.biens[key].bienslies){
+          let biensLiesTmp: any[] = [];
+          input.biens[key].bienslies.forEach((bienlie: any) => {
+            tmp.biens.forEach((docBien:Bien) => {
+              if(docBien.id == bienlie.bien){
+                biensLiesTmp.push({
+                  bien:docBien,
+                  ratio: bienlie.ratio
+                })
+              }
+            });
+          });
+          tmp.biens.forEach((docBien:Bien) => {
+            if(docBien.id == input.biens[key].id){
+              docBien.bienslies = biensLiesTmp;
+            }
+          });
+        }
+      };
     }
     //Load compteurs after biens
     if(input.compteurs){

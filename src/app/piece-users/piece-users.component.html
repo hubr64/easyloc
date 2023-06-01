@@ -1,5 +1,5 @@
 <mat-action-list>
-    <button mat-list-item *ngFor="let user of data.users"  [routerLink]="'/'+user.className.toLowerCase( )+'/'+user.id" (click)="openLink()">
+    <button mat-list-item *ngFor="let user of data.users"  [routerLink]="'/fiche/'+user.className.toLowerCase( )+'/'+user.id" (click)="openLink()">
         <mat-icon matListItemIcon svgIcon="{{userTypeIcon['svg.'+user.className]}}">{{userTypeIcon[user.className]}}</mat-icon>
         <h3 matListItemTitle>{{user.className}}</h3>
         <span matListItemLine>{{user.toString()}}</span>

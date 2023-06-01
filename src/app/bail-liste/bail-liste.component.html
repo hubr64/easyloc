@@ -20,12 +20,14 @@
     <div class="filter-box">
         <mat-form-field *ngIf="!defaultBien">
             <mat-label>Bien</mat-label>
-            <mat-icon matPrefix>apartment</mat-icon> 
+            <mat-icon matPrefix>key</mat-icon> 
             <mat-select [formControl]="bienFilter">
                 <mat-option value="" selected>Tous</mat-option>
-                <mat-option *ngFor="let bien of documentService.document.biens | orderBy:'nom'" [value]="bien.id">
-                    {{bien.nom}}
-                </mat-option>
+                <ng-container *ngFor="let bien of documentService.document.biens | orderBy:'nom'">
+                    <mat-option *ngIf="!bien.isImmeuble()" [value]="bien.id">
+                        {{bien.nom}}
+                    </mat-option>
+                </ng-container>
             </mat-select>
         </mat-form-field>
         <mat-form-field *ngIf="!defaultLocataire">

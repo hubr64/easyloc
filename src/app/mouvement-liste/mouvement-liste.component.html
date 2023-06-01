@@ -18,9 +18,8 @@
 <div class="filter-box">
     <mat-form-field *ngIf="!defaultBien">
         <mat-label>Bien</mat-label>
-        <mat-icon matPrefix>apartment</mat-icon> 
-        <mat-select [formControl]="bienFilter">
-            <mat-option value="" selected>Tous</mat-option>
+        <mat-icon matPrefix>key</mat-icon> 
+        <mat-select [formControl]="bienFilter" multiple>
             <mat-option *ngFor="let bien of documentService.document.biens | orderBy:'nom'" [value]="bien.id">
                 {{bien.nom}}
             </mat-option>
@@ -99,6 +98,17 @@
             <td mat-footer-cell *matFooterCellDef>{{getTotal() | currency:'EUR':'symbol':'1.2-2'}}</td>
         </ng-container>
 
+        <ng-container matColumnDef="montant_ratio">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Montant</th>
+            <td mat-cell *matCellDef="let row">
+                <mat-icon color="warn" *ngIf="row.montant<0">south_east</mat-icon>
+                <mat-icon color="primary" *ngIf="row.montant>0">north_east</mat-icon>
+                {{(defaultBienImmeuble&&row.bien==defaultBienImmeuble?(row.montant * defaultBienImmeuble.getBienLieRatio(defaultBien) / 100):row.montant) | currency:'EUR':'symbol':'1.2-2'}}
+                <mat-icon class="immeuble" *ngIf="defaultBienImmeuble&&row.bien==defaultBienImmeuble" [title]=" defaultBienImmeuble.getBienLieRatio(defaultBien) +'% de '+ row.montant + '€'">apartment</mat-icon>
+            </td>
+            <td mat-footer-cell *matFooterCellDef>{{getTotal() | currency:'EUR':'symbol':'1.2-2'}}</td>
+        </ng-container>
+
         <ng-container matColumnDef="tiers" *ngIf="!embedded">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Tiers</th>
             <td mat-cell *matCellDef="let row">{{row.tiers}}</td>
@@ -114,7 +124,7 @@
             <td mat-footer-cell *matFooterCellDef>&nbsp;</td>
         </ng-container>
 
-        <ng-container matColumnDef="actions" *ngIf="!embedded">
+        <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let row">
                 <button mat-icon-button [matMenuTriggerFor]="menuItem">
@@ -125,6 +135,10 @@
                     <button mat-menu-item title="Dupliquer" (click)="duplicate(row)"><mat-icon color="primary">content_copy</mat-icon> Dupliquer</button>
                     <button mat-menu-item title="Supprimer" (click)="delete(row)"><mat-icon color="warn">delete</mat-icon> Supprimer</button>
                     <mat-divider></mat-divider>
+                    <ng-container *ngIf="row.bien.isImmeuble()">
+                        <app-bien-ventilation [immeuble]="row.bien" [mouvement]="row" [type]="'menu-item'"></app-bien-ventilation>
+                        <mat-divider></mat-divider>
+                    </ng-container>
                     <button mat-menu-item title="Générer quittance" (click)="generateQuittance(row)"><mat-icon color="accent">receipt_long</mat-icon> Générer quittance</button>
                     <button mat-menu-item title="Associer quittance" (click)="addQuittance(row)"><mat-icon color="accent" matBadgeColor="accent" matBadge="+">receipt_long</mat-icon> Associer quittance</button>
                     <ng-container *ngIf="row.quittance">
@@ -142,12 +156,12 @@
             <td mat-footer-cell *matFooterCellDef>-</td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="embedded?displayedColumnsEmbedded:displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: embedded?displayedColumnsEmbedded:displayedColumns;" [ngClass]="{'success-alert': lastMouvement==row?true:false}"></tr>
+        <tr mat-header-row *matHeaderRowDef="embedded?(defaultBien?displayedColumnsDefaultBien:displayedColumnsEmbedded):displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: embedded?(defaultBien?displayedColumnsDefaultBien:displayedColumnsEmbedded):displayedColumns;" [ngClass]="{'success-alert': lastMouvement==row?true:false}"></tr>
         <tr class="mat-row" *matNoDataRow>
             <td class="centered-cell mat-cell empty-cell" [attr.colspan]="displayedColumns.length"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun résultat à afficher...</td>
         </tr>
-        <tr mat-footer-row *matFooterRowDef="embedded?displayedColumnsEmbedded:displayedColumns"></tr>
+        <tr mat-footer-row *matFooterRowDef="embedded?(defaultBien?displayedColumnsDefaultBien:displayedColumnsEmbedded):displayedColumns"></tr>
     </table>
     <mat-paginator #paginator
         [pageIndex]="0"

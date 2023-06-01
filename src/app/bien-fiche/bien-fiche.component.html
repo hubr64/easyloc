@@ -1,6 +1,6 @@
 <mat-toolbar color="primary" class="primary-darker sticky-toolbar no-print">
     <button mat-icon-button (click)="goBack()"><mat-icon>chevron_left</mat-icon></button>
-    <mat-icon>apartment</mat-icon>
+    <mat-icon>key</mat-icon>
     <span>Fiche descriptive de bien</span>
     <span class="flex"></span>
     <button mat-icon-button [matMenuTriggerFor]="menuListe">
@@ -16,7 +16,7 @@
         <button mat-menu-item (click)="toggleVisibily($event, 'eventsVisibility')"><mat-icon *ngIf="eventsVisibility">check_box</mat-icon><mat-icon *ngIf="!eventsVisibility">check_box_outline_blank</mat-icon><mat-icon>notifications</mat-icon> Evènements</button>
         <button mat-menu-item (click)="toggleVisibily($event, 'mouvementsVisibility')"><mat-icon *ngIf="mouvementsVisibility">check_box</mat-icon><mat-icon *ngIf="!mouvementsVisibility">check_box_outline_blank</mat-icon><mat-icon>euro</mat-icon> Mouvements</button>
         <button mat-menu-item (click)="toggleVisibily($event, 'compteursVisibility')"><mat-icon *ngIf="compteursVisibility">check_box</mat-icon><mat-icon *ngIf="!compteursVisibility">check_box_outline_blank</mat-icon><mat-icon>pin</mat-icon> Compteurs</button>
-        <button mat-menu-item (click)="toggleVisibily($event, 'bailsVisibility')"><mat-icon *ngIf="bailsVisibility">check_box</mat-icon><mat-icon *ngIf="!bailsVisibility">check_box_outline_blank</mat-icon><mat-icon>assignment</mat-icon> Baux</button>
+        <button mat-menu-item *ngIf="!bien.isImmeuble()" (click)="toggleVisibily($event, 'bailsVisibility')"><mat-icon *ngIf="bailsVisibility">check_box</mat-icon><mat-icon *ngIf="!bailsVisibility">check_box_outline_blank</mat-icon><mat-icon>assignment</mat-icon> Baux</button>
         <button mat-menu-item (click)="toggleVisibily($event, 'piecesVisibility')"><mat-icon *ngIf="piecesVisibility">check_box</mat-icon><mat-icon *ngIf="!piecesVisibility">check_box_outline_blank</mat-icon><mat-icon>book</mat-icon> Pièces</button>
     </mat-menu>
 </mat-toolbar>
@@ -24,12 +24,12 @@
 <div id="fiche" #fiche>
     <mat-card appearance="outlined" class="card-box">
         <mat-card-header>
-            <div mat-card-avatar class="avatar-letter"><mat-icon>apartment</mat-icon></div>
+            <div mat-card-avatar class="avatar-letter"><mat-icon>key</mat-icon></div>
             <mat-card-title>{{bien.nom}}</mat-card-title>
             <mat-card-subtitle>{{bienType[bien.type]}}</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
-            <mat-list>
+            <mat-list *ngVar="documentService.getImmeuble(bien) as bienImmeuble">
                 <mat-list-item>
                     <mat-icon matListItemIcon>feed</mat-icon>
                     <div matListItemTitle>Description</div>
@@ -40,12 +40,17 @@
                     <div matListItemTitle>Adresse</div>
                     <span matListItemLine [innerHTML]="bien.adresseHTML"></span>
                 </mat-list-item>
+                <mat-list-item *ngIf="bienImmeuble">
+                    <mat-icon matListItemIcon>apartment</mat-icon>
+                    <div matListItemTitle>Immeuble</div>
+                    <span matListItemMeta><a [routerLink]="'/fiche/bien/'+bienImmeuble.id">{{bienImmeuble.nom}}</a> ({{bienImmeuble.getBienLieRatio(bien).toFixed(1)}}%)</span>
+                </mat-list-item>
                 <mat-list-item>
                     <mat-icon matListItemIcon svgIcon="bailleur"></mat-icon>
                     <div matListItemTitle>Bailleur</div>
                     <span matListItemMeta>{{bien.proprietaire.nom}}</span>
                 </mat-list-item>
-                <mat-list-item>
+                <mat-list-item *ngIf="!bien.isImmeuble()">
                     <mat-icon matListItemIcon>shield</mat-icon>
                     <div matListItemTitle>Date effet assurance</div>
                     <span matListItemMeta>{{bien.dateAssurance| date:'shortDate':'fr-FR'}}</span>
@@ -63,16 +68,16 @@
                 <mat-list-item>
                     <mat-icon matListItemIcon>euro_symbol</mat-icon>
                     <div matListItemTitle>Montant Achat</div>
-                    <span matListItemMeta>{{bien.prixAchat| currency:'EUR':'symbol':'1.0-0'}}</span>
+                    <span matListItemMeta>{{documentService.getPrixAchatTotal(bien) | currency:'EUR':'symbol':'1.0-0'}}</span>
                 </mat-list-item>
                 <mat-list-item>
                     <mat-icon matListItemIcon>expand</mat-icon>
-                    <div matListItemTitle>Surface</div>
+                    <div matListItemTitle>Surface <ng-container *ngIf="bien.isImmeuble()">commune</ng-container></div>
                     <span matListItemMeta>{{bien.surface}} m²</span>
                 </mat-list-item>
                 <mat-list-item>
                     <mat-icon matListItemIcon>auto_awesome_mosaic</mat-icon>
-                    <div matListItemTitle>Nombre de pièces</div>
+                    <div matListItemTitle>Nombre de pièces <ng-container *ngIf="bien.isImmeuble()">commune</ng-container></div>
                     <span matListItemMeta>{{bien.nbPieces}}</span>
                 </mat-list-item>
                 <mat-list-item>
@@ -91,6 +96,35 @@
                     <span matListItemLine [innerHTML]="bien.commentaireHTML"></span>
                 </mat-list-item>
             </mat-list>
+        </mat-card-content>
+    </mat-card>
+
+    <mat-card *ngIf="bien.isImmeuble()" appearance="outlined" class="card-box">
+        <mat-card-header>
+            <div mat-card-avatar class="avatar-letter"><mat-icon>key</mat-icon></div>
+            <mat-card-title>Biens</mat-card-title>
+            <mat-card-subtitle>Biens liés à cet immeuble</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-nav-list>
+                <mat-list-item *ngFor="let bienLien of bien.bienslies; let i = index">
+                    <mat-icon matListItemIcon>key</mat-icon>
+                    <div matListItemTitle>{{bienLien.bien.nom}}</div>
+                    <div matListItemLine>{{bienLien.bien.surface}} m²</div>
+                    <span matListItemMeta>{{(bienLien.ratio).toFixed(1)}} %</span>
+                </mat-list-item>
+                <mat-divider></mat-divider>
+                <mat-list-item>
+                    <mat-icon matListItemIcon>expand</mat-icon>
+                    <div matListItemTitle>Surface totale</div>
+                    <span matListItemMeta>{{bien.surfaceTotale}} m²</span>
+                </mat-list-item>
+                <mat-list-item>
+                    <mat-icon matListItemIcon>auto_awesome_mosaic</mat-icon>
+                    <div matListItemTitle>Nombre de pièces total</div>
+                    <span matListItemMeta>{{bien.nbPiecesTotal}}</span>
+                </mat-list-item>
+            </mat-nav-list>
         </mat-card-content>
     </mat-card>
 
@@ -122,11 +156,18 @@
                 </ng-container>
                 <ng-container matColumnDef="montant">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>Montant</th>
-                    <td mat-cell *matCellDef="let row">{{row.montant| currency:'EUR':'symbol':'1.2-2'}}</td>
+                    <td mat-cell *matCellDef="let row">
+                        <ng-container *ngIf="row.bien.id==bien.id">{{row.montant| currency:'EUR':'symbol':'1.2-2'}}</ng-container>
+                        <ng-container *ngIf="row.bien.id==immeuble?.id">{{(row.montant * immeuble?.getBienLieRatio(bien) / 100)| currency:'EUR':'symbol':'1.2-2'}}</ng-container>
+                    </td>
                 </ng-container>
                 <ng-container matColumnDef="tiers">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Tiers</th>
+                    <th mat-header-cell *matHeaderCellDef>Tiers</th>
                     <td mat-cell *matCellDef="let row">{{row.tiers}}</td>
+                </ng-container>
+                <ng-container matColumnDef="immeuble">
+                    <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+                    <td mat-cell *matCellDef="let row"><ng-container *ngIf="row.bien.id==immeuble?.id"><mat-icon>apartment</mat-icon></ng-container></td>
                 </ng-container>
         
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -161,11 +202,11 @@
         </mat-card-actions>
     </mat-card>
 
-    <div *ngIf="bailsVisibility">
+    <div *ngIf="bailsVisibility && !bien.isImmeuble()">
         <mat-card appearance="outlined" class="card-box" *ngFor="let bail of bails">
             <mat-card-header>
                 <div mat-card-avatar class="avatar-letter" [ngClass]="{'old': bail.dateFin}"><mat-icon>assignment</mat-icon></div>
-                <mat-card-title><mat-icon>apartment</mat-icon>{{bail.bien.nom}}<mat-icon>multiple_stop</mat-icon>{{bail.locataire.nom}}<mat-icon>people</mat-icon></mat-card-title>
+                <mat-card-title><mat-icon>key</mat-icon>{{bail.bien.nom}}<mat-icon>multiple_stop</mat-icon>{{bail.locataire.nom}}<mat-icon>people</mat-icon></mat-card-title>
                 <mat-card-subtitle>Bail de location <ng-container *ngIf="bail.dateFin">in</ng-container>actif</mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
