@@ -9,7 +9,7 @@ import { Compteur } from './compteur';
 export const TYPEICON: {[key: string]: string} = {
   "Locataire": 'people',
   "svg.Bailleur": 'bailleur',
-  "Bien": 'apartment',
+  "Bien": 'key',
   "Bail": 'assignment',
   "Quittance": 'receipt_long',
   "Mouvement": 'euro_symbol',
