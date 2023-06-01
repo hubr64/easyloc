@@ -14,6 +14,7 @@ import { DocumentService } from '../_services/document.service';
 import { ExportCsvService }      from '../_services/export-csv.service';
 import { Locataire } from '../_modeles/locataire';
 import { Bail } from '../_modeles/bail';
+import { Bien } from '../_modeles/bien';
 import { DialogDeleteConfirmComponent } from '../dialog-delete-confirm/dialog-delete-confirm.component';
 import { MailComponent } from '../mail/mail.component';
 
@@ -217,12 +218,12 @@ export class LocataireListeComponent implements AfterViewInit {
     return tmpBail;
   }
 
-  getBienLoue(locataire: Locataire): string{
+  getBienLoue(locataire: Locataire): Bien|null{
     var bail = this.getBail(locataire);
     if(bail){
-      return bail.bien.nom;
+      return bail.bien;
     }else{
-      return "-"
+      return null
     }
   }
 }
