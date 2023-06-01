@@ -1,0 +1,8 @@
+<h3 mat-dialog-title>Ventilation par bien lié</h3>
+<mat-list>
+    <mat-list-item *ngFor="let bienlie of data.immeuble.bienslies">
+        <mat-icon matListItemIcon>arrow_right</mat-icon>
+        <h3 matListItemTitle>{{bienlie.bien.nom}} ({{bienlie.ratio}}%)</h3>
+        <span matListItemMeta>{{(montantToVentilate * bienlie.ratio /100) | currency:'EUR':'symbol':'1.2-2'}}</span>
+    </mat-list-item>
+</mat-list>

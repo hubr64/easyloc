@@ -97,6 +97,8 @@ import { CompteurDetailsComponent } from './compteur-details/compteur-details.co
 import { CompteurValueDetailsComponent } from './compteur-value-details/compteur-value-details.component';
 import { CompteurValueFicheComponent } from './compteur-value-fiche/compteur-value-fiche.component';
 import { StatistiquesBailsComponent } from './statistiques-bails/statistiques-bails.component';
+import { BienVentilationComponent } from './bien-ventilation/bien-ventilation.component';
+import { BienVentilationBottomSheetComponent } from './bien-ventilation/bien-ventilation.component';
 // Helpers
 import { FilterConfigurationPipe } from './_helpers/filter-configuration.pipe';
 import { DndDirective } from './_helpers/dnd.directive';
@@ -164,7 +166,9 @@ const globalRippleConfig: RippleGlobalOptions = {
     CompteurDetailsComponent,
     CompteurValueDetailsComponent,
     CompteurValueFicheComponent,
-    StatistiquesBailsComponent
+    StatistiquesBailsComponent,
+    BienVentilationComponent,
+    BienVentilationBottomSheetComponent
   ],
   imports: [
     BrowserModule,
