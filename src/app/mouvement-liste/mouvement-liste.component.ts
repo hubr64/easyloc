@@ -39,26 +39,27 @@ export class MouvementListeComponent implements AfterViewInit {
 
   // Columns displayed in the table. Columns IDs can be added, removed, or reordered.
   public displayedColumns = ['select', 'date', 'bien', 'libelle', 'montant', 'tiers', 'quittance', 'actions'];
-  public displayedColumnsEmbedded = ['select', 'date', 'libelle', 'montant', 'quittance'];
+  public displayedColumnsEmbedded = ['select', 'date', 'libelle', 'montant', 'quittance', 'actions'];
+  public displayedColumnsDefaultBien = ['select', 'date', 'libelle', 'montant_ratio', 'quittance', 'actions'];
   //Multi selection management
   public initialSelection = [];
   public allowMultiSelect: boolean = true;
   public selection: SelectionModel<Mouvement> = new SelectionModel<Mouvement>(this.allowMultiSelect, this.initialSelection);
   public lastMouvement: Mouvement;
   // String to manage the search filter
-  public bienFilter = new FormControl('');
+  public bienFilter = new FormControl<string[]>([]);
   public typeFilter = new FormControl('');
   public searchFilter = new FormControl('');
   public startDateFilter = new FormControl<Date | null>(null);
   public endDateFilter = new FormControl<Date | null>(null);
   public filterValues: {
-    bien: string|null,
+    bien: string[]|null,
     type: string|null,
     search: string|null,
     startDate: Date|null,
     endDate: Date|null
   } = {
-    bien: '',
+    bien: [],
     type: '',
     search: '',
     startDate: null,
@@ -69,6 +70,8 @@ export class MouvementListeComponent implements AfterViewInit {
   public urlQuittances: {[key: string]: string} = {};
   //404 error for each quittance
   public errorQuittances: {[key: string]: number} = {};
+  //Permet de mémroiser l'éventuel immeuble d'un bien
+  public defaultBienImmeuble: Bien;
 
   constructor(
     public alertService: AlertService,
@@ -93,15 +96,31 @@ export class MouvementListeComponent implements AfterViewInit {
     }
     //Manage default filtering if a bien is selected
     if(this.defaultBien){
-      this.bienFilter.setValue(this.defaultBien.id);
-      this.filterValues.bien = this.defaultBien.id;
+
+      let bienToFilter = [this.defaultBien.id];
+
+      //S'il le bien par défaut est associé à un immeuble
+      let immeuble = this.documentService.getImmeuble(this.defaultBien);
+      if(immeuble){
+        //On mémorise l'immeuble
+        this.defaultBienImmeuble = immeuble;
+        //Alors on ajoute cet immeuble dans le filtre par défaut
+        bienToFilter.push(immeuble.id);
+      }
+
+      this.bienFilter.setValue(bienToFilter);
+      this.filterValues.bien = bienToFilter;
+    }else{
+      let allBienArray = this.documentService.document.biens.map(obj => obj.id);
+      this.bienFilter.setValue(allBienArray);
+      this.filterValues.bien = allBienArray;
     }
     //Listen for filter change
     this.fieldListener();
   }
 
   private fieldListener() {
-    this.bienFilter.valueChanges.subscribe((bien:string | null) => {
+    this.bienFilter.valueChanges.subscribe((bien:string[] | null) => {
       this.filterValues.bien = bien;
       this.dataSource.filter = JSON.stringify(this.filterValues);
     });
@@ -177,7 +196,7 @@ export class MouvementListeComponent implements AfterViewInit {
       let searchTerms = JSON.parse(filter);
       if(searchTerms.startDate){searchTerms.startDate = new Date(searchTerms.startDate);}
       if(searchTerms.endDate){searchTerms.endDate = new Date(searchTerms.endDate);}
-      return (searchTerms.bien.length==0 || (searchTerms.bien.length>0 && mouvement.bien.id.indexOf(searchTerms.bien) !== -1))
+      return (searchTerms.bien.length==0 || (searchTerms.bien.length>0 && searchTerms.bien.indexOf(mouvement.bien.id) !== -1))
         && (searchTerms.type.length==0 || (searchTerms.type.length>0 && ((searchTerms.type=='in'&& mouvement.montant > 0) || (searchTerms.type=='out'&& mouvement.montant < 0) )))
         && (searchTerms.startDate == null || (searchTerms.startDate!=null && mouvement.date.getTime() >= searchTerms.startDate.getTime()))
         && (searchTerms.endDate == null || (searchTerms.endDate!=null && mouvement.date.getTime() <= searchTerms.endDate.getTime()))
@@ -190,14 +209,26 @@ export class MouvementListeComponent implements AfterViewInit {
     this.searchFilter.setValue('');
     this.typeFilter.setValue('');
     if(!this.defaultBien){
-      this.bienFilter.setValue('');
+      this.bienFilter.setValue(this.documentService.document.biens.map(obj => obj.id));
     }
     this.startDateFilter.setValue(null);
     this.endDateFilter.setValue(null);
   }
 
   public getTotal(): number{
-    return  this.dataSource&&this.dataSource.filteredData?this.dataSource.filteredData.map(m => m.montant).reduce((acc:any, value:any) => acc + value, 0):0;
+
+    let total: number = 0;
+    if(this.dataSource && this.dataSource.filteredData){
+      this.dataSource.filteredData.forEach(filteredMouvement => {
+        if(this.defaultBienImmeuble && filteredMouvement.bien==this.defaultBienImmeuble){
+          total += filteredMouvement.montant * this.defaultBienImmeuble.getBienLieRatio(this.defaultBien) / 100;
+        }else{
+          total += filteredMouvement.montant;
+        }
+      });      
+    }
+
+    return total;
   }
 
   add(): void {

@@ -17,7 +17,6 @@
                     {{bien.nom}}
                 </mat-option>
             </mat-select>
-            <mat-icon *ngIf="mouvementForm.value.bien" matSuffix color="accent" [routerLink]="'/fiche/bien/'+mouvementForm.value.bien">visibility</mat-icon>
             <mat-hint align="end">Bien concerné par le mouvement</mat-hint>
             <mat-error *ngIf="bien?.errors?.required">Le bien est obligatoire.</mat-error>
         </mat-form-field>
@@ -32,20 +31,23 @@
                 {{libelleAuto}}
             </mat-option>
         </mat-autocomplete>
-        <mat-form-field appearance="fill" *ngVar="isMouvementForLoyer() as mouvementForLoyer">
-            <mat-label>Montant</mat-label>
-            <mat-icon *ngIf="montant?.value < 0" matPrefix color="warn">south_east</mat-icon>
-            <mat-icon *ngIf="!(montant?.value < 0) && !(montant?.value > 0)" matPrefix>east</mat-icon>
-            <mat-icon *ngIf="montant?.value > 0" matPrefix color="primary">north_east</mat-icon>
-            <input matInput placeholder="Montant" id="montant" formControlName="montant" required>
-            <mat-icon *ngIf="mouvementForLoyer > 0" matSuffix color="warn">error</mat-icon>
-            <mat-icon *ngIf="mouvementForLoyer == 0" matSuffix color="primary">done</mat-icon>
-            <mat-hint class="mat-mdc-form-field-error" align="start" *ngIf="mouvementForLoyer > 0">Montant non conforme au loyer ({{mouvementForLoyer | currency:'EUR':'symbol':'1.2-2'}}).</mat-hint>
-            <mat-hint align="start" *ngIf="mouvementForLoyer == 0">Montant conforme au loyer.</mat-hint>
-            <mat-hint align="end">Montant négatif si au débit (mettre un '-' avant). Utiliser un '.' pour les décimales</mat-hint>
-            <mat-error *ngIf="montant?.errors?.pattern">Le montant doit être un nombre (utiliser un '.' pour les décimales).</mat-error>
-            <mat-error *ngIf="montant?.errors?.required">Le montant est obligatoire.</mat-error>
-        </mat-form-field>
+        <div class="form-field-montant">
+            <mat-form-field appearance="fill" *ngVar="isMouvementForLoyer() as mouvementForLoyer">
+                <mat-label>Montant</mat-label>
+                <mat-icon *ngIf="montant?.value < 0" matPrefix color="warn">south_east</mat-icon>
+                <mat-icon *ngIf="!(montant?.value < 0) && !(montant?.value > 0)" matPrefix>east</mat-icon>
+                <mat-icon *ngIf="montant?.value > 0" matPrefix color="primary">north_east</mat-icon>
+                <input matInput placeholder="Montant" id="montant" formControlName="montant" required>
+                <mat-icon *ngIf="mouvementForLoyer > 0" matSuffix color="warn">error</mat-icon>
+                <mat-icon *ngIf="mouvementForLoyer == 0" matSuffix color="primary">done</mat-icon>
+                <mat-hint class="mat-mdc-form-field-error" align="start" *ngIf="mouvementForLoyer > 0">Montant non conforme au loyer ({{mouvementForLoyer | currency:'EUR':'symbol':'1.2-2'}}).</mat-hint>
+                <mat-hint align="start" *ngIf="mouvementForLoyer == 0">Montant conforme au loyer.</mat-hint>
+                <mat-hint align="end">Montant négatif si au débit (mettre un '-' avant). Utiliser un '.' pour les décimales</mat-hint>
+                <mat-error *ngIf="montant?.errors?.pattern">Le montant doit être un nombre (utiliser un '.' pour les décimales).</mat-error>
+                <mat-error *ngIf="montant?.errors?.required">Le montant est obligatoire.</mat-error>
+            </mat-form-field>
+            <app-bien-ventilation *ngIf="isMouvementForImmeuble()" [immeuble]="getBienOfMouvement()!" [montant]="montant?.value"></app-bien-ventilation>
+        </div>
         <mat-form-field appearance="fill">
             <mat-label>Tiers</mat-label>
             <input matInput placeholder="Tiers concerné" id="tiers" formControlName="tiers" required>

@@ -7,6 +7,7 @@ import { map, startWith} from 'rxjs/operators';
 import { DocumentService } from '../_services/document.service';
 import { ConfigurationService } from '../_services/configuration.service';
 import { Bail } from '../_modeles/bail';
+import { Bien } from '../_modeles/bien';
 
 @Component({
   selector: 'app-mouvement-details',
@@ -157,6 +158,29 @@ export class MouvementDetailsComponent implements OnInit {
     }
 
     return mouvementIsCharge;
+  }
+
+  public getBienOfMouvement(): Bien|null {
+    if(this.bien){
+      for (var _i = 0; _i < this.documentService.document.biens.length; _i++) {
+        if(this.documentService.document.biens[_i].id == this.bien.value){
+          return this.documentService.document.biens[_i];
+        }
+      }
+    }
+    return null;
+  }
+
+  public isMouvementForImmeuble(): boolean {
+
+    let bienIsImmeuble: boolean = false;
+    let bienOfMouvement: Bien|null = this.getBienOfMouvement();
+
+    if(bienOfMouvement){
+      bienIsImmeuble = bienOfMouvement.isImmeuble();
+    }
+
+    return bienIsImmeuble;
   }
 
 }
