@@ -28,9 +28,11 @@
                 <mat-form-field appearance="fill">
                     <mat-label>Bien loué</mat-label>
                     <mat-select id="bien" formControlName="bien" required>
-                        <mat-option *ngFor="let bien of documentService.document.biens | orderBy:'nom'" [value]="bien.id">
-                            {{bien.nom}}
-                        </mat-option>
+                        <ng-container *ngFor="let bien of documentService.document.biens | orderBy:'nom'">
+                            <mat-option *ngIf="!bien.isImmeuble()" [value]="bien.id">
+                                {{bien.nom}}
+                            </mat-option>
+                        </ng-container>
                     </mat-select>
                     <mat-icon *ngIf="bailForm.value.bien" matSuffix color="accent" [routerLink]="'/fiche/bien/'+bailForm.value.bien">visibility</mat-icon>
                     <mat-hint align="end">Bien loué</mat-hint>
