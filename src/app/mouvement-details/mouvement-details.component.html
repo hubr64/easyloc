@@ -42,7 +42,7 @@
                 <mat-icon *ngIf="mouvementForLoyer == 0" matSuffix color="primary">done</mat-icon>
                 <mat-hint class="mat-mdc-form-field-error" align="start" *ngIf="mouvementForLoyer > 0">Montant non conforme au loyer ({{mouvementForLoyer | currency:'EUR':'symbol':'1.2-2'}}).</mat-hint>
                 <mat-hint align="start" *ngIf="mouvementForLoyer == 0">Montant conforme au loyer.</mat-hint>
-                <mat-hint align="end">Montant négatif si au débit (mettre un '-' avant). Utiliser un '.' pour les décimales</mat-hint>
+                <mat-hint align="end">Montant négatif si au débit. Utiliser un '.' pour les décimales</mat-hint>
                 <mat-error *ngIf="montant?.errors?.pattern">Le montant doit être un nombre (utiliser un '.' pour les décimales).</mat-error>
                 <mat-error *ngIf="montant?.errors?.required">Le montant est obligatoire.</mat-error>
             </mat-form-field>
