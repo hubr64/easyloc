@@ -141,22 +141,26 @@ export class QuittancesComponent implements OnInit {
         this.quittanceForm.patchValue({mois: this.mouvement.date});
 
         //A bien is correctly defined in the mouvement
+        console.dir(this.mouvement);
+
         if(this.mouvement.bien){
           var tmpBail: Bail | null = null;
           //Loop for all possible bails and select the accurate one
           for (var _i = 0; _i < this.documentService.document.bails.length; _i++) {
             // Find the requested bien
             if(this.documentService.document.bails[_i].bien == this.mouvement.bien){
-              //If the bail has an end date (bail finish) and if a bail is already selected
-              if(this.documentService.document.bails[_i].dateFin && tmpBail){
-                //If the bail is later then the already selected
-                if(this.documentService.document.bails[_i].dateFin > tmpBail.dateFin){
+              //If the bail has an end date then check if the mouvement date is between begin and end date
+              if(this.documentService.document.bails[_i].dateFin){
+                if(this.mouvement.date > this.documentService.document.bails[_i].dateDebut && 
+                  this.mouvement.date < this.documentService.document.bails[_i].dateFin)
+                {
                   tmpBail = this.documentService.document.bails[_i];
                 }
-              //No bail is selected or bail has no end date (current bail on the bien)  
-              }else{
-                tmpBail = this.documentService.document.bails[_i];
-                break;
+              } else{
+                if(this.mouvement.date > this.documentService.document.bails[_i].dateDebut)
+                {
+                  tmpBail = this.documentService.document.bails[_i];
+                }
               }
             }
           }

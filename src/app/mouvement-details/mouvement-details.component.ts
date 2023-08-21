@@ -123,16 +123,21 @@ export class MouvementDetailsComponent implements OnInit {
       for (var _i = 0; _i < this.documentService.document.bails.length; _i++) {
         // Find the requested bien
         if(this.documentService.document.bails[_i].bien.id == this.bien.value){
-          //If the bail has an end date (bail finish) and if a bail is already selected
-          if(this.documentService.document.bails[_i].dateFin && bailForMouvement){
-            //If the bail is later then the already selected
-            if(this.documentService.document.bails[_i].dateFin > bailForMouvement.dateFin){
-              bailForMouvement = this.documentService.document.bails[_i];
+          //If a date exists for the current mouvement
+          if(this.date && this.date.value){
+            //If the bail has an end date then check if the mouvement date is between begin and end date
+            if(this.documentService.document.bails[_i].dateFin){
+              if(this.date.value > this.documentService.document.bails[_i].dateDebut && 
+                this.date.value < this.documentService.document.bails[_i].dateFin)
+              {
+                bailForMouvement = this.documentService.document.bails[_i];
+              }
+            } else{
+              if(this.date.value > this.documentService.document.bails[_i].dateDebut)
+              {
+                bailForMouvement = this.documentService.document.bails[_i];
+              }
             }
-          //No bail is selected or bail has no end date (current bail on the bien)  
-          }else{
-            bailForMouvement = this.documentService.document.bails[_i];
-            break;
           }
         }
       }
