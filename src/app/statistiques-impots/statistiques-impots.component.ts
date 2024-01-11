@@ -440,7 +440,7 @@ export class StatistiquesImpotsComponent implements OnInit {
           charges += this.regulCharges[bien.nom].chargeTropPercu;
         }
         //If defined also add the amout of charges paied by the locataire
-        if(this.mouvementClassifiedIn[bien.nom][this.selectedAnnee-2]){
+        if(this.mouvementClassifiedIn[bien.nom] && this.mouvementClassifiedIn[bien.nom][this.selectedAnnee-2]){
           charges += this.mouvementClassifiedIn[bien.nom][this.selectedAnnee-2].charges;
         }
       }
