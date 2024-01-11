@@ -80,6 +80,13 @@ export class UserService {
             gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest');
             //Load the Google Identify Service (GIS) for identification
             this.googleInitClient();
+            //Now wait 5 seconds for auto authentification and if doesn't work then go to manuel connexion
+            setTimeout(()=>{
+                if(this.isLoading == true){
+                    this.alertService.error("Connexion automatique impossible...")
+                    this.isLoading = false;
+                }
+            },10000);
         });
     }
 

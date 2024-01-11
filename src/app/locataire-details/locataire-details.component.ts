@@ -25,8 +25,7 @@ export class LocataireDetailsComponent implements OnInit {
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private alertService: AlertService,
-    private documentService: DocumentService,
-    private driveService: DriveService,
+    public documentService: DocumentService,
     private location: Location) { }
 
   ngOnInit(): void {
