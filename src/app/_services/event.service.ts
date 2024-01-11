@@ -695,7 +695,7 @@ export class EventService {
             //If the bail revision is outdated then add an 2-gravity event
             if(bailDeltaNbJour>dureeRevisionLoyer){
                 updateEvent.designation = "Montant du loyer à modifier depuis " + bailDeltaNbJour + " jours";
-                updateEvent.gravite = 2;
+                updateEvent.gravite = 1;
                 //Add the actions possible
                 var action1: EventAction = new EventAction();
                 action1.icone = "edit";
