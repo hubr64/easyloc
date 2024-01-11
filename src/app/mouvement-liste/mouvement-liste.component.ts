@@ -119,6 +119,16 @@ export class MouvementListeComponent implements AfterViewInit {
     this.fieldListener();
   }
 
+  public bienFilterAll(evt:any){
+    if(this.filterValues.bien && this.filterValues.bien?.length < this.documentService.document.biens.length){
+      this.bienFilter.setValue(this.documentService.document.biens.map(obj => obj.id));
+    }else{
+      this.bienFilter.setValue([]);
+    }
+    this.bienFilter.markAsTouched()
+    evt.stopPropagation();
+  }
+
   private fieldListener() {
     this.bienFilter.valueChanges.subscribe((bien:string[] | null) => {
       this.filterValues.bien = bien;
@@ -196,7 +206,7 @@ export class MouvementListeComponent implements AfterViewInit {
       let searchTerms = JSON.parse(filter);
       if(searchTerms.startDate){searchTerms.startDate = new Date(searchTerms.startDate);}
       if(searchTerms.endDate){searchTerms.endDate = new Date(searchTerms.endDate);}
-      return (searchTerms.bien.length==0 || (searchTerms.bien.length>0 && searchTerms.bien.indexOf(mouvement.bien.id) !== -1))
+      return ((searchTerms.bien.length>0 && searchTerms.bien.indexOf(mouvement.bien.id) !== -1))
         && (searchTerms.type.length==0 || (searchTerms.type.length>0 && ((searchTerms.type=='in'&& mouvement.montant > 0) || (searchTerms.type=='out'&& mouvement.montant < 0) )))
         && (searchTerms.startDate == null || (searchTerms.startDate!=null && mouvement.date.getTime() >= searchTerms.startDate.getTime()))
         && (searchTerms.endDate == null || (searchTerms.endDate!=null && mouvement.date.getTime() <= searchTerms.endDate.getTime()))
@@ -257,7 +267,7 @@ export class MouvementListeComponent implements AfterViewInit {
   }
 
   edit(mouvement: Mouvement): void {
-    //Display a confirmation dialog
+    //Display the edition dialog
     const dialogRef = this.dialog.open(MouvementDetailsComponent, {
       data: {
         mouvement: mouvement
@@ -285,6 +295,38 @@ export class MouvementListeComponent implements AfterViewInit {
       // If user finally change his mind
       }else{
         this.alertService.error('La modification a été annulée...');
+      }
+    });
+  }
+
+  duplicate(mouvement: Mouvement){
+
+    //Display the edition dialog
+    const dialogRef = this.dialog.open(MouvementDetailsComponent, {
+      data: {
+        mouvement: mouvement
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result:any) => {
+      //If user confirm creation
+      if(result){
+        //Add in the global definition
+        let tmpNew: Mouvement = Mouvement.fromJSON(result, this.documentService.document.biens, this.documentService.document.pieces);
+        tmpNew.id = this.documentService.getUniqueId(4);
+        tmpNew.quittance = null;
+        this.documentService.document.mouvements.push(tmpNew);
+        this.alertService.success('Le mouvement est maintenant dupliqué après modifications.');
+        this.lastMouvement = tmpNew;
+        // Update data source
+        this.getData();
+        //Refresh sort (as it doesn't sort automaticlly after update)
+        const sortState: Sort = {active: this.sort.active, direction: this.sort.direction};
+        this.sort.sortChange.emit(sortState);
+        
+      // If user finally change his mind
+      }else{
+        this.alertService.error('La duplication a été annulée...');
       }
     });
   }
@@ -320,22 +362,6 @@ export class MouvementListeComponent implements AfterViewInit {
     for (let item of this.selection.selected) {
       this.delete(item);
     }
-  }
-
-  duplicate(mouvement: Mouvement){
-    //Duplicate (deep-copy) and first change the name as we can not have the same name in the file
-    const newMouvement = Mouvement.fromJSON(mouvement.toJSON(), this.documentService.document.biens, this.documentService.document.pieces);
-    newMouvement.id = this.documentService.getUniqueId(4);
-    newMouvement.quittance = null;
-    //Add the current mouvement once again
-    this.documentService.document.mouvements.push(newMouvement);
-    this.lastMouvement = newMouvement;
-    // Update data source
-    this.dataSource.data = this.documentService.document.mouvements;
-    //Dislpay message
-    this.alertService.success('La duplication est terminée.');
-    //SHow edition form
-    this.edit(newMouvement);
   }
 
   public export(): void {
