@@ -20,12 +20,14 @@
     <div class="filter-box">
         <mat-form-field *ngIf="!defaultBien">
             <mat-label>Bien</mat-label>
-            <mat-icon matPrefix>apartment</mat-icon> 
+            <mat-icon matPrefix>key</mat-icon> 
             <mat-select [formControl]="bienFilter">
                 <mat-option value="" selected>Tous</mat-option>
-                <mat-option *ngFor="let bien of documentService.document.biens | orderBy:'nom'" [value]="bien.id">
-                    {{bien.nom}}
-                </mat-option>
+                <ng-container *ngFor="let bien of documentService.document.biens | orderBy:'nom'">
+                    <mat-option *ngIf="!bien.isImmeuble()" [value]="bien.id">
+                        {{bien.nom}}
+                    </mat-option>
+                </ng-container>
             </mat-select>
         </mat-form-field>
         <mat-form-field *ngIf="!defaultLocataire">
@@ -140,6 +142,8 @@
                         <mat-icon>more_vert</mat-icon>
                     </button>
                     <mat-menu #menuItem="matMenu" yPosition="below" [overlapTrigger]="false">
+                        <button mat-menu-item title="Acquitter" (click)="acquitter(row)"><mat-icon color="accent">receipt_long</mat-icon> Acquitter</button>
+                        <mat-divider></mat-divider>
                         <button mat-menu-item title="Consulter" routerLink="/fiche/bail/{{row.id}}"><mat-icon color="primary">visibility</mat-icon> Consulter</button>
                         <button mat-menu-item title="Editer" (click)="edit(row)"><mat-icon color="primary">edit</mat-icon> Editer</button>
                         <button mat-menu-item title="Dupliquer" (click)="duplicate(row)"><mat-icon color="primary">content_copy</mat-icon> Dupliquer</button>
@@ -152,7 +156,7 @@
             <tr mat-header-row *matHeaderRowDef="embedded?displayedColumnsEmbedded:displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: embedded?displayedColumnsEmbedded:displayedColumns;" (click)="embedded?edit(row):''"></tr>
             <tr class="mat-row" *matNoDataRow>
-                <td class="centered-cell mat-cell" [attr.colspan]="displayedColumns.length"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun résultat à afficher</td>
+                <td class="centered-cell mat-cell empty-cell" [attr.colspan]="displayedColumns.length"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun résultat à afficher</td>
             </tr>
             <tr mat-footer-row *matFooterRowDef="embedded?displayedColumnsEmbedded:displayedColumns"></tr>
     

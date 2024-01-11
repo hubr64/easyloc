@@ -1,0 +1,42 @@
+<div [ngClass]="{'main-container': !simple}">
+    <div echarts [options]="chartOptionCharges" [loading]="true" class="main-chart mat-elevation-z1" [theme]="configurationService.isDarkMode()?'dark':''"></div>
+    <table *ngIf="!simple" mat-table [dataSource]="dataSource" class="mat-elevation-z1">
+        <ng-container matColumnDef="year">
+            <th mat-header-cell *matHeaderCellDef><mat-icon>calendar_month</mat-icon><div>Année</div></th>
+            <td mat-cell *matCellDef="let row">{{row.year}}</td>
+        </ng-container>
+        <ng-container matColumnDef="chargepercue">
+            <th mat-header-cell *matHeaderCellDef><mat-icon color="primary">call_missed</mat-icon><div>Perçues</div></th>
+            <td mat-cell *matCellDef="let row">{{row.chargepercue| currency:'EUR':'symbol':'1.2-2'}}</td>
+        </ng-container>
+        <ng-container matColumnDef="chargelocative">
+            <th mat-header-cell *matHeaderCellDef><mat-icon color="warn">call_missed_outgoing</mat-icon><div>Locatives</div></th>
+            <td mat-cell *matCellDef="let row">{{row.chargelocative| currency:'EUR':'symbol':'1.2-2'}}</td>
+        </ng-container>
+        <ng-container matColumnDef="provisioncharge">
+            <th mat-header-cell *matHeaderCellDef><mat-icon color="warn">call_missed_outgoing</mat-icon><div>Provisions</div></th>
+            <td mat-cell *matCellDef="let row">{{row.provisioncharge| currency:'EUR':'symbol':'1.2-2'}}</td>
+        </ng-container>
+        <ng-container matColumnDef="regulcharge">
+            <th mat-header-cell *matHeaderCellDef><mat-icon color="warn">call_missed_outgoing</mat-icon><div>Régularisations</div></th>
+            <td mat-cell *matCellDef="let row">{{row.regulcharge| currency:'EUR':'symbol':'1.2-2'}}</td>
+        </ng-container>
+        <ng-container matColumnDef="totalcharge">
+            <th mat-header-cell *matHeaderCellDef><mat-icon color="warn">call_missed_outgoing</mat-icon><div>Total</div></th>
+            <td mat-cell *matCellDef="let row">{{row.chargelocative+row.provisioncharge+row.regulcharge| currency:'EUR':'symbol':'1.2-2'}}</td>
+        </ng-container>
+        <ng-container matColumnDef="delta">
+            <th mat-header-cell *matHeaderCellDef><mat-icon>exposure</mat-icon><div>Delta</div></th>
+            <td mat-cell *matCellDef="let row">{{row.chargepercue - (row.chargelocative+row.provisioncharge+row.regulcharge)| currency:'EUR':'symbol':'1.2-2'}}</td>
+        </ng-container>
+        <ng-container matColumnDef="nonrecuperable">
+            <th mat-header-cell *matHeaderCellDef><mat-icon svgIcon="bailleur"></mat-icon><div title="Basée sur une estimation de 30% des provisions sur charges">Non récupérable*</div></th>
+            <td mat-cell *matCellDef="let row">{{row.nonrecuperable| currency:'EUR':'symbol':'1.2-2'}}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <tr class="mat-row" *matNoDataRow>
+            <td class="centered-cell mat-cell" [attr.colspan]="displayedColumns.length"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun résultat à afficher</td>
+        </tr>
+    </table>
+</div>

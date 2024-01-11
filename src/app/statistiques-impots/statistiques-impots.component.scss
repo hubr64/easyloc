@@ -16,16 +16,15 @@
     min-height: 48px;
  }
 table{
-    max-width: 1600px;
-    margin: 0 auto;
+    margin: 5px auto 0;
 }
 table td{
     width: 150px;
     text-align:center;
 }
 table td:first-child{
-    min-width: 300px;
     text-align:right;
+    width: auto;
 }
 table td:last-child{
     width: 70px;
@@ -63,7 +62,15 @@ table td:last-child{
 }
 td.details-category{
     border-bottom: 1px dotted #aaa;
-    background: white;
+    background: #EEEC;
+}
+.result{
+    position: relative;
+}
+.result > button{
+    position: absolute;
+    top: 10px;
+    right: 10px;
 }
 .result input{
     text-align: center;
@@ -90,4 +97,10 @@ td.details-category{
     font-size: 50px;
     flex: 1;
     width: 100%;
+}
+.mat-icon{
+    vertical-align: middle;
+}
+td.details-category > .mat-icon{
+    color:#999;
 }

@@ -58,7 +58,7 @@ export class Mouvement {
         montant: this.montant,
         tiers: this.tiers,
         quittance: this.quittance ? this.quittance.id: '',
-        commentaires: this.commentaires,
+        commentaires: this.commentaires
     };
 
     return serialize;

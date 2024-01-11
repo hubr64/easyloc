@@ -91,6 +91,14 @@ import { BailNewComponent } from './bail-new/bail-new.component';
 import { EventsListeComponent, EventsListeComponentSheet } from './events-liste/events-liste.component';
 import { EventsComponent } from './events/events.component';
 import { EventsFicheComponent } from './events-fiche/events-fiche.component';
+import { MouvementPickDialogComponent } from './mouvement-pick-dialog/mouvement-pick-dialog.component';
+import { CompteurListeComponent } from './compteur-liste/compteur-liste.component';
+import { CompteurDetailsComponent } from './compteur-details/compteur-details.component';
+import { CompteurValueDetailsComponent } from './compteur-value-details/compteur-value-details.component';
+import { CompteurValueFicheComponent } from './compteur-value-fiche/compteur-value-fiche.component';
+import { StatistiquesBailsComponent } from './statistiques-bails/statistiques-bails.component';
+import { BienVentilationComponent } from './bien-ventilation/bien-ventilation.component';
+import { BienVentilationBottomSheetComponent } from './bien-ventilation/bien-ventilation.component';
 // Helpers
 import { FilterConfigurationPipe } from './_helpers/filter-configuration.pipe';
 import { DndDirective } from './_helpers/dnd.directive';
@@ -152,7 +160,15 @@ const globalRippleConfig: RippleGlobalOptions = {
     EventsListeComponent,
     EventsListeComponentSheet,
     EventsComponent,
-    EventsFicheComponent
+    EventsFicheComponent,
+    MouvementPickDialogComponent,
+    CompteurListeComponent,
+    CompteurDetailsComponent,
+    CompteurValueDetailsComponent,
+    CompteurValueFicheComponent,
+    StatistiquesBailsComponent,
+    BienVentilationComponent,
+    BienVentilationBottomSheetComponent
   ],
   imports: [
     BrowserModule,

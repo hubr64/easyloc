@@ -2,10 +2,11 @@
   <img class="user-avatar" src="{{currentUser.image}}" referrerpolicy="no-referrer">
 </button>
 <div id="g_id_onload"
-         data-client_id="474764062918-h31g2d341hajtdhipuggq6uagnfi10rl.apps.googleusercontent.com"
+         [attr.data-client_id]="userService.g_client_id"
          data-callback="handleCredentialResponse"
          data-cancel_on_tap_outside="true"
-         data-auto_select="true"></div>
+         data-auto_select="true"
+         [attr.data-skip_prompt_cookie]="userService.g_cookie_id"></div>
 
 <mat-menu #my="matMenu" yPosition="above" [overlapTrigger]="false">
   <button mat-menu-item routerLink="/configuration"><mat-icon>settings</mat-icon> Configuration</button>

@@ -1,5 +1,4 @@
 import { Component, Inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { MatBottomSheetRef, MAT_BOTTOM_SHEET_DATA} from '@angular/material/bottom-sheet';
 import { TYPEICON } from '../_modeles/easyloc.data';
 
@@ -10,16 +9,11 @@ import { TYPEICON } from '../_modeles/easyloc.data';
 })
 export class PieceUsersComponent {
 
-  public urlUser: {[key: string]: string} = {};
   public userTypeIcon = TYPEICON;
 
   constructor(
     @Inject(MAT_BOTTOM_SHEET_DATA) public data: any,
-    private _bottomSheetRef: MatBottomSheetRef<PieceUsersComponent>,
-    private router: Router) { 
-      data.users.forEach((pieceUser: any) => {
-        this.urlUser[pieceUser.id] = "/"+pieceUser.className.toLowerCase( )+"/"+pieceUser.id;
-      });
+    private _bottomSheetRef: MatBottomSheetRef<PieceUsersComponent>) { 
     }
 
     detachUser(user:any, event: any){

@@ -8,12 +8,13 @@
       <a mat-list-item routerLink="/dashboard" title="Tableau de bord" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>dashboard_outlined</mat-icon></a>
       <a mat-list-item routerLink="/browse" title="Parcourir" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>view_stream</mat-icon></a>
       <mat-divider></mat-divider>
-      <a mat-list-item routerLink="/biens" title="Biens" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>apartment</mat-icon></a>
+      <a mat-list-item routerLink="/biens" title="Biens" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>key</mat-icon></a>
       <a mat-list-item routerLink="/locataires" title="Locataires" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>people</mat-icon></a>
       <a mat-list-item routerLink="/bails" title="Baux" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>assignment</mat-icon></a>
       <a mat-list-item routerLink="/bailleurs" title="Bailleurs" routerLinkActive="mat-nav-accent"><mat-icon matListIcon svgIcon="bailleur"></mat-icon></a>
       <a mat-list-item routerLink="/mouvements" title="Mouvements" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>euro_symbol</mat-icon></a>
       <a mat-list-item routerLink="/pieces" title="Documents" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>book</mat-icon></a>
+      <a mat-list-item routerLink="/compteurs" title="Compteurs" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>pin</mat-icon></a>
       <mat-divider></mat-divider>
       <a mat-list-item routerLink="/impots" title="Impots" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>account_balance</mat-icon></a>
       <a mat-list-item routerLink="/statistiques" title="Statistiques" routerLinkActive="mat-nav-accent"><mat-icon matListIcon>query_stats</mat-icon></a>
@@ -39,8 +40,9 @@
       </button>
       <span class="name">Easy<b>Loc</b></span>
       <span class="flex"></span>
+      <mat-icon title="Sauvegarde automatique en cours" *ngIf="documentService.autoSaveExecution" id="cloud_sync">sync</mat-icon>
       <button mat-icon-button *ngIf="!documentService.autoSave" (click)="saveDocument()" title="Sauvegarder" [disabled]="!documentService.docIsModified"><mat-icon [matBadge]="documentService.docIsModified?'!':''" matBadgeColor="warn">save</mat-icon></button>
-      <button mat-icon-button (click)="toggleTheme()" title="Changer de thème"><mat-icon *ngIf="darkModeCheck">dark_mode</mat-icon><mat-icon *ngIf="!darkModeCheck">light_mode</mat-icon></button>
+      <button mat-icon-button (click)="toggleTheme()" title="Changer de thème"><mat-icon *ngIf="configurationService.isDarkMode()">dark_mode</mat-icon><mat-icon *ngIf="!configurationService.isDarkMode()">light_mode</mat-icon></button>
       <button mat-icon-button routerLink="/conditions" title="Conditions"><mat-icon>info</mat-icon></button>
       <app-my></app-my>
     </mat-toolbar>
@@ -49,8 +51,8 @@
         <div>Easy<b>LOC</b></div>
         <mat-progress-bar *ngIf="isLoading" color="primary" mode="indeterminate"></mat-progress-bar> 
         <div *ngIf="userService.isLoading">Chargement des paramètres d'authentification...</div>
-        <div *ngIf="!userService.isLoading && driveService.isLoading">Chargement du drive...</div>
-        <div *ngIf="!driveService.isLoading && documentService.isLoading;">Chargement du fichier de définition...</div>
+        <div *ngIf="!userService.isLoading && driveService.isLoading">Chargement du drive de {{userService.getCurrentUser().nom}}...</div>
+        <div *ngIf="!driveService.isLoading && documentService.isLoading;">Chargement du fichier de définition v.{{driveService.dataFileVersion}}...</div>
         <div *ngIf="!isLoading">pour vous simplifier la location...</div>
       </div>
     <div *ngIf="(!isLoading && isLoggedIn && isCompliant) || isNonLoggedInRoute()">

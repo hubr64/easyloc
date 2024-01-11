@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 
 import * as Configuration from '../_helpers/global';
 import { environment } from '../../environments/environment';
@@ -14,6 +15,9 @@ export class ConfigurationService {
   public configurationItems: any;
   // Configuration categories
   public categories : any[];
+  // Configuration of the dark mode
+  public darkModeCheck = true;
+  public darkModeChange: Subject<boolean> = new Subject<boolean>();
   
   constructor() {
 
@@ -45,9 +49,13 @@ export class ConfigurationService {
       'bailUnpaiedLoyerNb': { advanced: false, title: 'Nombre de mois à analyser pour loyer impayé', value: Configuration.CONFIG["bailUnpaiedLoyerNb"], categorie: 'notifications' },
       'dureeRevisionLoyer': { advanced: false, title: 'Durée avant nouvelle révision de loyer (en jours)', value: Configuration.CONFIG["dureeRevisionLoyer"], categorie: 'notifications' },
       'nbCheckQuittance': { advanced: false, title: 'Nombre de mois à analyser pour paiement sans quittance', value: Configuration.CONFIG["nbCheckQuittance"], categorie: 'notifications' },
-      'impotDeductionForfaitaire': { advanced: false, title: 'Taux de déduction forfaitaire des revenus imposables', value: Configuration.CONFIG["impotDeductionForfaitaire"], categorie: 'tune' },
+      'margePaiementAssurance': { advanced: false, title: 'Marge de paiement assurance vs date échéance (en mois)', value: Configuration.CONFIG["margePaiementAssurance"], categorie: 'notifications' },
+      'impotDeductionForfaitaire': { advanced: false, title: 'Taux de déduction forfaitaire des revenus imposables (micro-foncier)', value: Configuration.CONFIG["impotDeductionForfaitaire"], categorie: 'tune' },
+      'impotChargesPartLocataire': { advanced: false, title: 'Taux moyen des charges à payer par le locataire (si abs', value: Configuration.CONFIG["impotChargesPartLocataire"], categorie: 'tune' },
+      'impotForfaitGestion': { advanced: false, title: 'Montant du forfait de gestion pour les impôts (en €)', value: Configuration.CONFIG["impotForfaitGestion"], categorie: 'tune' },
       'mouvementAutoCompleteIn': { advanced: false, title: 'Proposition textes de mouvements entrants (séparé par ";")', value: Configuration.CONFIG["mouvementAutoCompleteIn"], categorie: 'web_asset' },
       'mouvementAutoCompleteOut': { advanced: false, title: 'Proposition textes de mouvements sortants (séparé par ";")', value: Configuration.CONFIG["mouvementAutoCompleteOut"], categorie: 'web_asset' },
+      'compteurAutoComplete': { advanced: false, title: 'Proposition textes de compteurs (séparé par ";")', value: Configuration.CONFIG["compteurAutoComplete"], categorie: 'web_asset' },
       'nomModeleAnnoncePapier': { advanced: false, title: 'Nom du modèle par défaut pour une annonce de location en version papier', value: Configuration.CONFIG["nomModeleAnnoncePapier"], categorie: 'tune' },
       'nomModeleAnnonceWeb': { advanced: false, title: 'Nom du modèle par défaut pour une annonce de location en version Web', value: Configuration.CONFIG["nomModeleAnnonceWeb"], categorie: 'tune' },
       'ordreBien': { advanced: false, title: 'Ordre d\'affichage des biens par défaut (nom|dateAchat)', value: Configuration.CONFIG["ordreBien"], categorie: 'web_asset' },
@@ -56,6 +64,20 @@ export class ConfigurationService {
 
     // Load local storage that replace the global initial storage
     this.load();
+
+    //Default is set to false
+    this.darkModeCheck = false;
+    //Prepare subscription
+    this.darkModeChange.subscribe((value: boolean) => {
+        this.darkModeCheck = value
+    });
+    //Get default dark mode configuration
+    this.darkModeChange.next(this.getValue('defaultTheme') == 'dark');
+
+    //If the browser supports dark mode and dark mode is selected then force the dark mode
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+      this.darkModeCheck = true;
+    }
   }
 
   load() {
@@ -94,5 +116,15 @@ export class ConfigurationService {
       //Remove from local memory
       localStorage.removeItem(this.storageConfigurationPrefix + index);
     }
-  }  
+  }
+
+  isDarkMode(){
+    return this.darkModeCheck;
+  }
+
+  switchDisplayMode(){
+    //Toggle display mode
+    this.darkModeChange.next(!this.darkModeCheck)
+  }
+
 }

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef,ViewChild, Renderer2   } from '@angular/core';
+import { Component, ChangeDetectorRef, ViewChild, Renderer2   } from '@angular/core';
 import { Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, Subscription, interval  } from 'rxjs';
@@ -12,6 +12,7 @@ import { AlertService } from '../_services/alert.service';
 import { UserService } from '../_services/user.service';
 import { DriveService } from '../_services/drive.service';
 import { DocumentService } from '../_services/document.service';
+import { MailService } from '../_services/mail.service';
 import { EventService } from '../_services/event.service';
 import { MailComponent } from '../mail/mail.component';
 import { User } from '../_modeles/user';
@@ -23,15 +24,16 @@ import { User } from '../_modeles/user';
 })
 export class NavigationComponent {
 
+  //Various global information for initial loading
   public currentUser: User = new User();
   public currentDate: Date = new Date();
   public isLoggedIn: boolean = false;
   public isCompliant: boolean = false;
   public isLoading: boolean = true;
   private sub: Subscription;
-  private notLoggedInRoutes: string[] = ["/conditions"];
 
-  public darkModeCheck = true;
+  //Routes that do not need to be protected
+  private notLoggedInRoutes: string[] = ["/conditions"];
 
   /** Reference to the directive instance of the ripple. */
   @ViewChild(MatRipple) ripple: MatRipple;
@@ -43,34 +45,28 @@ export class NavigationComponent {
     );
 
   constructor(private breakpointObserver: BreakpointObserver,
-    private renderer: Renderer2,
     private cdr: ChangeDetectorRef,
+    private renderer: Renderer2,
     public router: Router,
     public configurationService: ConfigurationService,
     public alertService: AlertService,
     public userService: UserService,
     public documentService: DocumentService,
     public driveService: DriveService,
+    public mailService: MailService,
     public eventService: EventService,
     public dialog: MatDialog) {
+      //Get global information to manage initial progress loader
       this.currentUser = this.userService.getCurrentUser();
       this.isLoggedIn = this.userService.isUserSignedIn();
       this.isCompliant = this.driveService.isDriveCompliant();
       this.isLoading = true;
-
-      //Get dark mode configuration in configuration service
-      this.darkModeCheck = (this.configurationService.getValue('defaultTheme') == 'dark');
-      //If the dark mode is activated then add the class otherwise remove it
-      if(this.darkModeCheck){
-        this.renderer.addClass(document.body, 'dark-theme');
-      }else{
-        this.renderer.removeClass(document.body, 'dark-theme');
-      }
-      //If the browser supports dark mode and dark mode is selected then force the darkmode
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
-        this.darkModeCheck = true;
-        this.renderer.addClass(document.body, 'dark-theme');
-      }
+      //Apply mode to global body
+      this.changeDisplayMode();
+      // SUbscribe in case the document was reloaded
+      this.configurationService.darkModeChange.subscribe((darkMode: boolean) => {
+        this.changeDisplayMode();
+      });
     }
 
     ngOnInit(): void {
@@ -94,7 +90,7 @@ export class NavigationComponent {
         if(this.isLoading){
           //Check if still loading
           this.isLoading = this.userService.isLoading || this.driveService.isLoading || this.documentService.isLoading;
-          //Loading is finsihed then can qui interval
+          //Loading is finished then can quit interval
           if(!this.isLoading){
             this.sub.unsubscribe();
           }
@@ -102,13 +98,17 @@ export class NavigationComponent {
       });
     }
 
-    public toggleTheme(){
-      this.darkModeCheck = !this.darkModeCheck;
-      if(this.darkModeCheck){
+    changeDisplayMode(){
+      //If the dark mode is activated then add the class otherwise remove it
+      if(this.configurationService.darkModeCheck){
         this.renderer.addClass(document.body, 'dark-theme');
       }else{
         this.renderer.removeClass(document.body, 'dark-theme');
       }
+    }
+
+    public toggleTheme(){
+      this.configurationService.switchDisplayMode();
     }
 
     public mail(){
@@ -116,9 +116,10 @@ export class NavigationComponent {
       const dialogRef = this.dialog.open(MailComponent, {
         data: {
           destinataires: '',
-          emetteur: '',
+          emetteur: this.userService.currentUser.mail,
           sujet: "",
-          contenu: "\r\n\r\nCordialement.\r\n"+this.userService.currentUser.nom
+          contenu: "\r\n\r\nCordialement.\r\n"+this.userService.currentUser.nom,
+          pieces: []
         },
       });
     }

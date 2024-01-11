@@ -1,0 +1,9 @@
+<h2 mat-dialog-title><mat-icon>find_in_page</mat-icon> Choix de mouvements</h2>
+<mat-dialog-content>
+    <app-mouvement-liste [embedded]="true" [defaultBien]="defaultBien" (selected)="onSelected($event)"></app-mouvement-liste>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button color="primary" mat-flat-button [mat-dialog-close]="mouvements" [disabled]="mouvements.length == 0">Choisir</button>
+    <button color="warn" [mat-dialog-close]="false" mat-flat-button>Annuler</button>
+</mat-dialog-actions>
+

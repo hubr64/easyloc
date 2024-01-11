@@ -1,6 +1,6 @@
 #fiche{
     width:90%;
-    max-width:900px;
+    max-width:950px;
     margin:0px auto 5px auto;
 }
 .card-box{
@@ -26,6 +26,10 @@ mat-card-title mat-icon{
 }
 .mdc-list-item__end{
     font-size: 1em;
+    pointer-events:inherit!important;
+}
+.mdc-list-item__end mat-icon{
+    vertical-align: bottom;
 }
 .mat-icon-meta{
     vertical-align: middle;

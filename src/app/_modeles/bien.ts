@@ -9,6 +9,7 @@ export const BIENTYPE: {[key: string]: string} = {
   'MeubleMaison': "Maison Meublé",
   'VideMaison': "Maison Non meublé",
   'Pro': "Local Professionnel",
+  'Immeuble': 'Immeuble'
 }
 
 export class Bien {
@@ -30,7 +31,10 @@ export class Bien {
   dateAssurance: Date;
   commentaire: string;
   pieces: Piece[];
-
+  bienslies: {
+    bien: Bien,
+    ratio: number
+  }[];
 
   constructor() {
     this.className = 'Bien';
@@ -51,9 +55,10 @@ export class Bien {
     this.dateAssurance = new Date();
     this.commentaire = '';
     this.pieces = [];
+    this.bienslies = [];
   }
 
-  static fromJSON(input: any, docBailleurs: Bailleur[] = [], docPieces: Piece[] = []): Bien {
+  static fromJSON(input: any, docBailleurs: Bailleur[] = [], docPieces: Piece[] = [], docBiens: Bien[] = []): Bien {
     var tmp = Object.assign(new Bien(), input);
     //Build correct dates
     tmp.dateAchat = new Date(tmp.dateAchat);
@@ -83,6 +88,22 @@ export class Bien {
         }
       });
     }
+
+    //Convert linked biens id to references to biens
+    tmp.bienslies = [];   
+    if(input.bienslies){ 
+      input.bienslies.forEach((bienlie: any) => {
+        docBiens.forEach((docBien:Bien) => {
+          if(docBien.id == bienlie.bien){
+            tmp.bienslies.push({
+              bien:docBien,
+              ratio: bienlie.ratio
+            })
+          }
+        });
+      });
+    }
+
     return tmp;
   }
 
@@ -105,6 +126,7 @@ export class Bien {
       dateAssurance: this.dateAssurance,
       commentaire: this.commentaire,
       pieces: [''],
+      bienslies: ['']
     };
 
     let serializePieces : string[] = [];
@@ -113,31 +135,17 @@ export class Bien {
     });
     serialize.pieces = serializePieces;
 
+    let serializeBiensLies : any[] = [];
+    this.bienslies.forEach((bienlie: any) => {
+      serializeBiensLies.push({bien: bienlie.bien.id, ratio: bienlie.ratio});
+    });
+    serialize.bienslies = serializeBiensLies;
+
     return serialize;
   }
 
   toString(): string{
     return this.nom;
-  }
-
-  public getYearRentability(mouvements:Mouvement[]): number{
-    //Get current date
-    const currentDate = new Date();
-    //Compute start of year from current date
-    const startYearDate = new Date(currentDate.getFullYear(), 0, 1);
-    //Get all mouvements in the document
-    var yearIn: number = 0;
-    mouvements.forEach((mouvement:Mouvement) => {
-      if(mouvement.bien == this){
-        //If mouvement happens after the beginning of the year and if it is positive
-        if(mouvement.date >= startYearDate && mouvement.montant>0){
-          //Add it depending whether it is positive or negative
-          yearIn += mouvement.montant;
-        }
-      }
-    });
-    //Return result or 0 if prixAchat is undefined
-    return (yearIn / this.prixAchat) || 0;
   }
 
   public getBilan(mouvements:Mouvement[]): number{
@@ -201,6 +209,43 @@ export class Bien {
   }
   public get adresseHTML() {
     return this.adresse.replace(/\n/g,"<br/>");
+  }
+
+  public isImmeuble(): boolean{
+    return this.type == 'Immeuble'
+  }
+
+  public getBienLieRatio(bien: Bien): any{
+    let ratio: number = 0;
+    //On regarde tout ses biens liés
+    this.bienslies.forEach((bienlie: any) => {
+      //Si l'un des biens lies correspond au bien que l'on recherche alors on retourne son ratio
+      if(bienlie.bien.id == bien.id){
+        ratio = bienlie.ratio;
+      }
+    });
+    //On a rien trouvé on retourne un ratio nul
+    return ratio;
+  }
+
+  public get surfaceTotale(): number {
+    let surfaceTotale: number = this.surface;
+    if(this.isImmeuble()){
+      this.bienslies.forEach((bienlie: any) => {
+        surfaceTotale += bienlie.bien.surface;
+      });
+    }
+    return surfaceTotale;
+  }
+
+  public get nbPiecesTotal(): number {
+    let nbPiecesTotal: number = this.nbPieces;
+    if(this.isImmeuble()){
+      this.bienslies.forEach((bienlie: any) => {
+        nbPiecesTotal += bienlie.bien.nbPieces;
+      });
+    }
+    return nbPiecesTotal;
   }
 
 }

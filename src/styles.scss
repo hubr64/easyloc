@@ -6,6 +6,9 @@ body {
     font-family: "Raleway"!important; 
     background-color: #fafafa;
 }
+body.dark-theme {
+    background-color: #303030;
+}
 @media print{    
     body {
         background-color: #fff;
@@ -62,6 +65,14 @@ tr.mat-mdc-footer-row {
 .centered-cell{
     text-align:center;
 }
+.empty-cell mat-icon{
+    color: #ccc;
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    display: block;
+    margin: 5px auto;
+}
 h1 mat-icon{
     vertical-align: middle;
     margin-right: 5px;
@@ -76,6 +87,16 @@ h1 mat-icon{
 .tab-label-icon{
     margin-right: 5px;
     vertical-align: middle;
+}
+@media (max-width: 1200px) {
+    .tab-label-text{
+        display:none;
+    }
+}
+@media (max-width: 600px) {
+    .mdc-tab{
+        min-width:60px!important;
+    }
 }
 mat-tab-body.mat-mdc-tab-body{
     padding:0!important;

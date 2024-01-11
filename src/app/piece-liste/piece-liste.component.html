@@ -12,6 +12,7 @@
     </mat-menu>
     <mat-menu #selectionnes="matMenu">
         <button mat-menu-item (click)="deleteAll()"><mat-icon>delete</mat-icon> Supprimer</button>
+        <button mat-menu-item (click)="mailAll()"><mat-icon>email</mat-icon> Envoyer</button>
     </mat-menu>
 </mat-toolbar>
 
@@ -51,10 +52,15 @@
                 </mat-checkbox>
             </th>
             <td mat-cell *matCellDef="let row" [ngClass]="{'success-border': lastPieces.indexOf(row)!=-1?true:false}">
-                <mat-checkbox (click)="$event.stopPropagation()"
-                            (change)="$event ? selection.toggle(row) : null"
-                            [checked]="selection.isSelected(row)">
-                </mat-checkbox>
+                <ng-container *ngIf="!piecesComplementaires || (piecesComplementaires && piecesComplementaires.indexOf(row)==-1)">
+                    <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="$event ? selection.toggle(row) : null"
+                                [checked]="selection.isSelected(row)">
+                    </mat-checkbox>
+                </ng-container>
+                <ng-container *ngIf="piecesComplementaires && piecesComplementaires.indexOf(row)!=-1">
+                    <mat-icon>apartment</mat-icon>
+                </ng-container>
             </td>
         </ng-container>
                 
@@ -70,7 +76,7 @@
 
         <ng-container matColumnDef="description">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
-            <td mat-cell *matCellDef="let row">{{row.description}}</td>
+            <td mat-cell *matCellDef="let row" title="{{row.description}}">{{row.description}}</td>
         </ng-container>
 
         <ng-container matColumnDef="code">
@@ -105,6 +111,8 @@
                     <mat-icon>more_vert</mat-icon>
                 </button>
                 <mat-menu #menuItem="matMenu" yPosition="below" [overlapTrigger]="false">
+                    <button mat-menu-item title="Envoyer" (click)="mail(row)"><mat-icon color="accent">email</mat-icon> Envoyer</button>
+                    <mat-divider></mat-divider>
                     <button mat-menu-item title="Editer" (click)="edit(row)"><mat-icon color="primary">edit</mat-icon> Editer</button>
                     <button mat-menu-item title="Supprimer" (click)="delete(row)"><mat-icon color="warn">delete</mat-icon> Supprimer</button>
                 </mat-menu>
@@ -114,7 +122,7 @@
         <tr mat-header-row *matHeaderRowDef="embedded?displayedColumnsEmbedded:displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: embedded?displayedColumnsEmbedded:displayedColumns;" [ngClass]="{'success-alert': lastPieces.indexOf(row)!=-1?true:false}"></tr>
         <tr class="mat-row" *matNoDataRow>
-            <td class="centered-cell mat-cell" [attr.colspan]="displayedColumns.length"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun résultat à afficher</td>
+            <td class="centered-cell mat-cell empty-cell" [attr.colspan]="displayedColumns.length"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun résultat à afficher</td>
         </tr>
     </table>
     <mat-paginator #paginator

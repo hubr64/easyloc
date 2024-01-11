@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild, Inject, Input, Output, EventEmitter } from '@angular/core';
+import { AfterViewInit, Component, ViewChild, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { FormControl } from '@angular/forms';
@@ -11,6 +11,7 @@ import { MatDialog} from '@angular/material/dialog';
 
 import { AlertService } from '../_services/alert.service';
 import { DocumentService } from '../_services/document.service';
+import { DriveService } from '../_services/drive.service';
 import { ExportCsvService }      from '../_services/export-csv.service';
 import { Mouvement } from '../_modeles/mouvement';
 import { Bien } from '../_modeles/bien';
@@ -38,26 +39,46 @@ export class MouvementListeComponent implements AfterViewInit {
 
   // Columns displayed in the table. Columns IDs can be added, removed, or reordered.
   public displayedColumns = ['select', 'date', 'bien', 'libelle', 'montant', 'tiers', 'quittance', 'actions'];
-  public displayedColumnsEmbedded = ['select', 'date', 'libelle', 'montant', 'quittance'];
+  public displayedColumnsEmbedded = ['select', 'date', 'libelle', 'montant', 'quittance', 'actions'];
+  public displayedColumnsDefaultBien = ['select', 'date', 'libelle', 'montant_ratio', 'quittance', 'actions'];
   //Multi selection management
   public initialSelection = [];
   public allowMultiSelect: boolean = true;
   public selection: SelectionModel<Mouvement> = new SelectionModel<Mouvement>(this.allowMultiSelect, this.initialSelection);
   public lastMouvement: Mouvement;
   // String to manage the search filter
-  public bienFilter = new FormControl('');
+  public bienFilter = new FormControl<string[]>([]);
   public typeFilter = new FormControl('');
   public searchFilter = new FormControl('');
-  public filterValues: any = {
-    bien: '',
+  public startDateFilter = new FormControl<Date | null>(null);
+  public endDateFilter = new FormControl<Date | null>(null);
+  public filterValues: {
+    bien: string[]|null,
+    type: string|null,
+    search: string|null,
+    startDate: Date|null,
+    endDate: Date|null
+  } = {
+    bien: [],
     type: '',
-    search: ''
+    search: '',
+    startDate: null,
+    endDate: null
   }
+
+  //URL for each quittance
+  public urlQuittances: {[key: string]: string} = {};
+  //404 error for each quittance
+  public errorQuittances: {[key: string]: number} = {};
+  //Permet de mémroiser l'éventuel immeuble d'un bien
+  public defaultBienImmeuble: Bien;
 
   constructor(
     public alertService: AlertService,
     public documentService: DocumentService,
     private exportCsvService: ExportCsvService,
+    public driveService: DriveService,
+    private cdr: ChangeDetectorRef,
     private router: Router,
     public dialog: MatDialog
   ) {}
@@ -75,15 +96,41 @@ export class MouvementListeComponent implements AfterViewInit {
     }
     //Manage default filtering if a bien is selected
     if(this.defaultBien){
-      this.bienFilter.setValue(this.defaultBien.id);
-      this.filterValues.bien = this.defaultBien.id;
+
+      let bienToFilter = [this.defaultBien.id];
+
+      //S'il le bien par défaut est associé à un immeuble
+      let immeuble = this.documentService.getImmeuble(this.defaultBien);
+      if(immeuble){
+        //On mémorise l'immeuble
+        this.defaultBienImmeuble = immeuble;
+        //Alors on ajoute cet immeuble dans le filtre par défaut
+        bienToFilter.push(immeuble.id);
+      }
+
+      this.bienFilter.setValue(bienToFilter);
+      this.filterValues.bien = bienToFilter;
+    }else{
+      let allBienArray = this.documentService.document.biens.map(obj => obj.id);
+      this.bienFilter.setValue(allBienArray);
+      this.filterValues.bien = allBienArray;
     }
     //Listen for filter change
     this.fieldListener();
   }
 
+  public bienFilterAll(evt:any){
+    if(this.filterValues.bien && this.filterValues.bien?.length < this.documentService.document.biens.length){
+      this.bienFilter.setValue(this.documentService.document.biens.map(obj => obj.id));
+    }else{
+      this.bienFilter.setValue([]);
+    }
+    this.bienFilter.markAsTouched()
+    evt.stopPropagation();
+  }
+
   private fieldListener() {
-    this.bienFilter.valueChanges.subscribe((bien:string | null) => {
+    this.bienFilter.valueChanges.subscribe((bien:string[] | null) => {
       this.filterValues.bien = bien;
       this.dataSource.filter = JSON.stringify(this.filterValues);
     });
@@ -93,6 +140,14 @@ export class MouvementListeComponent implements AfterViewInit {
     });
     this.searchFilter.valueChanges.subscribe((search:string | null) => {
       this.filterValues.search = search;
+      this.dataSource.filter = JSON.stringify(this.filterValues);
+    });
+    this.startDateFilter.valueChanges.subscribe((startDate:Date | null) => {
+      this.filterValues.startDate = startDate;
+      this.dataSource.filter = JSON.stringify(this.filterValues);
+    });
+    this.endDateFilter.valueChanges.subscribe((endDate:Date | null) => {
+      this.filterValues.endDate = endDate;
       this.dataSource.filter = JSON.stringify(this.filterValues);
     });
   }
@@ -111,6 +166,27 @@ export class MouvementListeComponent implements AfterViewInit {
     this.selection.changed.subscribe(()=>{
       this.selected.emit(this.selection.selected);
     })
+    //Get download link for each quittance
+    this.documentService.document.mouvements.forEach((mouvement:Mouvement) => {
+      if(mouvement.quittance && mouvement.quittance.id){
+        this.driveService.get(mouvement.quittance.id).then( 
+          (response: any) => {
+            if(mouvement.quittance && mouvement.quittance.id){
+              this.urlQuittances[mouvement.quittance.id] = response.result.webContentLink;
+              this.cdr.detectChanges();
+            }
+          },
+          (error:any) => {
+            if(error.status==404){
+              if(mouvement.quittance && mouvement.quittance.id){
+                this.errorQuittances[mouvement.quittance.id] = error.status;
+                this.cdr.detectChanges();
+              }
+            }
+          }
+        );
+      }
+    });
   }
 
   isAllSelected() {
@@ -128,8 +204,12 @@ export class MouvementListeComponent implements AfterViewInit {
   private createFilter(): (mouvement: Mouvement, filter: string) => boolean {
     let filterFunction = function (mouvement: Mouvement, filter: string): boolean {
       let searchTerms = JSON.parse(filter);
-      return (searchTerms.bien.length==0 || (searchTerms.bien.length>0 && mouvement.bien.id.indexOf(searchTerms.bien) !== -1))
-        && (searchTerms.type.length==0 || (searchTerms.type.length>0 && ((searchTerms.type=='in'&& mouvement.montant > 0) || (searchTerms.type=='out'&& mouvement.montant < 0))))
+      if(searchTerms.startDate){searchTerms.startDate = new Date(searchTerms.startDate);}
+      if(searchTerms.endDate){searchTerms.endDate = new Date(searchTerms.endDate);}
+      return ((searchTerms.bien.length>0 && searchTerms.bien.indexOf(mouvement.bien.id) !== -1))
+        && (searchTerms.type.length==0 || (searchTerms.type.length>0 && ((searchTerms.type=='in'&& mouvement.montant > 0) || (searchTerms.type=='out'&& mouvement.montant < 0) )))
+        && (searchTerms.startDate == null || (searchTerms.startDate!=null && mouvement.date.getTime() >= searchTerms.startDate.getTime()))
+        && (searchTerms.endDate == null || (searchTerms.endDate!=null && mouvement.date.getTime() <= searchTerms.endDate.getTime()))
         && JSON.stringify(mouvement.toJSON()).toLowerCase().indexOf(searchTerms.search.toLowerCase()) !== -1;
     }
     return filterFunction;
@@ -139,12 +219,26 @@ export class MouvementListeComponent implements AfterViewInit {
     this.searchFilter.setValue('');
     this.typeFilter.setValue('');
     if(!this.defaultBien){
-      this.bienFilter.setValue('');
+      this.bienFilter.setValue(this.documentService.document.biens.map(obj => obj.id));
     }
+    this.startDateFilter.setValue(null);
+    this.endDateFilter.setValue(null);
   }
 
   public getTotal(): number{
-    return  this.dataSource&&this.dataSource.filteredData?this.dataSource.filteredData.map(m => m.montant).reduce((acc:any, value:any) => acc + value, 0):0;
+
+    let total: number = 0;
+    if(this.dataSource && this.dataSource.filteredData){
+      this.dataSource.filteredData.forEach(filteredMouvement => {
+        if(this.defaultBienImmeuble && filteredMouvement.bien==this.defaultBienImmeuble){
+          total += filteredMouvement.montant * this.defaultBienImmeuble.getBienLieRatio(this.defaultBien) / 100;
+        }else{
+          total += filteredMouvement.montant;
+        }
+      });      
+    }
+
+    return total;
   }
 
   add(): void {
@@ -173,7 +267,7 @@ export class MouvementListeComponent implements AfterViewInit {
   }
 
   edit(mouvement: Mouvement): void {
-    //Display a confirmation dialog
+    //Display the edition dialog
     const dialogRef = this.dialog.open(MouvementDetailsComponent, {
       data: {
         mouvement: mouvement
@@ -185,7 +279,7 @@ export class MouvementListeComponent implements AfterViewInit {
       if(result){
         mouvement.date = result.date;
         mouvement.libelle = result.libelle;
-        mouvement.montant = result.montant;
+        mouvement.montant = parseFloat(result.montant);
         mouvement.tiers = result.tiers;
         mouvement.commentaires = result.commentaires;
         this.documentService.document.biens.forEach((docBien:Bien) => {
@@ -201,6 +295,38 @@ export class MouvementListeComponent implements AfterViewInit {
       // If user finally change his mind
       }else{
         this.alertService.error('La modification a été annulée...');
+      }
+    });
+  }
+
+  duplicate(mouvement: Mouvement){
+
+    //Display the edition dialog
+    const dialogRef = this.dialog.open(MouvementDetailsComponent, {
+      data: {
+        mouvement: mouvement
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result:any) => {
+      //If user confirm creation
+      if(result){
+        //Add in the global definition
+        let tmpNew: Mouvement = Mouvement.fromJSON(result, this.documentService.document.biens, this.documentService.document.pieces);
+        tmpNew.id = this.documentService.getUniqueId(4);
+        tmpNew.quittance = null;
+        this.documentService.document.mouvements.push(tmpNew);
+        this.alertService.success('Le mouvement est maintenant dupliqué après modifications.');
+        this.lastMouvement = tmpNew;
+        // Update data source
+        this.getData();
+        //Refresh sort (as it doesn't sort automaticlly after update)
+        const sortState: Sort = {active: this.sort.active, direction: this.sort.direction};
+        this.sort.sortChange.emit(sortState);
+        
+      // If user finally change his mind
+      }else{
+        this.alertService.error('La duplication a été annulée...');
       }
     });
   }
@@ -236,22 +362,6 @@ export class MouvementListeComponent implements AfterViewInit {
     for (let item of this.selection.selected) {
       this.delete(item);
     }
-  }
-
-  duplicate(mouvement: Mouvement){
-    //Duplicate (deep-copy) and first change the name as we can not have the same name in the file
-    const newMouvement = Mouvement.fromJSON(mouvement.toJSON(), this.documentService.document.biens, this.documentService.document.pieces);
-    newMouvement.id = this.documentService.getUniqueId(4);
-    newMouvement.quittance = null;
-    //Add the current mouvement once again
-    this.documentService.document.mouvements.push(newMouvement);
-    this.lastMouvement = newMouvement;
-    // Update data source
-    this.dataSource.data = this.documentService.document.mouvements;
-    //Dislpay message
-    this.alertService.success('La duplication est terminée.');
-    //SHow edition form
-    this.edit(newMouvement);
   }
 
   public export(): void {

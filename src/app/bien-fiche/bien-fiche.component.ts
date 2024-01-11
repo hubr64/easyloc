@@ -29,6 +29,9 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
   //The current bien
   public bien: Bien = new Bien();
   public bienType = BIENTYPE;
+  //L'éventuel immeuble auqel appartient le bien
+  public immeuble: Bien|null;
+
   //All bails for the current bien
   public bails: Bail[];
   //Conversion of types in text
@@ -40,13 +43,22 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table!: MatTable<Mouvement>;
   public dataSource: MatTableDataSource<Mouvement>;
-  public displayedColumns = ['type', 'date', 'libelle', 'montant', 'tiers'];
+  public displayedColumns = ['type', 'date', 'libelle', 'montant', 'tiers','immeuble'];
   //All mouvements for the current bien
   public mouvements: Mouvement[];
+  //Tous les mouvements de l'éventuel immeuble du bien
+  public mouvementsImmeuble: Mouvement[];
   //Get in configuration the mandatary pieces for the piece container provided
   public piecesObligatoires: string;
   //The HTML element that contains element to display in PDF
   @ViewChild('fiche') fiche: ElementRef;
+  //Toggle visibility of various elements
+  [key: string]: any;
+  public eventsVisibility: boolean = true;
+  public compteursVisibility: boolean = true;
+  public mouvementsVisibility: boolean = true;
+  public bailsVisibility: boolean = true;
+  public piecesVisibility: boolean = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -65,23 +77,18 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
     //Get data
     this.getData();
 
-    this.mouvements = [];
-    for (var _i = 0; _i < this.documentService.document.mouvements.length; _i++) {
-      // Find the requested one
-      if(this.documentService.document.mouvements[_i].bien.id == this.bien.id){
-        this.mouvements.push(this.documentService.document.mouvements[_i]);
+    //If document is reloaded then get data again and recompute list of mouvements
+    this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
+      if(isLoaded){
+          this.getData();
+          this.getMouvements();
       }
-    }
-    
-    // Configure table
-    this.dataSource = new MatTableDataSource(this.mouvements);
+    });
   }
 
   ngAfterViewInit(): void {
-    
-
-    this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    //Get mouvements for this bien
+    this.getMouvements();
   }
 
   getData(): void {
@@ -109,11 +116,40 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
           }
         }
       }
+
+      //On reupère l'éventuel immeuble associé
+      this.immeuble = this.documentService.getImmeuble(this.bien);
+
     // NO one requested
     }else{
       this.goBack();
       this.alertService.error('Aucun bien demandé !');
     }
+  }
+
+  public getMouvements(){
+    this.mouvements = [];
+    for (var _i = 0; _i < this.documentService.document.mouvements.length; _i++) {
+      // Find the requested one
+      if(this.documentService.document.mouvements[_i].bien.id == this.bien.id){
+        this.mouvements.push(this.documentService.document.mouvements[_i]);
+      }
+    }
+
+    this.mouvementsImmeuble = [];
+    if(this.immeuble){
+      for (var _i = 0; _i < this.documentService.document.mouvements.length; _i++) {
+        // Find the requested one
+        if(this.documentService.document.mouvements[_i].bien.id == this.immeuble.id){
+          this.mouvementsImmeuble.push(this.documentService.document.mouvements[_i]);
+        }
+      }
+    }
+
+    // Configure table
+    this.dataSource = new MatTableDataSource(this.mouvements.concat(this.mouvementsImmeuble));
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
   }
 
   public goBack(): void {
@@ -122,6 +158,12 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
 
   public printFiche(){
     setTimeout(()=>window.print(),1000);
+  }
+
+  public toggleVisibily($event:any, visibleCard: string){
+    this[visibleCard] = !this[visibleCard] ;
+    $event.stopPropagation();
+
   }
 
 }

@@ -19,6 +19,28 @@ form > button {
     margin-left: 35px;
     padding-top: 10px;
 }
+.form-group > .form-group-bien-lie {
+    margin: 10px 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+.bien-lie-error{
+    font-size: 14px;
+    display:inline-block;
+    margin: 10px;
+    top: -10px;
+    position: relative;
+}
+.bien-lie-error mat-icon{
+    vertical-align: middle;
+}
+
+.form-group > button {
+    margin: 10px;
+}
 @media only screen and (max-width: 800px) {
     .mat-mdc-form-field {
         width: 95%!important;
@@ -30,6 +52,12 @@ form > button {
     margin: 5px 10px 0 10px;
     vertical-align: top;
 }
+.form-group > .form-group-bien-lie > .mat-mdc-form-field {
+    width: auto!important;
+    flex:1;
+    flex-basis: 300px;
+}
+
 textarea{
     min-height: 80px;
     resize: none!important;

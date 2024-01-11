@@ -8,7 +8,7 @@
         <div class="piece-title">Pièces obligatoires</div>
         <div class="piece-container">
             <ng-container *ngFor="let piece of mandatoryPieces">
-                <div id="{{piece.id}}" *ngIf="!errorPieces[piece.id]">
+                <div id="{{piece.id}}" *ngIf="!errorPieces[piece.id]" [ngClass]="{'piece-complementaire': piecesComplementaires.indexOf(piece)!=-1}">
                     <div *ngIf="piece.code != 'BIEN_PHOT'">
                         <div>
                             <a href="{{urlPieces[piece.id]}}" target="_blank">
@@ -18,14 +18,18 @@
                         </div>
                         <div>
                             <div>
-                                <img src="{{iconPieces[piece.id]}}"> 
+                                <img src="{{iconPieces[piece.id]}}" referrerpolicy="no-referrer"> 
                                 {{pieceCode[piece.code]}}
                             </div>
                             <div>{{piece.nom}}</div>
+                            <mat-icon *ngIf="piecesComplementaires?.indexOf(piece)!=-1">apartment</mat-icon>
                         </div>
                     </div>
                     <div class="piece-box" *ngIf="piece.code == 'BIEN_PHOT'">
-                        <img class="piece-photo" title="{{piece.nom}}" src="{{urlPieces[piece.id]}}">
+                        <a href="{{urlPieces[piece.id]}}" target="_blank">
+                            <img class="piece-photo" title="{{piece.nom}}" src="{{thumbPieces[piece.id]}}" referrerpolicy="no-referrer">
+                            <mat-icon *ngIf="piecesComplementaires?.indexOf(piece)!=-1">apartment</mat-icon>
+                        </a>
                     </div>
                 </div>
             </ng-container>
@@ -37,24 +41,28 @@
         <div *ngIf="pieceSpecific && specificPieces.length>0" class="piece-title">{{pieceCode[pieceSpecific]}}</div>
         <div class="piece-container" *ngIf="pieceSpecific && specificPieces.length>0">
             <ng-container *ngFor="let piece of specificPieces">
-                <div id="{{piece.id}}" *ngIf="!errorPieces[piece.id]">
+                <div id="{{piece.id}}" *ngIf="!errorPieces[piece.id]"  [ngClass]="{'piece-complementaire': piecesComplementaires.indexOf(piece)!=-1}">
                     <div *ngIf="piece.code != 'BIEN_PHOT'">
                         <div>
                             <a href="{{urlPieces[piece.id]}}">
-                                <img *ngIf="thumbPieces[piece.id]" src="{{thumbPieces[piece.id]}}">
+                                <img *ngIf="thumbPieces[piece.id]" src="{{thumbPieces[piece.id]}}" referrerpolicy="no-referrer">
                                 <mat-icon *ngIf="!thumbPieces[piece.id]">description</mat-icon>
                             </a>
                         </div>
                         <div>
                             <div>
-                                <img src="{{iconPieces[piece.id]}}"> 
+                                <img src="{{iconPieces[piece.id]}}" referrerpolicy="no-referrer"> 
                                 {{pieceCode[piece.code]}}
                             </div>
                             <div>{{piece.nom}}</div>
+                            <mat-icon *ngIf="piecesComplementaires?.indexOf(piece)!=-1">apartment</mat-icon>
                         </div>
                     </div>
                     <div class="piece-box" *ngIf="piece.code == 'BIEN_PHOT'">
-                        <img class="piece-photo" title="{{piece.nom}}" src="{{urlPieces[piece.id]}}">
+                        <a href="{{urlPieces[piece.id]}}" target="_blank">
+                            <img class="piece-photo" title="{{piece.nom}}" src="{{thumbPieces[piece.id]}}" referrerpolicy="no-referrer">
+                            <mat-icon *ngIf="piecesComplementaires?.indexOf(piece)!=-1">apartment</mat-icon>
+                        </a>
                     </div>
                 </div>
             </ng-container>
@@ -63,31 +71,35 @@
         <div class="piece-title" *ngIf="otherPieces.length>0">Autres Pièces</div>
         <div class="piece-container" *ngIf="otherPieces.length>0">
             <ng-container *ngFor="let piece of otherPieces">
-                <div id="{{piece.id}}" *ngIf="!errorPieces[piece.id]">
+                <div id="{{piece.id}}" *ngIf="!errorPieces[piece.id]"  [ngClass]="{'piece-complementaire': piecesComplementaires.indexOf(piece)!=-1}">
                     <div *ngIf="piece.code != 'BIEN_PHOT'">
                         <div>
                             <a href="{{urlPieces[piece.id]}}">
-                                <img *ngIf="thumbPieces[piece.id]" src="{{thumbPieces[piece.id]}}">
+                                <img *ngIf="thumbPieces[piece.id]" src="{{thumbPieces[piece.id]}}" referrerpolicy="no-referrer">
                                 <mat-icon *ngIf="!thumbPieces[piece.id]">description</mat-icon>
                             </a>
                         </div>
                         <div>
                             <div>
-                                <img src="{{iconPieces[piece.id]}}"> 
+                                <img src="{{iconPieces[piece.id]}}" referrerpolicy="no-referrer"> 
                                 {{pieceCode[piece.code]}}
                             </div>
                             <div>{{piece.nom}}</div>
+                            <mat-icon *ngIf="piecesComplementaires?.indexOf(piece)!=-1">apartment</mat-icon>
                         </div>
                     </div>
                     <div class="piece-box" *ngIf="piece.code == 'BIEN_PHOT'">
-                        <img class="piece-photo" title="{{piece.nom}}" src="{{urlPieces[piece.id]}}">
+                        <a href="{{urlPieces[piece.id]}}" target="_blank">
+                            <img class="piece-photo" title="{{piece.nom}}" src="{{thumbPieces[piece.id]}}" referrerpolicy="no-referrer">
+                            <mat-icon *ngIf="piecesComplementaires?.indexOf(piece)!=-1">apartment</mat-icon>
+                        </a>
                     </div>
                 </div>
             </ng-container>
         </div>
     </mat-card-content>
     <mat-card-actions class="no-print">
-        <button mat-icon-button color="accent" (click)="addPieces()"><mat-icon>add_link</mat-icon></button>
-        <button mat-icon-button color="accent" (click)="uploadPieces()"><mat-icon>note_add</mat-icon></button>
+        <button mat-icon-button color="accent" (click)="addPieces()" title="Annexer une pièce"><mat-icon>add_link</mat-icon></button>
+        <button mat-icon-button color="accent" (click)="uploadPieces()" title="Importer une nouvelle pièce"><mat-icon>note_add</mat-icon></button>
     </mat-card-actions>
 </mat-card>

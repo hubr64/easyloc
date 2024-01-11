@@ -1,7 +1,7 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
-import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 import { Bail } from '../_modeles/bail';
 import { BAILTERMEPAIEMENT as bailTermePaiements } from '../_modeles/bail';
@@ -9,7 +9,6 @@ import { BAILTYPEPAIEMENT as bailTypePaiements } from '../_modeles/bail';
 import { BAILPERIODEPAIEMENT as bailPeriodePaiements } from '../_modeles/bail';
 import { AlertService } from '../_services/alert.service';
 import { DocumentService } from '../_services/document.service';
-import { DriveService } from '../_services/drive.service';
 
 @Component({
   selector: 'app-bail-details',
@@ -28,12 +27,9 @@ export class BailDetailsComponent implements OnInit {
   public bailPeriodePaiements = bailPeriodePaiements;
 
   constructor(
-    private router: Router,
-    private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private alertService: AlertService,
     public documentService: DocumentService,
-    private driveService: DriveService,
     private location: Location) { }
 
   ngOnInit(): void {
@@ -76,6 +72,13 @@ export class BailDetailsComponent implements OnInit {
       'commentaire': new FormControl('')
     });
     this.getData();
+
+    //If document is reloaded then get data again
+    this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
+      if(isLoaded){
+          this.getData();
+      }
+    });
   }
 
   get locataire() { return this.bailForm.get('locataire'); }

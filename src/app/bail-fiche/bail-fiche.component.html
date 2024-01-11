@@ -17,7 +17,7 @@
     <mat-card appearance="outlined" class="card-box">
         <mat-card-header>
             <div mat-card-avatar class="avatar-letter"><mat-icon>assignment</mat-icon></div>
-            <mat-card-title><mat-icon>apartment</mat-icon>{{bail.bien.nom}}<mat-icon>multiple_stop</mat-icon>{{bail.locataire.nom}}<mat-icon>people</mat-icon></mat-card-title>
+            <mat-card-title><mat-icon>key</mat-icon>{{bail.bien.nom}}<mat-icon>multiple_stop</mat-icon>{{bail.locataire.nom}}<mat-icon>people</mat-icon></mat-card-title>
             <mat-card-subtitle>Bail de location <ng-container *ngIf="bail.dateFin">in</ng-container>actif</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
@@ -128,15 +128,15 @@
             <button mat-icon-button color="accent" (click)="contact(bail.locataire.mail)"><mat-icon>email</mat-icon> </button>
         </mat-card-actions>
     </mat-card>
-
-    <mat-card appearance="outlined" class="card-box" class="no-print">
+    <mat-card appearance="outlined" class="card-box no-print">
         <mat-card-header>
             <div mat-card-avatar class="avatar-letter"><mat-icon>receipt_long</mat-icon></div>
             <mat-card-title>Quittances</mat-card-title>
             <mat-card-subtitle>Quittances du bail</mat-card-subtitle>
         </mat-card-header>
-        <mat-card-content>           
-            <table mat-table [dataSource]="dataSource" class="full-width-table" matSort matSortActive="date" matSortDirection="desc">      
+        <mat-card-content>
+            <app-statistiques-bails [bail]="bail" [simple]="true"></app-statistiques-bails>
+            <table mat-table [dataSource]="dataSource" class="full-width-table" matSort matSortActive="date" matSortDirection="desc">
                 <ng-container matColumnDef="date">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
                     <td mat-cell *matCellDef="let row">{{row.date| date:'yyyy-MM-dd' }}</td>

@@ -1,0 +1,17 @@
+.main-chart {
+    height: 400px;
+}
+.main-container{
+    padding: 10px;
+    text-align: center;
+}
+table{
+    margin: 10px auto;
+    min-width: auto;
+}
+::ng-deep .mat-sort-header-content {
+    flex-direction: column;
+}
+td, th{
+    text-align:center;
+}

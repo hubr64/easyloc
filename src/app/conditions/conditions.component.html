@@ -5,7 +5,7 @@
 
 <div>
     <h1>Définitions</h1>
-    <p><b>Version et date des conditions applicables</b> : 0.0.3 (20/12/2022)</p>
+    <p><b>Version et date des conditions applicables</b> : 0.0.4 (21/08/2023)</p>
     <p><b>Pays d'application</b> : France</p>
 
     <h1>Description du produit</h1>
@@ -30,7 +30,25 @@
     </ul>
     <p>L'auteur n'est en aucune mesure responsable des données ou de l'usage que vous faite de votre compte Google et des services utilisés.</p>
     <p>Le service Google Drive est utilisé pour stocker vos données d'utilisation de l'application.</p>
-    <p>Le service Google Gmail est utilisé pour envoyer des mails depuis l'application.</p>
+    <p>Le service Google Gmail est utilisé pour envoyer des mails depuis l'application et pour lire des mails afin d'importer automatiquement depuis sa boîte Gmail (cf. ci-dessous).</p>
+
+    <h3>Import de données par mail</h3>
+    <p>Le logiciel inclut une fonction d'import de données par email qui fonctionne sur le principe suivant :</p>
+    <ul>
+        <li>Votre boîte mail reçoit un mail dont le titre est "Easyloc" (la casse n'a pas d'importance)</li>
+        <li>Le logiciel traite ce mail du fait que le titre est "Easyloc" et qu'il n'est pas lu.</li>
+        <li>Si le logiciel détecte une séquence de carcatères attendue il exécute l'importation.</li>
+        <li>Le mail est ensuite marqué comme lu (mais n'est pas supprimé).</li>
+    </ul>
+    <p>Les importations possibles sont les suivantes :</p>
+    <ul>
+        <li>Import de document libre (sans être associé à un objet)</li>
+        <li>Import d'un document et association à un bien (le mail doit contenir : "Bien:[Nom du bien]"</li>
+        <li>Import d'un document et association à un locataire (le mail doit contenir : "Locataire:[Nom du locataire]"</li>
+        <li>Import d'un document et association à un bail (le mail doit contenir : "Bail:[Nom du locataire]"</li>
+        <li>Import d'un document et association à un bailleur (le mail doit contenir : "Bailleur:[Nom du bailleur]"</li>
+        <li>Import d'une valeur de compteur (le mail doit contenir : "Compteur:[Nom du bien]:[Désignation du compteur]:[Valeur]" (exemple : "Compteur:Le Colombier:Electricité:123"). Si un document est en PJ il sera la preuve de la valeur.</li>
+    </ul>
 
     <h2>Autres conditions requises</h2>
     <p>Un accès à Internet est requis pour utiliser le produit.</p>
@@ -40,7 +58,7 @@
     <p>Ce produit ne constitue pas un serveur Web. Le produit doit donc être hébergé par un hébergeur compétent.</p>
     <p>Ce produit n'héberge aucune donnée personnelle (cf. § Données personnelles).</p>
 
-    <h1>Données personelles</h1>
+    <h1>Données personnelles</h1>
     <p>En tant qu'application simple, le logiciel ne stocke, n'utilise ni n'exploite en aucune manière vos données personnelles.</p>
     <p>Vos données personnelles sont principalement stockées sur le cloud Google (cf. § Où sont stockées mes données ?) selon les conditions d'utilisation que vous avez agréer avec Google et sur lesquelles l'auteur n'a aucune influence.</p>
     <p>Quelques données de configuration de l'application (données de configuration modifiées par l'utilisateur) sont stockées en local (<a href="https://developer.mozilla.org/fr/docs/Web/API/Window/localStorage">https://developer.mozilla.org/fr/docs/Web/API/Window/localStorage</a>) sur votre ordinateur. Ces données se sont pas exploitées par le produit à d'autres fins que pour configurer le produit. Ces données ne sont pas exploitables par des tierces applications.</p>

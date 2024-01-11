@@ -1,0 +1,12 @@
+<ng-container *ngIf="!type || type == 'button-icon'">
+    <button *ngIf="immeuble.isImmeuble()" mat-icon-button title="Ventilation du montant" (click)="openVentilation()">
+        <mat-icon>share</mat-icon>
+    </button>
+    <button *ngIf="!immeuble.isImmeuble()" mat-icon-button title="Ce bien n'est pas un immeuble." disabled>
+        <mat-icon matBadge="!" matBadgeColor="warn">share</mat-icon>
+    </button>
+</ng-container>
+<ng-container *ngIf="type == 'menu-item'">
+    <button *ngIf="immeuble.isImmeuble()" mat-menu-item title="Voir la ventilation" (click)="openVentilation()"><mat-icon>share</mat-icon> Voir ventilation</button>
+    <button *ngIf="!immeuble.isImmeuble()" mat-menu-item title="Ce bien n'est pas un immeuble" disabled><mat-icon>share</mat-icon> Voir ventilation</button>
+</ng-container>

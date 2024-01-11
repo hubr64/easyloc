@@ -5,7 +5,7 @@ export const CONFIG: { [key: string]: any } = {
   "configurationPrefix": 'config-',
   "messageDuration" : 3,
   'autoSaveDuration': 1,
-  'autoSyncDuration': 10,
+  'autoSyncDuration': 20,
   'autoSave': true,
   'defaultTheme': 'dark',
   'quittanceFileNamePrefix': 'quittance_',
@@ -19,12 +19,16 @@ export const CONFIG: { [key: string]: any } = {
   'bailUnpaiedLoyerNb': 3,
   'dureeRevisionLoyer': 365,
   'nbCheckQuittance': 12,
+  'margePaiementAssurance': 1,
   'impotDeductionForfaitaire': 0.3,
+  'impotChargesPartLocataire': 0.7,
+  'impotForfaitGestion': 20,
   'mouvementAutoCompleteIn': 'Loyer;Régularisation de charges;Remboursement',
-  'mouvementAutoCompleteOut': 'Taxe foncière;Assurance prêt immobilier;Assurance PNO;Provision sur charges;Intérêts d\'emprunt;Frais de dossier prêt immobilier;Travaux;Achat;Régularisation de charges;Frais de garantie',
+  'mouvementAutoCompleteOut': 'Taxe foncière;Assurance prêt immobilier;Assurance PNO;Provision sur charges;Intérêts d\'emprunt;Frais de dossier prêt immobilier;Travaux d\'entretien;Travaux de rénovation;Régularisation de charges;Frais de garantie;Charges locatives;Travaux de construction;Frais non déductibles',
+  'compteurAutoComplete': 'Electricité;Gaz;Eau;Télécom',
   'nomModeleAnnoncePapier': 'Modèle Annonce Web',
   'nomModeleAnnonceWeb': 'Modèle Annonce Papier',
   'ordreBien': 'nom',
-  'datePaiementTaxe': '2022-10-01'
+  'datePaiementTaxe': '2023-10-01'
 }
 

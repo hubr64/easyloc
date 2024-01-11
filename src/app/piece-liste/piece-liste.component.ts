@@ -13,12 +13,14 @@ import { AlertService } from '../_services/alert.service';
 import { DriveService } from '../_services/drive.service';
 import { DocumentService } from '../_services/document.service';
 import { ExportCsvService }      from '../_services/export-csv.service';
+import { UserService } from '../_services/user.service';
 import { Piece } from '../_modeles/piece';
 import { PIECECODE as pieceCodes } from '../_modeles/piece';
 import { DialogDeleteConfirmComponent } from '../dialog-delete-confirm/dialog-delete-confirm.component';
 import { PieceDetailsComponent } from '../piece-details/piece-details.component';
 import { UploadComponent } from '../upload/upload.component';
 import { PieceUsersComponent } from '../piece-users/piece-users.component';
+import { MailComponent } from '../mail/mail.component';
 
 @Component({
   selector: 'app-piece-liste',
@@ -30,7 +32,7 @@ export class PieceListeComponent implements AfterViewInit  {
   // COmponent input and output
   @Input() embedded: boolean = false;
   @Output() selected = new EventEmitter<Piece[]>();
-  
+  @Input() piecesComplementaires: Piece[]|undefined;
   private _defaultPieces: Piece[];
   @Input() 
   set defaultPieces(value: Piece[]) {
@@ -87,6 +89,7 @@ export class PieceListeComponent implements AfterViewInit  {
     public driveService: DriveService,
     public documentService: DocumentService,
     private exportCsvService: ExportCsvService,
+    public userService: UserService,
     public dialog: MatDialog,
     private _bottomSheet: MatBottomSheet,
     private cdr: ChangeDetectorRef
@@ -125,8 +128,24 @@ export class PieceListeComponent implements AfterViewInit  {
   }
 
   getData(): void {
+
+    //On établit d'abord la liste des pièces à afficher
+    let dataSourcePieces: Piece[] = [];
+    //Si on a une liste de pièce bien définie à afficher
+    if(this.defaultPieces){
+      //Alors on utilise cette liste de pieces
+      dataSourcePieces = dataSourcePieces.concat(this.defaultPieces);
+      //Et s'il y en a on ajoute les pièces complémentaires
+      if(this.piecesComplementaires){
+        dataSourcePieces = dataSourcePieces.concat(this.piecesComplementaires);
+      }
+    }else{
+      //SInon on affiche toutes les pièces existantes
+      dataSourcePieces = this.documentService.document.pieces
+    }
+
     //Create datasource from data
-    this.dataSource = new MatTableDataSource(this.defaultPieces?this.defaultPieces:this.documentService.document.pieces);
+    this.dataSource = new MatTableDataSource(dataSourcePieces);
     // Add sort and paginator
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
@@ -159,13 +178,18 @@ export class PieceListeComponent implements AfterViewInit  {
   isAllSelected() {
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.data.length;
-    return numSelected == numRows;
+    return numSelected == (numRows-(this.piecesComplementaires?this.piecesComplementaires.length:0));
   }
 
   masterToggle() {
     this.isAllSelected() ?
         this.selection.clear() :
-        this.dataSource.filteredData.forEach(row => this.selection.select(row));
+        this.dataSource.filteredData.forEach(row => {
+          if(!this.piecesComplementaires || (this.piecesComplementaires && this.piecesComplementaires.indexOf(row)==-1)){
+            this.selection.select(row)
+          }
+          
+        });
   }
 
   private createFilter(): (piece: Piece, filter: string) => boolean {
@@ -256,7 +280,6 @@ export class PieceListeComponent implements AfterViewInit  {
   }
 
   deleteAll(): void {
-    var bailleursMail: string[] = [];
     for (let item of this.selection.selected) {
       this.delete(item);
     }
@@ -330,6 +353,39 @@ export class PieceListeComponent implements AfterViewInit  {
 
   public compareCodes(a: any, b: any){
     return (a.value < b.value ? -1 : a.value > b.value ? 1 : 0)
+  }
+
+  public mail(piece: Piece){
+    //Display the mail dialog
+    this.dialog.open(MailComponent, {
+      data: {
+        destinataires: '',
+        emetteur: this.userService.currentUser.mail,
+        sujet: piece.description,
+        contenu: "Veuillez trouver ci-joint "+ piece.description + " (" + piece.nom + ")." + "\r\n\r\nCordialement.\r\n"+this.userService.currentUser.nom,
+        pieces: [piece]
+      }
+    });
+  }
+
+  public mailAll(){
+    //Manage all selected pieces
+    var selectedPieces: Piece[]  = [];
+    var selectedPiecesText: string = "";
+    for (let item of this.selection.selected) {
+      selectedPieces.push(item);
+      selectedPiecesText += " - "+item.description + " (" + item.nom + ")\r\n"
+    }
+    //Display the mail dialog
+    this.dialog.open(MailComponent, {
+      data: {
+        destinataires: '',
+        emetteur: this.userService.currentUser.mail,
+        sujet: "",
+        contenu: "Veuillez trouver ci-joint :\r\n"+ selectedPiecesText + "\r\n\r\nCordialement.\r\n"+this.userService.currentUser.nom,
+        pieces: selectedPieces
+      }
+    });
   }
 
 }

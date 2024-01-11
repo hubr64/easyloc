@@ -17,6 +17,9 @@ import { PiecesChoixComponent } from '../pieces-choix/pieces-choix.component';
 })
 export class PiecesJointesComponent {
 
+  //Injected data 
+  private injectedData: any;
+  //List of pieced to display
   public pieces: Piece[] = [];
   //COnversion of pieces codes into strings
   public pieceCode = PIECECODE;
@@ -26,6 +29,9 @@ export class PiecesJointesComponent {
   public errorPieces: {[key: string]: boolean} = {};
   //Missed pieces beyond mandatary expected pieces
   public missedPieces: string[];
+  //Pieces complémentaires à afficher en parallèle des pièces du container
+  //Utiles pour les biens associés à des immeubles
+  public piecesComplementaires: Piece[];
 
   constructor(
     @Inject(MAT_BOTTOM_SHEET_DATA) public data: any,
@@ -35,10 +41,22 @@ export class PiecesJointesComponent {
     public dialog: MatDialog,
     private cdr: ChangeDetectorRef
   ) { 
+    //Memorize injected data
+    this.injectedData = data;
+    //Get displayed data
+    this.getData();
+    //If document is reloaded then get data again
+    this.documentService.docIsLoadedChange.subscribe((isLoaded: boolean) => {
+      if(isLoaded){
+        this.getData();
+      }
+    });
+  }
 
-    if(data.piecesContainer.pieces){
+  public getData(){
+    if(this.injectedData.piecesContainer.pieces){
       //Get pieces locally
-      this.pieces = data.piecesContainer.pieces;
+      this.pieces = this.injectedData.piecesContainer.pieces;
       // For each piece found try to get the link
       this.pieces.forEach((piece:Piece) => {
         this.driveService.get(piece.id).then( 
@@ -57,7 +75,35 @@ export class PiecesJointesComponent {
       });
     }
     //Get missed pieces for displaying them in the list
-    this.missedPieces = this.eventService.checkPiecesObligatoires(data.piecesContainer)
+    this.missedPieces = this.eventService.checkPiecesObligatoires(this.injectedData.piecesContainer);
+
+    this.piecesComplementaires = [];
+    //Si le container est un Bien alors un traitement supplémentaire est à prévoir
+    if(this.injectedData.piecesContainer.className=='Bien'){
+      //ON recupère l'immeuble du bien
+      let bienImmeuble = this.documentService.getImmeuble(this.injectedData.piecesContainer);
+      //Si le bien a un immeuble des pièces sont peut être dans l'immeuble (ex : acte de vente ou règlement de Copropriété, ...)
+      if(bienImmeuble){
+        this.piecesComplementaires = bienImmeuble.pieces;
+
+        // For each piece found try to get the link
+        this.piecesComplementaires.forEach((piece:Piece) => {
+          this.driveService.get(piece.id).then( 
+            (response: any) => {
+              this.urlPieces[piece.id] = response.result.webContentLink;
+              this.cdr.detectChanges();
+            },
+            (error:any) => {
+              if(error.status==404){
+                this.errorPieces[piece.id] = true;
+                this.cdr.detectChanges();
+              }
+              console.error("Impossible to get metadata for " + piece.nom);
+            }
+          );
+        });
+      }
+    }
   }
 
   addPiece(){

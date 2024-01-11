@@ -6,12 +6,14 @@ import { MatDialog} from '@angular/material/dialog';
 
 import { Piece } from '../_modeles/piece';
 import { Mouvement } from '../_modeles/mouvement';
+import { CompteurValue } from '../_modeles/compteur';
 import { AlertService } from '../_services/alert.service';
 import { DocumentService } from '../_services/document.service';
 import { UserService } from '../_services/user.service';
 import { MailComponent } from '../mail/mail.component';
 import { MouvementDetailsComponent } from '../mouvement-details/mouvement-details.component';
 import { UploadComponent } from '../upload/upload.component';
+import { CompteurValueDetailsComponent } from '../compteur-value-details/compteur-value-details.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -32,10 +34,6 @@ export class DashboardComponent {
   //Whether the list of pissing pieces or warning is big or small (small by default)
   public rowSpanWarn = 2;
   public rowSpanStats = 2;
-  //List of events
-  /*
-  public eventGravite: number = 2;
-  */
 
   constructor(
     public alertService: AlertService,
@@ -43,9 +41,7 @@ export class DashboardComponent {
     public documentService: DocumentService,
     public userService: UserService,
     public dialog: MatDialog) {
-
   }
-
 
   addMouvement(): void {
     //Display a confirmation dialog
@@ -74,9 +70,10 @@ export class DashboardComponent {
     this.dialog.open(MailComponent, {
       data: {
         destinataires: '',
-        emetteur: '',
+        emetteur: this.userService.currentUser.mail,
         sujet: "",
-        contenu: "\r\n\r\nCordialement.\r\n"+this.userService.currentUser.nom
+        contenu: "\r\n\r\nCordialement.\r\n"+this.userService.currentUser.nom,
+        pieces: []
       },
     });
   }
@@ -106,6 +103,34 @@ export class DashboardComponent {
             this.documentService.document.pieces.push(tmpPiece);
           });
         }
+      }
+    });
+  }
+
+  addCompteurValue(){
+    //Display a selection dialog
+    const dialogRef = this.dialog.open(CompteurValueDetailsComponent, {
+      data: {
+        chooseCompteur: true
+      }
+    });
+    //Manage dialog result
+    dialogRef.afterClosed().subscribe((result:any) => {
+      //If user confirm add
+      if(result && result.compteur){
+        //Add in the global definition
+        let tmpNew: CompteurValue = CompteurValue.fromJSON(result, this.documentService.document.pieces);
+        for (let compteur of this.documentService.document.compteurs) {
+          if(compteur.id==result.compteur){
+            compteur.valeurs.push(tmpNew);
+          }
+        }
+        console.dir(this.documentService.document.compteurs);
+        //TODO : gérer la pièce
+        this.alertService.success('La nouvelle valeur de compteur est maintenant ajoutée.');
+      // If user finally change his mind
+      }else{
+        this.alertService.error("L'ajout d'une valeur a été annulée...");
       }
     });
   }

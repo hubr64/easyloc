@@ -28,9 +28,11 @@
                 <mat-form-field appearance="fill">
                     <mat-label>Bien loué</mat-label>
                     <mat-select id="bien" formControlName="bien" required>
-                        <mat-option *ngFor="let bien of documentService.document.biens | orderBy:'nom'" [value]="bien.id">
-                            {{bien.nom}}
-                        </mat-option>
+                        <ng-container *ngFor="let bien of documentService.document.biens | orderBy:'nom'">
+                            <mat-option *ngIf="!bien.isImmeuble()" [value]="bien.id">
+                                {{bien.nom}}
+                            </mat-option>
+                        </ng-container>
                     </mat-select>
                     <mat-icon *ngIf="bailForm.value.bien" matSuffix color="accent" [routerLink]="'/fiche/bien/'+bailForm.value.bien">visibility</mat-icon>
                     <mat-hint align="end">Bien loué</mat-hint>
@@ -142,5 +144,11 @@
             <mat-icon class="tab-label-icon">book</mat-icon> Pièces jointes
         </ng-template>
         <app-pieces-jointes-details *ngIf="bail" [container]="bail"></app-pieces-jointes-details>
+    </mat-tab>
+    <mat-tab [disabled]="!bail">
+        <ng-template mat-tab-label>
+            <mat-icon class="tab-label-icon">euro</mat-icon> Suivi de charges
+        </ng-template>
+        <app-statistiques-bails [bail]="bail" *ngIf="bail"></app-statistiques-bails>
     </mat-tab>
 </mat-tab-group>

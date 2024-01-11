@@ -17,7 +17,6 @@ import { Bien } from '../_modeles/bien';
 import { BIENTYPE as bienTypes } from '../_modeles/bien';
 import { Bailleur } from '../_modeles/bailleur';
 import { DialogDeleteConfirmComponent } from '../dialog-delete-confirm/dialog-delete-confirm.component';
-import { MailComponent } from '../mail/mail.component';
 
 @Component({
   selector: 'app-bien-liste',
@@ -176,7 +175,7 @@ export class BienListeComponent implements AfterViewInit {
 
   duplicate(bien: Bien){
     //Duplicate (deep-copy) and first change the name as we can not have the same name in the file
-    const newBien = Bien.fromJSON(bien.toJSON(), this.documentService.document.bailleurs, this.documentService.document.pieces);
+    const newBien = Bien.fromJSON(bien.toJSON(), this.documentService.document.bailleurs, this.documentService.document.pieces, this.documentService.document.biens);
     newBien.id = this.documentService.getUniqueId(4);
     //Add the current bien once again
     this.documentService.document.biens.push(newBien);
@@ -206,7 +205,7 @@ export class BienListeComponent implements AfterViewInit {
           "Syndic":bien.syndic,
           "Fabrication":bien.dateFabrication.toLocaleDateString(),
           "Achat":bien.dateAchat.toLocaleDateString(),
-          "Prix d'achat":bien.prixAchat,
+          "Prix d'achat":this.documentService.getPrixAchatTotal(bien),
           "Surface (m²)":bien.surface,
           "Nb Pièces":bien.nbPieces,
           "Parking":bien.parking,

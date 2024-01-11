@@ -1,5 +1,5 @@
 <mat-toolbar color="primary" class="primary-darker sticky-toolbar" *ngIf="!embedded">
-    <mat-icon>apartment</mat-icon>
+    <mat-icon>key</mat-icon>
     <span>Liste des biens</span>
     <span class="flex"></span>
     <button mat-icon-button [matMenuTriggerFor]="menuListe">
@@ -127,7 +127,7 @@
         <tr mat-header-row *matHeaderRowDef="embedded?displayedColumnsEmbedded:displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: embedded?displayedColumnsEmbedded:displayedColumns;" (click)="embedded?edit(row):''"></tr>
         <tr class="mat-row" *matNoDataRow>
-            <td class="centered-cell mat-cell" [attr.colspan]="displayedColumns.length"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun résultat à afficher</td>
+            <td class="centered-cell mat-cell empty-cell" [attr.colspan]="displayedColumns.length"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun résultat à afficher</td>
         </tr>
 
     </table>

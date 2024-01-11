@@ -1,12 +1,14 @@
-<mat-nav-list>
-    <a *ngFor="let user of data.users" [routerLink]="urlUser[user.id]" (click)="openLink()" mat-list-item>
-        <mat-icon matListIcon svgIcon="{{userTypeIcon['svg.'+user.className]}}">{{userTypeIcon[user.className]}}</mat-icon>
-        <span mat-line>{{user.className}} : {{user.toString()}}</span>
-        <mat-icon *ngIf="data.canRemove" color="warn" (click)="detachUser(user, $event)" title="Dissocier">link_off</mat-icon>
-    </a>
-    <mat-list-item *ngIf="data.users.length == 0" disabled>
-        <mat-icon matListIcon color="accent">help</mat-icon>
-        <span mat-line>Aucune utilisation de la pièce</span>
-    </mat-list-item>
-</mat-nav-list>
-    
+<mat-action-list>
+    <button mat-list-item *ngFor="let user of data.users"  [routerLink]="'/fiche/'+user.className.toLowerCase( )+'/'+user.id" (click)="openLink()">
+        <mat-icon matListItemIcon svgIcon="{{userTypeIcon['svg.'+user.className]}}">{{userTypeIcon[user.className]}}</mat-icon>
+        <h3 matListItemTitle>{{user.className}}</h3>
+        <span matListItemLine>{{user.toString()}}</span>
+        <span matListItemMeta>
+            <a *ngIf="data.canRemove" (click)="detachUser(user, $event)" title="Dissocier"><mat-icon color="warn">link_off</mat-icon></a>
+        </span>
+    </button>
+    <button mat-list-item *ngIf="data.users.length == 0" [disabled]="true">
+        <mat-icon matListItemIcon color="accent">help</mat-icon>
+        <span matListItemTitle>Aucune utilisation de la pièce</span>
+    </button>
+</mat-action-list>

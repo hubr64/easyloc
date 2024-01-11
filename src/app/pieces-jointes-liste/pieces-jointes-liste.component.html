@@ -1,3 +1,3 @@
 <button mat-icon-button title="Liste des pièces jointes" (click)="openPieces()">
-    <mat-icon [matBadge]="container.pieces.length" [matBadgeColor]="badgeColor?badgeColor:(missedPieces.length>0?'warn':'accent')">book</mat-icon>
+    <mat-icon [matBadge]="container.pieces.length+piecesComplementaires.length" [matBadgeColor]="badgeColor?badgeColor:(missedPieces.length>0?'warn':'accent')">book</mat-icon>
 </button>
