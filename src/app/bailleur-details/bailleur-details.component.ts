@@ -30,7 +30,7 @@ export class BailleurDetailsComponent implements OnInit {
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private alertService: AlertService,
-    private documentService: DocumentService,
+    public documentService: DocumentService,
     private driveService: DriveService,
     private location: Location,
     public dialog: MatDialog) { }

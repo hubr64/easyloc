@@ -32,7 +32,9 @@ export class DocumentService {
   // Variables used to track document modifications that need to be saved
   public oldDocument = '';
   public docIsModified: boolean = false;
+  //Variables used to manage document save
   public autoSave: boolean = false;
+  public autoSaveExecution: boolean = false;
   private autoSaveDuration: number = 1;
   // Variables used to track document synchronisation with server
   private autoSyncExecution: boolean = false;
@@ -59,6 +61,7 @@ export class DocumentService {
     //Retrieve configuration from service
     this.autoSaveDuration = parseInt(this.configurationService.getValue('autoSaveDuration'));
     this.autoSave = (this.configurationService.getValue('autoSave')==true || this.configurationService.getValue('autoSave')=="true") ;
+    this.autoSaveExecution = false;
     this.autoSyncDuration = parseInt(this.configurationService.getValue('autoSyncDuration'));
     this.autoSyncExecution = false;
     // By default the document is not loading as we wait for the drive to be ready
@@ -109,6 +112,9 @@ export class DocumentService {
         }else{
           //Display an alert message
           this.alertService.success("Rechargement du document terminé...")
+          //Auto sync and save can be executed again
+          this.autoSyncExecution = false;
+          this.autoSaveExecution = false;
         }
 
         //Everything is now loaded
@@ -138,49 +144,136 @@ export class DocumentService {
 
   }
 
+  public updateDataFileId(){
+
+    //Now that document is updated get the new version
+    this.driveService.get(this.driveService.dataFileId).then( 
+      (response: any) => {
+        if(response && response.result && response.result.version){
+          if(response.result.version > this.driveService.dataFileVersion){
+            this.driveService.dataFileVersion = response.result.version;
+            console.log("UpdateDataFileId : new version = " + this.driveService.dataFileVersion)
+            //Autosync can now be executed again
+            this.autoSyncExecution = false;
+            //Autosave can now be executed
+            this.autoSaveExecution = false;
+          }else{
+            console.log("UpdateDataFileId : version is still the same then we need to try again (try 2)");
+            this.driveService.get(this.driveService.dataFileId).then( 
+              (response: any) => {
+                if(response && response.result && response.result.version){
+                  if(response.result.version > this.driveService.dataFileVersion){
+                    this.driveService.dataFileVersion = response.result.version;
+                    console.log("UpdateDataFileId : new version = " + this.driveService.dataFileVersion)
+                    //Autosync can now be executed again
+                    this.autoSyncExecution = false;
+                    //Autosave can now be executed
+                    this.autoSaveExecution = false;
+                  }else{
+                    console.log("UpdateDataFileId : version is still the same then we need to try again (try 3)");
+                    this.driveService.get(this.driveService.dataFileId).then( 
+                      (response: any) => {
+                        if(response && response.result && response.result.version){
+                          if(response.result.version > this.driveService.dataFileVersion){
+                            this.driveService.dataFileVersion = response.result.version;
+                            console.log("UpdateDataFileId : new version = " + this.driveService.dataFileVersion)
+                            //Autosync can now be executed again
+                            this.autoSyncExecution = false;
+                            //Autosave can now be executed
+                            this.autoSaveExecution = false;
+                          }else{
+                            this.alertService.error("Impossible de récupérer la dernière version du fichier. Veuillez recharger manuellement.");
+                            console.error("UpdateDataFileId : Impossible to get last version of file. Manual refresh require");
+                          }
+                        }
+                      }
+                    );
+                  }
+                }
+              }
+            );
+          }
+        }
+      },
+      (error:any) => {
+        console.error('UpdateDataFileId : New version can not be loaded after save : ');
+        console.dir(error);
+
+        //Try one more time
+        this.driveService.get(this.driveService.dataFileId).then( 
+          (response: any) => {
+            if(response && response.result && response.result.version){
+              if(response.result.version > this.driveService.dataFileVersion){
+                this.driveService.dataFileVersion = response.result.version;
+                console.log("UpdateDataFileId : new version = " + this.driveService.dataFileVersion)
+                //Autosync can now be executed again
+                this.autoSyncExecution = false;
+                //Autosave can now be executed
+                this.autoSaveExecution = false;
+              }else{
+                this.alertService.error("Impossible de récupérer la dernière version du fichier. Veuillez recharger manuellement.");
+                console.log("UpdateDataFileId : Impossible to get last version of file. Manual refresh require");
+              }
+            }
+          },
+          (error:any) => {
+            this.alertService.error("Impossible de récupérer la dernière version du fichier. Veuillez recharger manuellement.");
+            console.error("UpdateDataFileId : Impossible to get last version of file. Manual refresh require");
+          }
+        );
+
+      }
+    );
+  }
+
   public saveDocumentFile(){
+
+    //Prevent sync to be executed otherwise save and sync may interfer
+    console.log("SaveDoc : Prevent synchronisation to execute during save")
+    this.autoSyncExecution = true;
+
+    console.log("SaveDoc : A manual or auto save on the drive is requested")
     //First check if a more recent file existe on the server (which is not good)
     this.driveService.get(this.driveService.dataFileId).then( 
       (response: any) => {
         if(response && response.result && response.result.version && this.driveService.dataFileVersion == response.result.version){
+          console.log("SaveDoc : Version on server is same as version local")
+          console.log("SaveDoc : Local version = " + this.driveService.dataFileVersion)
+          console.log("SaveDoc : Server version = " + response.result.version)
+
           this.docIsLoadedChange.next(false);
-          //Prevent sync to be executed otherwise save and sync may interfer
-          this.autoSyncExecution = true;
-          console.dir("File is the last version. Save can be executed");
+          
+          console.dir("SaveDoc : Save can be executed");
           //Document is converted in a JSON string
           const documentJson = JSON.stringify(this.document.toJSON());
           //Save document throught the drive service
-          this.driveService.upload(this.driveService.dataFileId, this.driveService.dataFileName, documentJson).subscribe(
-            (response:any) => {
-              console.log('Modification saved.');
+          this.driveService.upload(this.driveService.dataFileId, this.driveService.dataFileName, documentJson).subscribe({
+            next: (v) => {
+              //console.log(v)
+            },
+            complete: ()  => {
+              console.log('SaveDoc : Modification saved.');
+              this.alertService.success("Vos modifications ont été sauvegardées.")
               this.docIsModified = false;
               this.docIsLoadedChange.next(true);
 
-              //Now that document is updated get the new version
-              this.driveService.get(this.driveService.dataFileId).then( 
-                (response: any) => {
-                  if(response && response.result && response.result.version){
-                    this.driveService.dataFileVersion = response.result.version;
-                    //Autosync can now be executed again
-                    this.autoSyncExecution = false;
-                  }
-                },
-                (error:any) => {
-                  console.error('New version can not be loaded after save : ');
-                  console.dir(error);
-                  //Autosync can now be executed again
-                  this.autoSyncExecution = false;
-                }
-              );
+              //call a little later the function to update data file id
+              setTimeout(()=>this.updateDataFileId(),2000);
             },
-            (error:any) => {
-              this.alertService.error("Impossible de sauvegarder le document. Veuillez vérifier votre connexion.");
-              console.error('Modification not saved : ');
+            error: (error:any) => {
+              this.alertService.error("SaveDoc : Impossible de sauvegarder le document. Veuillez vérifier votre connexion.");
+              console.error('SaveDoc : Modification not saved : ');
               console.dir(error);
-              //Autosync can now be executed again
+              //Autosync and autosave can now be executed again
               this.autoSyncExecution = false;
-            });
+              this.autoSaveExecution = false;
+            }
+          });
         }else{
+          console.log("SaveDoc : Version on server is newer than version local")
+          console.log("SaveDoc : Local version = " + this.driveService.dataFileVersion)
+          console.log("SaveDoc : Server version = " + response.result.version)
+
           //Problem of version : version on server is more recent then ask user what to do
           const dialogRef = this.dialog.open(DialogReloadComponent, {
             data: {
@@ -193,24 +286,28 @@ export class DocumentService {
           dialogRef.afterClosed().subscribe((result:boolean) => {
             //User wants to reload
             if(result){
+              console.log("SaveDoc : User asks to load last version.")
               this.load(response.result.version);
               this.ref.tick();
             }else{
-              console.log("User wants to keep current version.")
+              console.log("SaveDoc : User wants to keep current version.")
             }
           });
         }
       },
       (error: any) => {
-        console.error("Impossible to get data file version.");
+        console.error("SaveDoc : Impossible to get data file version.");
         console.dir(error);
       }
     );
   }
 
   private watchDocumentSync(){
-    //Do not sync if a sync is in execution
-    if(this.autoSyncExecution == false){
+    console.log("watchSync : Start synchronisation...");
+    console.log("watchSync : Current version : " + this.driveService.dataFileVersion);
+    //Do not sync if a sync is in execution or if a save is in current execution
+    if(this.autoSyncExecution == false && this.autoSaveExecution == false){
+      console.log("watchSync : No current synchronisation so synchronisation can continue")
       //A sync is in execution
       this.autoSyncExecution = true;
       // If there is a document and if the drive is compliant
@@ -219,7 +316,9 @@ export class DocumentService {
         this.driveService.get(this.driveService.dataFileId).then( 
           (response: any) => {
             if(response && response.result && response.result.version && response.result.version > this.driveService.dataFileVersion){
-              console.dir("File is not the last version. Reload should be proposed");
+              console.dir("watchSync : File is not the last version. Reload should be proposed");
+              console.log("watchSync : Current version : " + this.driveService.dataFileVersion);
+              console.log("watchSync : Detected version : " + response.result.version);
               //New version on server then ask user what to do
               const dialogRef = this.dialog.open(DialogReloadComponent, {
                 data: {
@@ -232,26 +331,31 @@ export class DocumentService {
               dialogRef.afterClosed().subscribe((result:boolean) => {
                 //User wants to reload
                 if(result){
+                  console.log("watchSync : User asks to load the last version.")
                   this.load(response.result.version);
                   this.ref.tick();
                 }else{
-                  console.log("User wants to keep current version.")
+                  console.log("watchSync : User wants to keep current version.")
                 }
-                this.autoSyncExecution = false;
+                console.log("watchSync : Synchronisation is finished.")
               });
             }else{
+              console.log("watchSync : Synchronisation is not to do as file is at last version.")
               this.autoSyncExecution = false;
             }
           },
           (error: any) => {
-            console.error("Impossible to get data file version.");
+            console.log("watchSync : Synchronisation is impossible as data file version can not be retreived.")
             console.dir(error);
             this.autoSyncExecution = false;
           }
         );
       }else{
+        console.error("watchSync : Synchronization can not be executed (drive is not compliant).");
         this.autoSyncExecution = false;
       }
+    }else{
+      console.log("watchSync : A synchronisation or a save is already in execution")
     }
   }
 
@@ -273,15 +377,22 @@ export class DocumentService {
 
       // If the deep copies are different then it means there is a modification
       if (currentDocument !== this.oldDocument) {
-        console.log('Modification détectée.');
+        console.log('watchModification : Modification is detected and should be saved.');
         setTimeout(() => {
           this.docIsModified = true;
         });
         //IF user wants autosave then modification is saved automatically and no message is display
         if(this.autoSave){
-          this.saveDocumentFile();
+          console.log('watchModification : Auto saved activated, modification will be saved.');
+          //Can only auto save once at a time
+          if(this.autoSaveExecution == false){
+            //Prevent auto save to be executed many times at the same time
+            this.autoSaveExecution = true;
+            this.saveDocumentFile();
+          }
         }
         // Memorize modification for future comparison
+        console.log('watchModification : Replace old document with new one.');
         this.oldDocument = currentDocument;
       }
     }

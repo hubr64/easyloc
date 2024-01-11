@@ -273,7 +273,7 @@ export class MailService {
           });
         });
       }else{
-        console.log("No message to synchronize.");
+        console.log("No email to import.");
       }
     });
   }

@@ -141,8 +141,6 @@ export class QuittancesComponent implements OnInit {
         this.quittanceForm.patchValue({mois: this.mouvement.date});
 
         //A bien is correctly defined in the mouvement
-        console.dir(this.mouvement);
-
         if(this.mouvement.bien){
           var tmpBail: Bail | null = null;
           //Loop for all possible bails and select the accurate one

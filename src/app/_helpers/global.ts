@@ -5,7 +5,7 @@ export const CONFIG: { [key: string]: any } = {
   "configurationPrefix": 'config-',
   "messageDuration" : 3,
   'autoSaveDuration': 1,
-  'autoSyncDuration': 10,
+  'autoSyncDuration': 20,
   'autoSave': true,
   'defaultTheme': 'dark',
   'quittanceFileNamePrefix': 'quittance_',
@@ -29,6 +29,6 @@ export const CONFIG: { [key: string]: any } = {
   'nomModeleAnnoncePapier': 'Modèle Annonce Web',
   'nomModeleAnnonceWeb': 'Modèle Annonce Papier',
   'ordreBien': 'nom',
-  'datePaiementTaxe': '2022-10-01'
+  'datePaiementTaxe': '2023-10-01'
 }
 
