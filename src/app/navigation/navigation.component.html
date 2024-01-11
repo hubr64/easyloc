@@ -40,6 +40,7 @@
       </button>
       <span class="name">Easy<b>Loc</b></span>
       <span class="flex"></span>
+      <mat-icon title="Sauvegarde automatique en cours" *ngIf="documentService.autoSaveExecution" id="cloud_sync">sync</mat-icon>
       <button mat-icon-button *ngIf="!documentService.autoSave" (click)="saveDocument()" title="Sauvegarder" [disabled]="!documentService.docIsModified"><mat-icon [matBadge]="documentService.docIsModified?'!':''" matBadgeColor="warn">save</mat-icon></button>
       <button mat-icon-button (click)="toggleTheme()" title="Changer de thème"><mat-icon *ngIf="configurationService.isDarkMode()">dark_mode</mat-icon><mat-icon *ngIf="!configurationService.isDarkMode()">light_mode</mat-icon></button>
       <button mat-icon-button routerLink="/conditions" title="Conditions"><mat-icon>info</mat-icon></button>

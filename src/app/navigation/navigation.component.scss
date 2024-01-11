@@ -32,6 +32,29 @@ mat-nav-list img{
 .flex{
   width: 100%;
 }
+#cloud_sync{
+  animation: rotate 1s linear infinite;
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  opacity: 0.3;
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+}
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.1;
+  }
+  100% {
+    transform: rotate(-360deg);
+    opacity: 0.3;
+  }
+}
 .connect-msg{
   text-align: right;
   padding-right: 30px;
