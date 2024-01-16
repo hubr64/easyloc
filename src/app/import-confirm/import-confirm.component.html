@@ -1,0 +1,18 @@
+<h2 mat-dialog-title><mat-icon>help</mat-icon> Confirmation import</h2>
+<mat-dialog-content>
+    <div>Êtes-vous sûr de vouloir importer les {{data.imports.length}} {{data.type}} suivants ?</div>
+    <mat-list>
+        <ng-container *ngFor="let import of data.imports">
+            <mat-list-item>
+                <mat-icon matListItemIcon svgIcon="{{userTypeIcon['svg.'+import.className]}}">{{userTypeIcon[import.className]}}</mat-icon>
+                <h3 matListItemTitle>{{import.className}}</h3>
+                <span matListItemLine>{{import.toString()}}</span>
+            </mat-list-item>
+            <mat-divider></mat-divider>
+        </ng-container>
+    </mat-list>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button color="warn" mat-button [mat-dialog-close]="false" cdkFocusInitial>Non</button>
+    <button color="primary" mat-button [mat-dialog-close]="true">Oui</button>
+</mat-dialog-actions>

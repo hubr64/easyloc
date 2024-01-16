@@ -6,7 +6,6 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { MatTableDataSource} from '@angular/material/table';
-import { MatDialog} from '@angular/material/dialog';
 
 import { Bien, BIENTYPE } from '../_modeles/bien';
 import { Mouvement } from '../_modeles/mouvement';
@@ -63,7 +62,6 @@ export class BienFicheComponent implements OnInit, AfterViewInit {
   constructor(
     private route: ActivatedRoute,
     private location: Location,
-    public dialog: MatDialog,
     public userService: UserService,
     public configurationService: ConfigurationService,
     public documentService: DocumentService,

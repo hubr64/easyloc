@@ -7,6 +7,7 @@
     </button>
     <mat-menu #menuListe="matMenu" yPosition="below" [overlapTrigger]="false">
         <button mat-menu-item (click)="add()"><mat-icon>add</mat-icon> Ajouter</button>
+        <button mat-menu-item (click)="import()"><mat-icon>upload_file</mat-icon> Importer</button>
         <button mat-menu-item [disabled]="!selection.hasValue()" [matMenuTriggerFor]="selectionnes"><mat-icon>check</mat-icon> Sélection</button>
         <button mat-menu-item (click)="export()"><mat-icon>file_download</mat-icon> Exporter</button>
     </mat-menu>
@@ -64,7 +65,7 @@
                             [indeterminate]="selection.hasValue() && !isAllSelected()">
                 </mat-checkbox>
             </th>
-            <td mat-cell *matCellDef="let row" [ngClass]="{'success-border': lastMouvement==row?true:false}">
+            <td mat-cell *matCellDef="let row" [ngClass]="{'success-border': lastMouvements.indexOf(row)!=-1?true:false}">
                 <mat-checkbox (click)="$event.stopPropagation()"
                             (change)="$event ? selection.toggle(row) : null"
                             [checked]="selection.isSelected(row)">
@@ -160,7 +161,7 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="embedded?(defaultBien?displayedColumnsDefaultBien:displayedColumnsEmbedded):displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: embedded?(defaultBien?displayedColumnsDefaultBien:displayedColumnsEmbedded):displayedColumns;" [ngClass]="{'success-alert': lastMouvement==row?true:false}"></tr>
+        <tr mat-row *matRowDef="let row; columns: embedded?(defaultBien?displayedColumnsDefaultBien:displayedColumnsEmbedded):displayedColumns;" [ngClass]="{'success-alert': lastMouvements.indexOf(row)!=-1?true:false}"></tr>
         <tr class="mat-row" *matNoDataRow>
             <td class="centered-cell mat-cell empty-cell" [attr.colspan]="displayedColumns.length"><mat-icon>sentiment_very_dissatisfied</mat-icon> Aucun résultat à afficher...</td>
         </tr>
