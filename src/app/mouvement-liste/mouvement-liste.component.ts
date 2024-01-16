@@ -18,6 +18,8 @@ import { Bien } from '../_modeles/bien';
 import { DialogDeleteConfirmComponent } from '../dialog-delete-confirm/dialog-delete-confirm.component';
 import { MouvementDetailsComponent } from '../mouvement-details/mouvement-details.component';
 import { PiecesChoixComponent } from '../pieces-choix/pieces-choix.component';
+import { ImportComponent } from '../import/import.component';
+import { ImportConfirmComponent } from '../import-confirm/import-confirm.component';
 
 @Component({
   selector: 'app-mouvement-liste',
@@ -45,7 +47,7 @@ export class MouvementListeComponent implements AfterViewInit {
   public initialSelection = [];
   public allowMultiSelect: boolean = true;
   public selection: SelectionModel<Mouvement> = new SelectionModel<Mouvement>(this.allowMultiSelect, this.initialSelection);
-  public lastMouvement: Mouvement;
+  public lastMouvements: Mouvement[];
   // String to manage the search filter
   public bienFilter = new FormControl<string[]>([]);
   public typeFilter = new FormControl('');
@@ -81,7 +83,9 @@ export class MouvementListeComponent implements AfterViewInit {
     private cdr: ChangeDetectorRef,
     private router: Router,
     public dialog: MatDialog
-  ) {}
+  ) {
+    this.lastMouvements = [];
+  }
 
   ngAfterViewInit(): void {
     // Subscribe in case the document was reloaded
@@ -251,12 +255,13 @@ export class MouvementListeComponent implements AfterViewInit {
     dialogRef.afterClosed().subscribe((result:any) => {
       //If user confirm creation
       if(result){
+        this.lastMouvements = [];
         //Add in the global definition
         let tmpNew: Mouvement = Mouvement.fromJSON(result, this.documentService.document.biens, this.documentService.document.pieces);
         tmpNew.id = this.documentService.getUniqueId(4);
         this.documentService.document.mouvements.push(tmpNew);
         this.alertService.success('Le mouvement est maintenant ajouté.');
-        this.lastMouvement = tmpNew;
+        this.lastMouvements.push(tmpNew);
         // Update data source
         this.getData();
       // If user finally change his mind
@@ -311,13 +316,14 @@ export class MouvementListeComponent implements AfterViewInit {
     dialogRef.afterClosed().subscribe((result:any) => {
       //If user confirm creation
       if(result){
+        this.lastMouvements = [];
         //Add in the global definition
         let tmpNew: Mouvement = Mouvement.fromJSON(result, this.documentService.document.biens, this.documentService.document.pieces);
         tmpNew.id = this.documentService.getUniqueId(4);
         tmpNew.quittance = null;
         this.documentService.document.mouvements.push(tmpNew);
         this.alertService.success('Le mouvement est maintenant dupliqué après modifications.');
-        this.lastMouvement = tmpNew;
+        this.lastMouvements.push(tmpNew);
         // Update data source
         this.getData();
         //Refresh sort (as it doesn't sort automaticlly after update)
@@ -362,6 +368,125 @@ export class MouvementListeComponent implements AfterViewInit {
     for (let item of this.selection.selected) {
       this.delete(item);
     }
+  }
+
+  public import(): void{
+    //Display an import dialog
+    const dialogRef = this.dialog.open(ImportComponent, {
+      data: {
+        multiple: false,
+        authorisedExtensions: ['.csv', '.txt'],
+        authorisedTypes: ['text/csv', 'text/plain'],
+        encoding: 'ISO-8859-1'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result:any) => {
+      //If user has choosed a file
+      if(result){
+        if(result.length>0){
+          //Get content of the file
+          var fileContent = result[0];
+
+          //Create the object that will contain all the mouvement to import
+          var mouvementsToImport: Mouvement[] = [];
+
+          //Extract columns name
+          const propertyNames = fileContent.slice(0,fileContent.indexOf('\r\n')).split(';');
+          //Extract valu lines
+          const dataRows = fileContent.slice(fileContent.indexOf('\r\n')+1).split('\r\n');
+
+          //There must have 6 columns exaclty
+          if(propertyNames.length == 6){
+            //Order of columns matter
+            if(propertyNames[0]=="Date" && propertyNames[1]=="Bien" && propertyNames[2]=="Libellé" && propertyNames[3]=="Montant" && propertyNames[4]=="Tiers" && propertyNames[5]=="Commentaires"){
+              //If there is enough lines
+              if(dataRows.length > 0){
+                //All global control ended then browse values lines
+                dataRows.forEach((dataRow: any) => {
+                  //Extract columns of each value
+                  let mouvement = dataRow.split(";");
+                  if(mouvement.length == 6){
+                    //Create a temporary mouvement
+                    let tmpMouvement = new Mouvement();
+                    //Fill the mouvement with all the information
+                    tmpMouvement.id = this.documentService.getUniqueId(4);
+
+                    var dateParts = mouvement[0].trim().split("/");
+                    tmpMouvement.date = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+                    
+                    this.documentService.document.biens.forEach( (bien:Bien) => {
+                      if(bien.nom == mouvement[1].trim()){
+                        tmpMouvement.bien = bien;
+                      }
+                    });
+                    tmpMouvement.libelle = mouvement[2].trim();
+                    tmpMouvement.montant = parseFloat(mouvement[3].trim());
+                    tmpMouvement.tiers = mouvement[4].trim();
+                    tmpMouvement.quittance = null;
+                    tmpMouvement.commentaires = mouvement[5].trim();
+
+                    //Check that mandaotry information are filled
+                    if(isNaN(tmpMouvement.date.getTime()) || tmpMouvement.bien.nom=='' || tmpMouvement.libelle=='' || tmpMouvement.tiers=='' || isNaN(tmpMouvement.montant)){
+                      console.error("Mouvement non conforme : " + dataRow);
+                      console.error("Date : " + isNaN(tmpMouvement.date.getTime()));
+                      console.error("Montant : " + isNaN(tmpMouvement.montant));
+                      console.error("Bien : " + tmpMouvement.bien.nom);
+                      console.error("Autre : " + tmpMouvement.libelle=='' || tmpMouvement.tiers=='');
+                    }else{
+                      //Add the mouvement to the temporary list
+                      mouvementsToImport.push(tmpMouvement);
+                    }
+                  }
+                });
+                console.dir(mouvementsToImport);
+
+                if(mouvementsToImport.length>0){
+
+                  //Display a confirmation popup with the computed temporay mouvements
+                  const dialogRefConfirm = this.dialog.open(ImportConfirmComponent, {
+                    data: {
+                      type: "mouvements",
+                      imports: mouvementsToImport
+                    }
+                  });
+
+                  dialogRefConfirm.afterClosed().subscribe((result:any) => {
+                    //If user has choosed to import
+                    if(result){
+                      //User confirm importation thus import
+                      var nbImporte: number = 0;
+                      this.lastMouvements = [];
+                      mouvementsToImport.forEach((tmpMouvement:Mouvement) => {
+                        this.documentService.document.mouvements.push(tmpMouvement);
+                        nbImporte++;
+                        this.lastMouvements.push(tmpMouvement);
+                      });
+
+                      this.alertService.success(nbImporte + ' mouvements ont été importés avec succès !');
+
+                    }else{
+                      this.alertService.error("Importation annulée : l'importation n'est pas confirmée !");
+                    }
+                  });
+                }else{
+                  this.alertService.error("Importation impossible : aucun mouvement valide à importer !");
+                }
+              }else{
+                this.alertService.error("Importation impossible : il manque l'entête ou aucune donnée à importer !");
+              }
+            }else{
+              this.alertService.error("Importation impossible : ordre ou type des colonnes non conforme (attendu : Date;Bien;Libellé;Montant;Tiers;Commentaires) !");
+            }
+          }else{
+            this.alertService.error('Importation impossible : le format d\'import n\'est pas respecté (6 colonnes requises) !');
+          }
+        }
+      }else{
+        //User cancel importation
+        this.alertService.error('Importation annulée : les mouvements n\'ont pas été importés !');
+      }
+    });
   }
 
   public export(): void {
