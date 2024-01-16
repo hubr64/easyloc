@@ -1,4 +1,4 @@
-<h2 mat-dialog-title><mat-icon>file_upload</mat-icon> Upload de fichiers</h2>
+<h2 mat-dialog-title><mat-icon>cloud_upload</mat-icon> Upload de fichiers</h2>
 <mat-dialog-content>
     <div class="container" appDnd (fileDropped)="onFileDropped($event)">
         <input type="file" #fileDropRef id="fileDropRef" [multiple]="data.multiple" (change)="fileBrowseHandler($event)" />
@@ -10,7 +10,7 @@
     <mat-list dense>
         <ng-container *ngFor="let file of files; let i = index">
             <mat-list-item>
-                <mat-icon *ngIf="file.progressMode == 'indeterminate'" matListItemIcon>file_upload</mat-icon>
+                <mat-icon *ngIf="file.progressMode == 'indeterminate'" matListItemIcon>cloud_upload</mat-icon>
                 <mat-icon *ngIf="file.progressMode == 'determinate'" color="primary" matListItemIcon>insert_drive_file</mat-icon>
                 <mat-icon *ngIf="file.progressMode == 'buffer'" color="warn" matListItemIcon title="Impossible de charger le fichier, veuillez réessayer">warning</mat-icon>
                 <h3 matListItemTitle>{{ file?.name }}</h3>
