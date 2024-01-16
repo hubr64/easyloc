@@ -1,0 +1,32 @@
+<h2 mat-dialog-title><mat-icon>upload_file</mat-icon> Import de fichiers</h2>
+<mat-dialog-content>
+    <div class="container" appDnd (fileDropped)="onFileDropped($event)" *ngIf="(files.length == 0 && !data.multiple) || (data.multiple)">
+        <input type="file" #fileDropRef accept="{{data.authorisedExtensions.join(',')}}" id="fileDropRef" [multiple]="data.multiple" (change)="fileBrowseHandler($event)" />
+        <mat-icon>upload</mat-icon>
+        <h3>Glisser et déposer {{data.multiple?"vos fichiers":"votre fichier"}} ici</h3>
+        <h3>OU</h3>
+        <label for="fileDropRef">Choisir {{data.multiple?"des fichiers":"un fichier"}}</label>
+        <h4>Types autorisés : {{data.authorisedExtensions.join(', ')}}</h4>
+    </div>
+    <mat-list>
+        <ng-container *ngFor="let file of files; let i = index">
+            <mat-list-item>
+                <mat-icon *ngIf="file.progress == 'loading'" matListItemIcon color="accent">pending</mat-icon>
+                <mat-icon *ngIf="file.progress == 'error'" matListItemIcon color="warn">error</mat-icon>
+                <mat-icon *ngIf="file.progress == 'finish'" matListItemIcon color="primary">check_circle</mat-icon>
+                <h3 matListItemTitle>{{ file?.name }}</h3>
+                <div matListItemLine *ngIf="file?.progress == 'finish'">{{ formatBytes(file?.size, 0) }}</div>
+                <span matListItemMeta>
+                    <button mat-icon-button *ngIf="file.progress != 'loading'" (click)="deleteFile(i)">
+                        <mat-icon >delete</mat-icon>
+                    </button>
+                </span>
+            </mat-list-item>
+            <mat-divider></mat-divider>
+        </ng-container>
+    </mat-list>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button color="primary" (click)="beforeChoose()" mat-flat-button [mat-dialog-close]="filesContent" [disabled]="!canImport()">Importer</button>
+    <button color="warn" mat-flat-button [mat-dialog-close]="">Annuler</button>
+</mat-dialog-actions>

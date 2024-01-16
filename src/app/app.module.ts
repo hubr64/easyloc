@@ -99,11 +99,13 @@ import { CompteurValueFicheComponent } from './compteur-value-fiche/compteur-val
 import { StatistiquesBailsComponent } from './statistiques-bails/statistiques-bails.component';
 import { BienVentilationComponent } from './bien-ventilation/bien-ventilation.component';
 import { BienVentilationBottomSheetComponent } from './bien-ventilation/bien-ventilation.component';
+import { ImportComponent } from './import/import.component';
 // Helpers
 import { FilterConfigurationPipe } from './_helpers/filter-configuration.pipe';
 import { DndDirective } from './_helpers/dnd.directive';
 import { VarDirective } from './_helpers/ng-var.directive';
 import { OrderByPipe } from './_helpers/orderby.pipe';
+import { ImportConfirmComponent } from './import-confirm/import-confirm.component';
 
 registerLocaleData(localeFr);
 
@@ -168,7 +170,9 @@ const globalRippleConfig: RippleGlobalOptions = {
     CompteurValueFicheComponent,
     StatistiquesBailsComponent,
     BienVentilationComponent,
-    BienVentilationBottomSheetComponent
+    BienVentilationBottomSheetComponent,
+    ImportComponent,
+    ImportConfirmComponent
   ],
   imports: [
     BrowserModule,
